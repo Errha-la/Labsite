@@ -1,0 +1,30 @@
+# macOS-specific files
+.DS_Store
+
+# Windows
+Thumbs.db
+
+# Claude Code local config/skills
+.claude/
+
+# Local planning tickets
+.scratch/
+
+# Node and build output
+node_modules/
+dist/
+playwright-report/
+test-results/
+
+# Local environment files
+.env*
+!.env.example
+
+# GitHub source exclusions
+archive/
+assets/design-system/
+docs/GITHUB-PAGES.md
+docs/screens/
+docs/agents/
+.codex/
+security-reports/

@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI 智慧製造場景 — 3D 模型（開發檢測環境）</title>
+<link rel="icon" href="../assets/images/head-banner.png" type="image/png">
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.184.0/build/three.module.js",
+    "three/addons/controls/OrbitControls.js": "https://unpkg.com/three@0.184.0/examples/jsm/controls/OrbitControls.js",
+    "three/addons/exporters/OBJExporter.js": "https://unpkg.com/three@0.184.0/examples/jsm/exporters/OBJExporter.js",
+    "three/addons/exporters/GLTFExporter.js": "https://unpkg.com/three@0.184.0/examples/jsm/exporters/GLTFExporter.js"
+  },
+  "integrity": {
+    "https://unpkg.com/three@0.184.0/build/three.module.js": "sha384-8FCZ1eVO6it4+pbec2aDtnTrwjWXZLJRC+MAGCIPDgsYnUrl/E0A2YlF8ioMKI/J",
+    "https://unpkg.com/three@0.184.0/build/three.core.js": "sha384-dw2ooPewaEIrAgl6oFDBmmBWCE9oW9LxRGcfwZ0hLvEprzo202wXl7vCYHRlSnOT",
+    "https://unpkg.com/three@0.184.0/examples/jsm/controls/OrbitControls.js": "sha384-4rziNxOBZKQ69i+w+f89KJ55TCYquwchVbByQwmaOeIOXdOU2PLDn3kOfXHwIJC9",
+    "https://unpkg.com/three@0.184.0/examples/jsm/exporters/OBJExporter.js": "sha384-nbwtoZENJD3Vq+ACK0CuGQdPMuDWHkamC2KJD70EV5nfg6jQjfppKOea07YJN+N3",
+    "https://unpkg.com/three@0.184.0/examples/jsm/exporters/GLTFExporter.js": "sha384-VofkvpG6HERhFCYbsUOHeNXBCqID2nfqkQqnVzE1jc/oPcz+qJ13ADdXH08hE+cQ"
+  }
+}
+</script>
+<link rel="stylesheet" href="../assets/design/styles.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@500;600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  html,body{margin:0;height:100%}
+  body{background:var(--color-bg);color:var(--color-text);font-family:"Barlow","Noto Sans TC",system-ui,sans-serif;display:flex;flex-direction:column}
+  h1,h2{font-family:"Barlow Condensed","Noto Sans TC",system-ui,sans-serif}
+  three-d-stage:not(:defined){visibility:hidden}
+  three-d-stage{flex:1;min-height:0;display:block}
+  header{flex:none;border-bottom:1px solid var(--color-divider);padding:16px 26px;display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+  footer{flex:none;border-top:1px solid var(--color-divider);padding:10px 26px;display:flex;gap:16px;flex-wrap:wrap;align-items:center}
+  .bar{flex:none;border-bottom:1px solid var(--color-divider);padding:9px 26px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;background:var(--color-neutral-100)}
+  .kk{font-family:"Barlow Condensed",sans-serif;font-weight:700;font-size:10.5px;letter-spacing:.18em;color:var(--color-neutral-600);margin-right:2px}
+  button.t{font-family:"Barlow Condensed",sans-serif;font-weight:600;font-size:12px;letter-spacing:.09em;padding:5px 11px;border:1px solid var(--color-divider);background:transparent;color:var(--color-accent-700);cursor:pointer}
+  button.t:hover{background:var(--color-accent-100)}
+  button.t[aria-pressed="true"]{background:var(--color-accent);border-color:var(--color-accent);color:#fff}
+  button.t:focus-visible{outline:2px solid var(--color-accent);outline-offset:2px}
+  .key{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--color-neutral-700)}
+  .sw{width:12px;height:12px;border:1px solid rgba(29,45,61,.25)}
+  #stat{font-family:"Barlow Condensed",sans-serif;font-size:12px;letter-spacing:.06em;color:var(--color-neutral-700);margin-left:auto}
+</style>
+</head>
+<body>
+  <header>
+    <span style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:12px;letter-spacing:.2em;color:var(--color-accent-700)">FIG. 01 — 3D</span>
+    <h1 style="margin:0;font-size:25px">AI Agent 閉環智慧製造場景</h1>
+    <span style="font-family:'Barlow Condensed',sans-serif;font-size:15px;letter-spacing:.02em;color:var(--color-accent-700)">Factory IO style · scroll-driven</span>
+    <span style="margin-left:auto;font-size:12.5px;color:var(--color-neutral-600)">開發檢測環境 · 拖曳旋轉 · 滾輪縮放 · 進度條即首頁捲動進度 p</span>
+  </header>
+
+  <div class="bar">
+    <span class="kk">PROGRESS p</span>
+    <input id="pSlider" type="range" min="0" max="1" step="0.001" value="0.16" style="width:min(360px,40vw)" aria-label="捲動進度 p">
+    <span id="pOut" style="font-family:'Barlow Condensed',sans-serif;font-size:13px;min-width:44px">0.160</span>
+    <span class="kk" style="margin-left:14px">VIEW</span>
+    <button class="t" data-view="wide">全景</button>
+    <button class="t" data-view="detect">01 檢測（桌機）</button>
+    <button class="t" data-view="detectM">01 檢測（手機）</button>
+    <span class="kk" style="margin-left:14px">CLOSE-UP</span>
+    <button class="t" data-focus="ok">良品</button>
+    <button class="t" data-focus="crack">裂痕</button>
+    <button class="t" data-focus="chip">缺角</button>
+    <span class="kk" style="margin-left:14px">DEBUG</span>
+    <button class="t" id="bWire" aria-pressed="false">線架</button>
+    <button class="t" id="bNorm" aria-pressed="false">法線</button>
+    <button class="t" id="bLow" aria-pressed="false">手機簡化版</button>
+    <span id="stat">—</span>
+  </div>
+
+  <three-d-stage name="ai-manufacturing-scene" background="#f2f2f3"></three-d-stage>
+
+  <footer>
+    <span class="key"><span class="sw" style="background:#2f6fb2"></span>藍：結構與龍門架</span>
+    <span class="key"><span class="sw" style="background:#f2b233"></span>黃：地板護緣</span>
+    <span class="key"><span class="sw" style="background:#2fa85a"></span>綠：通過（O）</span>
+    <span class="key"><span class="sw" style="background:#e5423b"></span>紅：瑕疵（X）與紅框</span>
+    <span class="key" style="margin-left:auto">單位：公尺 · y 軸向上 · 輸送帶沿 +x</span>
+  </footer>
+
+  <script src="../assets/data/story-data.js"></script>
+  <script src="../assets/js/three-d-stage.js"></script>
+  <script type="module">
+    import { buildScene, slotAt, chipKind, CAM_X, SLOTS } from '../assets/js/factory-scene.js';
+
+    const stage = document.querySelector('three-d-stage');
+    const { THREE } = await stage.ready;
+
+    let scene = null, wire = false, norm = false, low = false, p = 0.16;
+
+    function build() {
+      if (scene) scene.dispose();
+      scene = buildScene(THREE, { detail: low ? 'low' : 'high', shadows: !low, dialogue: (window.STORY_DATA && window.STORY_DATA.dialogue) || [] });
+      scene.update(p);
+      applyDebug();
+      stage.setObject(scene.group);
+      let tris = 0, meshes = 0;
+      scene.group.traverse(o => {
+        if (!o.isMesh) return;
+        meshes++;
+        const g = o.geometry;
+        tris += g.index ? g.index.count / 3 : g.attributes.position.count / 3;
+      });
+      document.getElementById('stat').textContent =
+        (low ? 'LOW · ' : 'HIGH · ') + meshes + ' NAMED MESHES · ' + Math.round(tris).toLocaleString() + ' TRIS';
+    }
+
+    function applyDebug() {
+      if (!scene) return;
+      Object.values(scene.materials).forEach(m => { m.wireframe = wire; });
+      scene.group.traverse(o => {
+        if (!o.isMesh) return;
+        if (norm) {
+          if (!o.userData._m) o.userData._m = o.material;
+          o.material = o.userData._nm || (o.userData._nm = new THREE.MeshNormalMaterial({ flatShading: true }));
+        } else if (o.userData._m) {
+          o.material = o.userData._m;
+        }
+      });
+    }
+
+    function setP(v) {
+      p = Math.max(0, Math.min(1, v));
+      document.getElementById('pSlider').value = p;
+      document.getElementById('pOut').textContent = p.toFixed(3);
+      if (scene) scene.update(p);
+    }
+
+    function look(pos, tgt) {
+      const cam = stage._camera, ctr = stage._controls;
+      if (!cam) return;
+      cam.position.set(pos[0], pos[1], pos[2]);
+      if (ctr) { ctr.target.set(tgt[0], tgt[1], tgt[2]); ctr.update(); }
+      cam.lookAt(tgt[0], tgt[1], tgt[2]);
+      cam.updateProjectionMatrix();
+    }
+    function goView(key) {
+      if (!scene) return;
+      if (key === 'wide') { const s = scene.shots(false).wide; look(s.pos, s.tgt); }
+      if (key === 'detect') { const s = scene.shots(false).detect; look(s.pos, s.tgt); }
+      if (key === 'detectM') { const s = scene.shots(true).detect; look(s.pos, s.tgt); }
+    }
+
+    /* 特寫：找出某種晶片剛好位於相機前方 1.2 m 的進度，鏡頭貼近 */
+    function focus(kind) {
+      for (let q = 0; q <= 1; q += 0.0005) {
+        for (let i = 0; i < SLOTS; i++) {
+          const s = slotAt(i, q);
+          if (chipKind(s.id) === kind && Math.abs(s.x - (CAM_X + 1.2)) < 0.01) {
+            setP(q);
+            look([CAM_X + 1.2 + 0.5, 1.15, 1.0], [CAM_X + 1.2, 0.68, 0]);
+            return;
+          }
+        }
+      }
+    }
+    window.__preview = { goView, focus, setP, inspect: () => scene.inspect() };
+
+    document.querySelectorAll('[data-view]').forEach(b => b.addEventListener('click', () => goView(b.dataset.view)));
+    document.querySelectorAll('[data-focus]').forEach(b => b.addEventListener('click', () => focus(b.dataset.focus)));
+    document.getElementById('pSlider').addEventListener('input', e => setP(+e.target.value));
+    const tog = (id, fn) => {
+      const b = document.getElementById(id);
+      b.addEventListener('click', () => {
+        const on = b.getAttribute('aria-pressed') !== 'true';
+        b.setAttribute('aria-pressed', String(on));
+        fn(on);
+      });
+    };
+    tog('bWire', v => { wire = v; applyDebug(); });
+    tog('bNorm', v => { norm = v; applyDebug(); });
+    tog('bLow', v => { low = v; build(); goView('wide'); });
+
+    build();
+    goView('wide');
+    window.addEventListener('beforeunload', () => { if (scene) scene.dispose(); });
+  </script>
+</body>
+</html>
