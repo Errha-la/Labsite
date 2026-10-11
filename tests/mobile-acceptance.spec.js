@@ -159,7 +159,11 @@ async function checkStory(page, testInfo) {
   await page.evaluate(() => scrollTo(0, 0));
   await page.waitForFunction(() => getComputedStyle(document.querySelector('#lineFallback')).display === 'none', null, { timeout: 30_000 });
   const introScreenshot = testInfo.outputPath(`story-intro-${testInfo.project.name}-${testInfo.title.replaceAll(/[^a-z0-9-]/gi, '-')}.png`);
-  await expectLineCount(page.locator('#heroTitle .hero-subtitle.l-zh'), 2);
+  if (await page.locator('html').getAttribute('data-lang') === 'zh') {
+    await expectLineCount(page.locator('#heroTitle .hero-subtitle.l-zh'), 2);
+  } else {
+    await expect(page.locator('#heroTitle .hero-subtitle.l-en')).toBeVisible();
+  }
   await page.screenshot({ path: introScreenshot });
   await testInfo.attach('homepage intro', { path: introScreenshot, contentType: 'image/png' });
 
