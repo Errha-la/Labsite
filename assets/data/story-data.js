@@ -39,8 +39,8 @@ window.STORY_DATA = {
         'Most vision models only draw boxes and stop there.',
         'So we combine YOLO for detection, Multi-Agent reasoning, and Structured RAG over structured SOPs and past cases to fill the gap: why it happened and what to do next.'
       ],
-      techZh: ['YOLO', 'Multi-Agent', 'Structured RAG（把規範與案例整理成結構化資料再檢索，比整篇文件搜尋更精確、可追溯）'],
-      techEn: ['YOLO', 'Multi-Agent', 'Structured RAG']
+      techZh: ['YOLO', 'Multi-Agent', 'Structured RAG（結構化檢索 SOP 與案例）'],
+      techEn: ['YOLO', 'Multi-Agent', 'Structured RAG (structured retrieval from SOPs and cases)']
     },
     {
       num: '04', code: 'DECIDE',

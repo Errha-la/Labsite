@@ -1,10 +1,32 @@
 <!DOCTYPE html>
-<html lang="zh-Hant">
+<html lang="zh-Hant" data-lang="zh">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>先進製程與設備智能輔助實驗室</title>
 <meta name="description" content="國立臺灣科技大學先進製程與設備智能輔助實驗室官方網站。">
+<meta property="og:type" content="website">
+<meta property="og:title" content="先進製程與設備智能輔助實驗室">
+<meta property="og:description" content="國立臺灣科技大學先進製程與設備智能輔助實驗室官方網站。">
+<meta property="og:url" content="https://errha-la.github.io/Labsite/">
+<meta property="og:image" content="https://errha-la.github.io/Labsite/assets/images/hero-desktop.webp">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="先進製程與設備智能輔助實驗室">
+<meta name="twitter:description" content="國立臺灣科技大學先進製程與設備智能輔助實驗室官方網站。">
+<meta name="twitter:image" content="https://errha-la.github.io/Labsite/assets/images/hero-desktop.webp">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "EducationalOrganization",
+  "name": "先進製程與設備智能輔助實驗室",
+  "alternateName": "Advanced Process Control and Intelligent Equipment Laboratory",
+  "url": "https://errha-la.github.io/Labsite/",
+  "parentOrganization": {
+    "@type": "CollegeOrUniversity",
+    "name": "國立臺灣科技大學"
+  }
+}
+</script>
 <link rel="icon" href="assets/images/head-banner.webp" type="image/webp">
 <style>
 /* 首屏（尚未執行 JS 時就能看到）：隱藏原始樣板、顯示與 3D 開場一致的靜態畫面，App 掛載後再淡出 */
@@ -25,6 +47,9 @@ html,body{margin:0;background:#f2f2f3}
 #boot .l-en{display:none}
 html[data-lang="en"] #boot .l-zh{display:none}
 html[data-lang="en"] #boot .l-en{display:block}
+.l-en{display:none}
+html[data-lang="en"] .l-zh{display:none}
+html[data-lang="en"] .l-en{display:revert}
 @media (max-width:760px){
   .mobile-page-content{padding-left:16px !important;padding-right:16px !important;min-width:0;box-sizing:border-box}
   .about-content-grid{grid-template-columns:minmax(0,1fr) !important;gap:24px !important}
@@ -43,10 +68,10 @@ html[data-lang="en"] #boot .l-en{display:block}
 }
 </style>
 <link rel="preload" href="assets/design/styles.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-<script>
-/* 網頁字型（Barlow 與切成數十段、合計 1MB+ 的 Noto Sans TC）等首屏載完後才載入，避免與 LCP 圖片搶頻寬；載入前先用系統字型 */
-window.addEventListener('load',function(){setTimeout(function(){var l=document.createElement('link');l.rel='stylesheet';l.href='https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@400;500;600;700;800&family=Noto+Sans+TC:wght@400;500;700&display=swap';document.head.appendChild(l)},800)});
-</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&amp;family=Barlow+Condensed:wght@400;500;600;700;800&amp;family=Noto+Sans+TC:wght@400;500;700&amp;display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&amp;family=Barlow+Condensed:wght@400;500;600;700;800&amp;family=Noto+Sans+TC:wght@400;500;700&amp;display=swap"></noscript>
 <noscript><link rel="stylesheet" href="assets/design/styles.css"></noscript>
 <link rel="preload" as="image" href="assets/images/hero-desktop.webp" type="image/webp" media="(min-width:761px)" fetchpriority="high">
 <link rel="preload" as="image" href="assets/images/hero-mobile.webp" type="image/webp" media="(max-width:760px)" fetchpriority="high">
@@ -74,273 +99,95 @@ window.addEventListener('load',function(){setTimeout(function(){var l=document.c
 </div>
 <script>setTimeout(function(){var b=document.getElementById('boot');if(b)b.remove()},8000)</script>
 <x-dc>
-<helmet>
-<style>
-/* 色彩與教授頁（.cv-page）對齊：墨藍文字、青綠主色、金色點綴 */
-:root{--color-text:#1f2d3d;--color-accent:#0b7f97;--color-accent-2:#f2c230;--color-gold:#f2c230;
---color-accent-100:#e7f4f7;--color-accent-200:#c9e6ed;--color-accent-300:#9fd0db;--color-accent-400:#5db3c5;--color-accent-500:#2596ad;--color-accent-600:#0b7f97;--color-accent-700:#096a7e;--color-accent-800:#075263;--color-accent-900:#1f2d3d;
---color-accent-2-100:#fdf6dc;--color-accent-2-200:#fbecb0;--color-accent-2-300:#f7dd7a;--color-accent-2-400:#f2c230;--color-accent-2-500:#d9a80f;--color-accent-2-600:#b58a0a;--color-accent-2-700:#8f6c08;--color-accent-2-800:#6b5106;--color-accent-2-900:#4a3804;
---card-line:color-mix(in srgb,#1f2d3d 16%,#fff);--card-shadow:0 8px 24px rgba(29,45,61,.08)}
-@media (min-width:761px){.act-inset{padding-right:3em}}
-/* 論文資訊膠囊：日期（灰）、類型（淡青） */
-.pill{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:999px;font-size:12.5px;line-height:1.4;white-space:nowrap}
-.pill-date{background:#eceff1;color:#4a5866}
-.pill-type{background:var(--color-accent-100);color:var(--color-accent);border:1px solid var(--color-accent-200)}
-/* 視圖切換（Uiverse radio-inputs 版型，配色為站內青綠） */
-.radio-inputs{position:relative;display:flex;flex-wrap:wrap;width:300px;max-width:100%;box-sizing:border-box;padding:.25rem;border-radius:.5rem;background:var(--color-accent-100);box-shadow:0 0 0 1px rgba(31,45,61,.06);font-size:14px}
-.radio-inputs .radio{display:block;flex:1 1 0;min-width:0;gap:0;text-align:center}
-.radio-inputs .radio input{display:none}
-.radio-inputs .radio .name{display:flex;align-items:center;justify-content:center;padding:.5rem 0;border-radius:.5rem;border:0;cursor:pointer;color:var(--color-neutral-700);transition:all .15s ease-in-out}
-.radio-inputs .radio:hover .name{box-shadow:inset 0 0 0 999px rgba(255,255,255,.5)}
-.pub-meta{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:10px}
-/* 柔和圓角卡片（團隊、核心技術、研究成果）：取代藍圖角標方框 */
-.blueprint.soft-card{border:1px solid var(--card-line);border-radius:16px;box-shadow:var(--card-shadow)}
-.blueprint.soft-card>.corner{display:none}
-.input,select.input{background:#fff}
-select.input{border-radius:999px;padding-left:14px !important}
-/* 下拉選單彈出層：支援 appearance:base-select 的瀏覽器（Chrome 135+）改用站內樣式，其餘維持原生 */
-@supports (appearance:base-select){
-select.input,select.input::picker(select){appearance:base-select}
-select.input{cursor:pointer;color:var(--color-text)}
-select.input::picker-icon{color:var(--color-accent);transition:transform .2s}
-select.input:open::picker-icon{transform:rotate(180deg)}
-select.input::picker(select){margin-top:6px;padding:6px;border:1px solid var(--card-line);border-radius:14px;background:#fff;box-shadow:var(--card-shadow)}
-select.input option{padding:8px 14px;border-radius:999px;font-size:13px;color:var(--color-text);cursor:pointer}
-select.input option:hover,select.input option:focus-visible{background:var(--color-accent-100);color:var(--color-accent-700);outline:0}
-select.input option:checked{background:var(--color-accent);color:#fff}
-select.input option::checkmark{display:none}
-}
-.btn,.btn.btn-secondary,.btn.btn-ghost{border-radius:999px}
-#g-pubs>article{display:flex;flex-direction:column}
-#g-pubs>article>a{margin-top:auto !important;padding-top:14px;align-self:flex-start}
-body{margin:0;background:var(--color-bg);color:var(--color-text);font-family:"Barlow","Noto Sans TC",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
-h1,h2,h3,h4{font-family:"Barlow Condensed","Noto Sans TC",system-ui,sans-serif}
-a{color:var(--color-accent-700);text-decoration:none}
-a:hover{color:var(--color-accent-900)}
-html[data-lang="zh"] .l-en{display:none !important}
-html[data-lang="en"] .l-zh{display:none !important}
-*:focus-visible{outline:2px solid var(--color-accent);outline-offset:2px}
-@keyframes beltflow{to{stroke-dashoffset:-48}}
-@keyframes clawbob{0%,100%{transform:translateY(0)}50%{transform:translateY(6px)}}
-[data-reveal]{transition:opacity .55s ease,transform .55s ease}
-html.rev-on [data-reveal]{opacity:0;transform:translateY(20px)}
-html.rev-on [data-reveal].shown{opacity:1;transform:none}
-.navlink{display:inline-flex;align-items:center;padding:8px 14px;border-radius:999px;font-family:"Barlow Condensed","Noto Sans TC",sans-serif;font-weight:600;font-size:15px;white-space:nowrap;background:transparent;border:0;cursor:pointer;color:var(--color-neutral-700)}
-.navlink:hover{background:var(--color-accent-100);color:var(--color-text)}
-.navlink[data-on="1"]{background:var(--color-accent-100);color:var(--color-accent-700)}
-.navlink:focus-visible{outline-offset:-2px}
-.cta{display:inline-flex;align-items:center;justify-content:center;white-space:nowrap;position:relative}
-.mobile-menu-button{display:none}
-.mobile-nav-panel{position:absolute;left:0;right:0;top:100%;padding:10px 16px 16px;background:rgba(242,242,243,.98);backdrop-filter:blur(14px);border-bottom:1px solid var(--color-divider);box-shadow:0 12px 24px rgba(29,45,61,.12)}
-.mobile-nav-panel .navlink{width:100%;justify-content:flex-start;min-height:44px;padding:10px 12px}
-.mobile-nav-panel .mobile-lang{width:100%;min-height:44px;margin:8px 0 0 !important;text-align:left}
-html,body{max-width:100%;overflow-x:clip}
-button,a,select{touch-action:manipulation}
-#worldBox{touch-action:pan-y;overscroll-behavior-x:none}
-#lineCanvas{touch-action:pan-y}
-#actNav button[aria-current="true"]{background:var(--color-accent) !important;border-color:var(--color-accent) !important;color:#fff !important}
-#actNav button:hover{border-color:var(--color-accent)}
-#actPanel{transition:none}
-#graphsvg{max-width:100%;overscroll-behavior:contain}
-.cv-page{--cv-ink:#1f2d3d;--cv-teal:#0b7f97;--cv-gold:#f2c230;--cv-side:color-mix(in srgb,var(--cv-teal) 6%,#fff);--cv-line:color-mix(in srgb,var(--cv-ink) 16%,#fff);--cv-mute:color-mix(in srgb,var(--cv-ink) 78%,#fff);padding:40px 28px 90px;font-family:"Barlow","Noto Sans TC",system-ui,sans-serif;color:var(--cv-ink)}
-.cv-page h2,.cv-page h3,.cv-page h4,.cv-page button{font-family:inherit}
-.cv{max-width:1240px;margin:0 auto;display:grid;grid-template-columns:360px 1fr;background:#fff;border:1px solid var(--cv-line);border-radius:18px;overflow:hidden;box-shadow:0 10px 30px rgba(29,45,61,.08)}
-.cv-side{background:var(--cv-side);padding:40px 32px 36px;border-right:1px solid var(--cv-line)}
-.cv-photo{display:block;width:176px;height:176px;margin:0 auto 20px;border-radius:50%;object-fit:cover;object-position:center 22%;border:4px solid #fff;box-shadow:0 0 0 1px var(--cv-line),0 6px 16px rgba(29,45,61,.16)}
-.cv-name{margin:0;text-align:center;font-size:28px;font-weight:700;color:var(--cv-ink)}
-.cv-name-alt{margin:2px 0 14px;text-align:center;font-size:16px;color:var(--cv-mute)}
-.cv-role{margin:0;text-align:center;font-size:14px;line-height:1.55;color:var(--cv-ink)}
-.cv-role-org{color:var(--cv-mute);margin-bottom:12px}
-.cv-mail{display:block;text-align:center;font-size:14px;color:var(--cv-teal);word-break:break-all}
-.cv-loc{margin:8px 0 28px;text-align:center;font-size:12.5px;line-height:1.6;color:var(--cv-mute)}
-.cv-loc span{display:block}
-.cv-h{margin:26px 0 12px;padding-bottom:6px;font-size:20px;font-weight:700;color:var(--cv-teal);border-bottom:2px solid var(--cv-line)}
-.cv-list{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:12px}
-.cv-list li{font-size:13.5px;line-height:1.5;color:var(--cv-mute)}
-.cv-list b{display:block;font-size:14px;font-weight:600;color:var(--cv-ink)}
-.cv-main{padding:40px 48px 44px;min-width:0}
-.cv-title{margin:0 0 12px;font-size:26px;font-weight:700;color:var(--cv-ink)}
-.cv-main .cv-title:not(:first-child){margin-top:36px;padding-top:24px;border-top:3px solid var(--cv-gold)}
-.cv-main .cv-title:first-child{padding-top:0}
-.cv-text{margin:0 0 12px;font-size:15.5px;line-height:1.85;color:var(--cv-ink);text-align:justify;text-wrap:pretty}
-.cv-tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
-.cv-tag{display:inline-block;padding:3px 10px;border:1px solid var(--color-accent);color:var(--color-accent);font-size:12.5px;border-radius:999px;background:#fff}
-.cv-fig{margin:26px 0 0;text-align:center}
-.cv-fig img{display:block;width:100%;max-width:760px;height:auto;margin:0 auto}
-.cv-fig figcaption{font-size:12.5px;color:var(--cv-mute);margin-top:6px}
-.cv-proj{margin:0;padding:0;list-style:none;display:flex;flex-direction:column}
-.cv-proj li{display:grid;grid-template-columns:52px 1fr;gap:12px;padding:11px 0;border-bottom:1px solid var(--cv-line);font-size:14.5px;line-height:1.55;color:var(--cv-ink)}
-.cv-proj b{font-size:16px;font-weight:700;color:var(--cv-teal)}
-.cv-proj i{display:block;margin-top:2px;font-style:normal;font-size:12.5px;color:var(--cv-mute)}
-.cv-pubhead{margin-top:36px;padding-top:24px;border-top:3px solid var(--cv-gold);display:flex;align-items:baseline;justify-content:space-between;gap:16px;flex-wrap:wrap}
-.cv-pubhead .cv-title{flex:1 1 auto;margin:0 !important;padding:0 !important;border:0 !important}
-.cv-more{background:transparent;border:0;cursor:pointer;font-weight:600;font-size:15px;color:var(--cv-teal)}
-.cv-pubs{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;align-items:start}
-.cv-pub{padding:18px 20px;border:1px solid var(--cv-line);border-radius:10px;background:#fff}
-.cv-pub-meta{display:flex;gap:10px;align-items:center;margin-bottom:8px;font-size:13px;color:var(--cv-mute)}
-.cv-pub h4{margin:0 0 8px;font-size:16.5px;line-height:1.35;font-weight:700;color:var(--cv-ink)}
-.cv-pub p{margin:0 0 4px;font-size:13px;color:var(--cv-mute)}
-.cv-venue{font-style:italic}
-.cv-pub a{display:inline-block;margin-top:10px;font-weight:600;font-size:14px;color:var(--cv-teal)}
-@media (max-width:1000px){.cv{grid-template-columns:1fr}.cv-side{border-right:0;border-bottom:1px solid var(--cv-line)}.cv-main{padding:32px 24px 36px}}
-@media (max-width:760px){.cv-page{padding:20px 12px 64px}.cv{border-radius:12px}.cv-side{padding:28px 20px}.cv-text{text-align:left}.cv-pubs{grid-template-columns:1fr}.cv-proj li{grid-template-columns:44px 1fr}}
-@media (prefers-reduced-motion:reduce){
-  *,*:before,*:after{animation-duration:.001ms !important;animation-iteration-count:1 !important;scroll-behavior:auto !important;transition-duration:.001ms !important}
-}
-@media (max-width:1120px){#g-tech{grid-template-columns:repeat(2,1fr) !important}#g-graph{flex-direction:column !important}#g-graph > aside{width:100% !important;height:auto !important;max-height:520px !important}#g-contact{grid-template-columns:1fr !important}#g-feat{grid-template-columns:1fr !important}#g-foot{grid-template-columns:1fr !important}}
-@media (max-width:760px){
-  header{position:sticky !important}
-  html[data-lang="zh"] :is(p,h1,h2,h3,h4,h5,h6,li,blockquote){text-wrap:pretty}
-  .site-header-inner{height:64px !important;min-height:64px;padding:8px 16px !important;gap:10px !important}
-  .site-brand{min-width:0;max-width:calc(100vw - 116px)}
-  .site-brand img{width:auto;max-width:100%;height:auto !important;max-height:42px;object-fit:contain}
-  .desktop-nav{display:none !important}
-  .mobile-menu-button{display:inline-grid;place-items:center;flex:none;width:44px;height:44px;margin-left:auto;border:1px solid var(--color-divider);background:transparent;color:var(--color-accent-900);cursor:pointer;font-size:20px;line-height:1}
-  .mobile-nav-panel{z-index:70}
-  #scrollwrap{height:900vh !important;min-height:100dvh}
-  #actNav{left:16px !important;top:76px !important;gap:4px !important}
-  #actNav button{min-width:44px}
-  #heroTitle{height:42% !important;padding:0 18px !important}
-  #heroTitle h1{font-size:clamp(31px,9vw,52px) !important;line-height:1.08 !important}
-  #heroTitle .hero-kicker{gap:7px !important;margin-bottom:14px !important}
-  #heroTitle .hero-kicker span:not(.hero-kicker-text){width:22px !important}
-  #heroTitle .hero-kicker-text{font-size:9px !important;letter-spacing:.13em !important}
-  #heroTitle .hero-subtitle{white-space:normal !important;max-width:20em !important;font-size:12px !important;line-height:1.65 !important}
-  #heroFrame{top:42% !important}
-  #heroFrame > span{font-size:8px !important;letter-spacing:.12em !important}
-  #heroFrame > span:first-child{left:16px !important}
-  #heroFrame > span:last-child{right:16px !important;text-align:right}
-  #worldBox{clip-path:inset(42% 0 0 0);}
-  #stationUI{inset:auto 0 0 0 !important;top:auto !important;height:min(52dvh,440px) !important;min-height:270px;opacity:0;pointer-events:none;overflow:visible !important}
-  #stationUI .station-title{top:12px !important;left:16px !important;right:16px !important;justify-content:space-between;gap:8px !important}
-  #stationUI .station-title h2{font-size:16px !important;text-align:right}
-  #stationUI .station-mode{top:42px !important;right:16px !important;font-size:10px !important}
-  #stationUI .station-hint{display:none !important}
-  #stationUI .station-panel{position:absolute !important;inset:0 !important;width:auto !important;max-width:none !important;min-height:0 !important;padding:148px 18px calc(18px + env(safe-area-inset-bottom)) !important;background:linear-gradient(to bottom,rgba(242,242,243,.98),rgba(242,242,243,.92)) !important;overflow-y:auto !important;overscroll-behavior:contain}
-  #stationUI .station-panel h3{font-size:30px !important}
-  #stationUI .station-panel p{font-size:14px !important}
-  #stationUI .station-panel ol{margin-bottom:18px !important}
-  #g-feat,#g-tech,#g-pubs{grid-template-columns:1fr !important}
-    #g-graph{gap:12px !important}
-  #g-graph > div:first-child{width:100% !important;min-width:0 !important}
-  #g-graph > div:first-child svg{height:min(92vw,520px) !important}
-  #g-graph > aside{width:100% !important;height:auto !important;max-height:440px !important}
-  #g-contact{grid-template-columns:1fr !important}
-  #g-contact figure,#g-contact > .blueprint{min-height:420px !important}
-  #g-contact figure iframe{min-height:320px}
-  #teamWrap{padding:56px 16px 72px !important}
-  #teamWrap .member-group-heading{align-items:flex-start !important;flex-wrap:wrap}
-  #teamWrap select{min-height:44px !important;width:140px !important;max-width:100%;box-sizing:border-box;flex:0 1 140px !important}
-  .member-grid{grid-template-columns:1fr !important}
-  #teamWrap article[data-reveal]{height:auto !important;min-height:0;padding:14px !important}
-  #teamWrap article[data-reveal] > div:first-child{align-items:center !important;gap:14px !important}
-  #teamWrap .member-photo-frame{width:104px !important;height:104px !important;border-radius:10px}
-  #teamWrap .member-photo-frame img{width:100% !important;height:100% !important}
-  #teamWrap article[data-reveal] > div:nth-child(2){flex:none !important;overflow:visible !important;gap:6px !important;margin-top:14px !important;padding-top:12px !important}
-  .about-photo{height:auto !important;aspect-ratio:4/3}
-  .page-gutter{padding-left:16px !important;padding-right:16px !important}
-  .touch-target{min-width:44px !important;min-height:44px !important}
-  }
-@media (max-width:420px){
-  .site-brand{max-width:calc(100vw - 104px)}
-  .site-brand img{max-height:36px}
-  #heroTitle{padding:0 14px !important}
-  #heroTitle h1{font-size:clamp(28px,9.8vw,42px) !important}
-  #heroTitle .hero-subtitle{max-width:20em !important;font-size:12px !important}
-  #stationUI{height:min(53dvh,380px) !important}
-  #stationUI .station-panel{padding-left:16px !important;padding-right:16px !important}
-  #stationUI .station-panel h3{font-size:27px !important}
-  #teamWrap .member-photo-frame{width:100px !important;height:100px !important}
-}
-@media (min-width:761px){.mobile-nav-panel{display:none !important}}
-</style>
-</helmet>
 
-<div style="min-height:100vh">
 
-<header style="position:sticky;top:0;z-index:60;background:rgba(242,242,243,.94);backdrop-filter:blur(10px);border-bottom:1px solid var(--color-divider)">
-  <div class="site-header-inner" style="margin:0;padding:0 28px;height:66px;display:flex;align-items:center;gap:20px">
-    <button type="button" class="site-brand" onClick="{{ goHome }}" aria-label="先進製程與設備智能輔助實驗室 Advanced Process Control and Intelligent Equipment Laboratory" style="display:flex;align-items:center;background:transparent;border:0;padding:0;cursor:pointer;color:var(--color-text)">
-      <img src="assets/images/head-banner.webp" alt="Advanced Process Control and Intelligent Equipment Laboratory" width="176" height="44" style="height:44px;width:auto;display:block">
+<div class="site-shell">
+
+<header class="site-header">
+  <div class="site-header-inner">
+    <button type="button" class="site-brand" onClick="{{ goHome }}" aria-label="先進製程與設備智能輔助實驗室 Advanced Process Control and Intelligent Equipment Laboratory">
+      <img src="assets/images/head-banner.webp" alt="" width="176" height="44">
     </button>
-    <nav class="desktop-nav" aria-label="主導覽" style="display:flex;align-items:center;gap:2px;margin-left:auto">
+    <nav class="desktop-nav" aria-label="主導覽">
       <sc-for list="{{ navItems }}" as="n" hint-placeholder-count="5">
         <button type="button" class="navlink" data-on="{{ n.on }}" onClick="{{ n.go }}"><span class="l-zh">{{ n.zh }}</span><span class="l-en">{{ n.en }}</span></button>
       </sc-for>
-      <button type="button" onClick="{{ toggleLang }}" aria-label="{{ langLabel }} 切換語言 Switch language" style="margin-left:12px;border-radius:999px;border:1px solid var(--color-divider);background:transparent;cursor:pointer;font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:12px;letter-spacing:.1em;padding:7px 10px;color:var(--color-accent-700)" style-hover="background:var(--color-accent-100)">{{ langLabel }}</button>
+      <button type="button" class="lang-toggle u-margin-left-12px-border-radius-999-7367b0b" onClick="{{ toggleLang }}" aria-label="{{ langLabel }} 切換語言 Switch language">{{ langLabel }}</button>
     </nav>
     <button type="button" class="mobile-menu-button" onClick="{{ toggleMobileMenu }}" aria-controls="mobileNavPanel" aria-expanded="{{ mobileMenuExpanded }}" aria-label="{{ mobileMenuLabel }}">{{ mobileMenuIcon }}</button>
   </div>
-  <div id="mobileNavPanel" class="mobile-nav-panel" style="display:{{ mobileMenuDisplay }}" aria-hidden="{{ mobileMenuHidden }}">
+  <div id="mobileNavPanel" class="mobile-nav-panel {{ mobileMenuClass }}" aria-hidden="{{ mobileMenuHidden }}">
     <nav aria-label="手機主導覽">
       <sc-for list="{{ navItems }}" as="n" hint-placeholder-count="5">
         <button type="button" class="navlink" data-on="{{ n.on }}" onClick="{{ n.go }}"><span class="l-zh">{{ n.zh }}</span><span class="l-en">{{ n.en }}</span></button>
       </sc-for>
-      <button type="button" class="mobile-lang" onClick="{{ toggleLang }}" aria-label="{{ langLabel }} 切換語言 Switch language" style="border-radius:999px;border:1px solid var(--color-divider);background:transparent;cursor:pointer;font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:12px;letter-spacing:.1em;padding:7px 10px;color:var(--color-accent-700)" style-hover="background:var(--color-accent-100)">{{ langLabel }}</button>
+      <button type="button" class="mobile-lang lang-toggle u-border-radius-999px-border-1px-sol-89f7b7d" onClick="{{ toggleLang }}" aria-label="{{ langLabel }} 切換語言 Switch language">{{ langLabel }}</button>
     </nav>
   </div>
 </header>
 
+<main id="main-content">
+
 <sc-if value="{{ atHome }}" hint-placeholder-val="{{ true }}">
 <section>
-  <div id="scrollwrap" style="position:relative;height:900vh;background:var(--color-neutral-100);border-bottom:1px solid var(--color-divider)">
-    <div style="position:sticky;top:0;height:100vh;overflow:hidden">
+  <div id="scrollwrap" class="story-scroll">
+    <div class="story-scroll__stage">
 
-      <div id="worldBox" style="position:absolute;inset:0;clip-path:inset(44% 0% 0% 0%);will-change:clip-path">
-        <canvas id="lineCanvas" style="position:absolute;inset:0;width:100%;height:100%;display:block"></canvas>
-        <div id="lineFallback" aria-hidden="true" style="position:absolute;inset:0;background-color:var(--color-neutral-100);transition:opacity .4s ease">
+      <div id="worldBox" class="u-position-absolute-inset-0-4a7d83b">
+        <canvas id="lineCanvas" class="u-position-absolute-inset-0-8f868de"></canvas>
+        <div id="lineFallback" aria-hidden="true" class="u-position-absolute-inset-0-ee3a069">
           <picture>
             <source media="(max-width:760px)" srcset="assets/images/hero-mobile.webp" type="image/webp">
-            <img src="assets/images/hero-desktop.webp" alt="" width="1440" height="900" fetchpriority="high" decoding="async" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">
+            <img src="assets/images/hero-desktop.webp" alt="" width="1440" height="900" fetchpriority="high" decoding="async" class="u-position-absolute-inset-0-886a8b0">
           </picture>
         </div>
       </div>
 
-      <div id="bleedFrame" aria-hidden="true" style="position:absolute;inset:0;z-index:3;pointer-events:none;box-sizing:border-box;border:12px solid var(--color-neutral-100);box-shadow:inset 0 0 0 1px var(--color-accent-500);opacity:0"></div>
+      <div id="bleedFrame" aria-hidden="true" class="u-position-absolute-inset-0-d9bdb33"></div>
 
-      <div id="heroFrame" style="position:absolute;left:0;right:0;top:44%;bottom:0;z-index:4;pointer-events:none;border-top:1px solid var(--color-accent-500)">
-        <span style="position:absolute;left:28px;top:12px;font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:10px;letter-spacing:.18em;color:var(--color-accent-700)">FIG. 01 — CLOSED LOOP LINE</span>
-        <span style="position:absolute;right:28px;top:12px;font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:10px;letter-spacing:.18em;color:var(--color-accent-700)">ISOMETRIC · NTUST APC LAB</span>
+      <div id="heroFrame" class="u-position-absolute-left-0-afbd2c5">
+        <span class="u-position-absolute-left-28px-8504d94">FIG. 01 — CLOSED LOOP LINE</span>
+        <span class="u-position-absolute-right-28px-31a1cf2">ISOMETRIC · NTUST APC LAB</span>
       </div>
 
-      <div id="heroTitle" style="position:absolute;left:0;right:0;top:0;height:44%;z-index:5;display:grid;align-content:center;justify-items:center;text-align:center;pointer-events:none;padding:0 28px">
+      <div id="heroTitle" class="u-position-absolute-left-0-afbe29d">
         <div>
-          <div class="hero-kicker" style="display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:20px">
-            <span style="width:40px;height:1px;background:var(--color-accent)"></span>
-            <span class="hero-kicker-text" style="font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--color-accent-700)">National Taiwan University of Science and Technology</span>
-            <span style="width:40px;height:1px;background:var(--color-accent)"></span>
+          <div class="hero-kicker u-display-flex-align-items-center-5437597">
+            <span class="u-width-40px-height-1px-8d98d94"></span>
+            <span class="hero-kicker-text u-font-size-11px-letter-spacing-2em-8a33be1">National Taiwan University of Science and Technology</span>
+            <span class="u-width-40px-height-1px-8d98d94"></span>
           </div>
-          <h1 class="l-zh" style="font-size:clamp(38px,5vw,76px);line-height:1.04;letter-spacing:-.02em;margin:0 0 16px">先進製程與設備智能輔助實驗室</h1>
-          <h1 class="l-en" style="font-size:clamp(32px,4vw,62px);line-height:1.06;letter-spacing:-.02em;margin:0 0 16px">Advanced Process Control &amp; Intelligent Equipment Lab</h1>
-          <p class="hero-subtitle l-zh" style="font-size:clamp(13px,1.35vw,17px);line-height:1.7;white-space:nowrap;max-width:none;margin:0 auto;color:var(--color-neutral-800)">以 AI Agent 與數位雙生為核心，打造自主決策與人機協作的閉環智慧製造。</p>
-          <p class="hero-subtitle l-en" style="font-size:16px;line-height:1.75;max-width:60ch;margin:0 auto;color:var(--color-neutral-800)">Closed-loop smart manufacturing built on AI agents and digital twins, for autonomous decisions and human–AI collaboration.</p>
-          <div style="margin-top:26px;font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:11px;letter-spacing:.24em;color:var(--color-accent-700)">↓ <span class="l-zh">向下捲動展開產線</span><span class="l-en">SCROLL TO EXPAND THE LINE</span></div>
+          <h1 class="l-zh u-font-size-clamp-38px-5vw-76px-line-c27766d">先進製程與設備智能輔助實驗室</h1>
+          <h1 class="l-en u-font-size-clamp-32px-4vw-62px-line-b32f764">Advanced Process Control &amp; Intelligent Equipment Lab</h1>
+          <p class="hero-subtitle l-zh u-font-size-clamp-13px-1-35vw-17px-l-7a0aca6">以 AI Agent 與數位雙生為核心，打造自主決策與人機協作的閉環智慧製造。</p>
+          <p class="hero-subtitle l-en u-font-size-16px-line-height-1-75-f27a36e">Closed-loop smart manufacturing built on AI agents and digital twins, for autonomous decisions and human–AI collaboration.</p>
+          <div class="u-margin-top-26px-font-family-barlow-4acf456">↓ <span class="l-zh">向下捲動展開產線</span><span class="l-en">SCROLL TO EXPAND THE LINE</span></div>
         </div>
       </div>
 
-      <nav id="actNav" aria-label="故事章節 Story chapters" style="position:absolute;left:32px;top:84px;z-index:7;opacity:0;pointer-events:none;display:flex;gap:6px">
+      <nav id="actNav" aria-label="故事章節 Story chapters" class="u-position-absolute-left-32px-fe9cff1">
         <sc-for list="{{ stations }}" as="s" hint-placeholder-count="6">
-          <button type="button" data-actjump="{{ s.i }}" aria-label="{{ s.num }} {{ s.en }}" title="{{ s.en }}" style="min-width:44px;height:44px;padding:0 6px;border-radius:12px;border:1px solid var(--color-divider);background:rgba(242,242,243,.92);cursor:pointer;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;letter-spacing:.14em;color:var(--color-neutral-700);transition:background .3s,color .3s,border-color .3s">{{ s.num }}</button>
+          <button type="button" data-actjump="{{ s.i }}" aria-label="{{ s.num }} {{ s.en }}" title="{{ s.en }}" class="u-min-width-44px-height-44px-baf111c">{{ s.num }}</button>
         </sc-for>
       </nav>
-      <div id="stationUI" style="position:absolute;inset:0;z-index:6;opacity:0;pointer-events:none">
-        <div class="station-title" style="position:absolute;right:28px;top:26px;display:flex;align-items:baseline;gap:12px">
-          <span style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;letter-spacing:.18em;color:var(--color-accent-700)">FIG. 01</span>
-          <h2 style="margin:0;font-size:20px"><span class="l-zh">閉環智慧製造產線</span><span class="l-en">Closed-loop Smart Production Line</span></h2>
+      <div id="stationUI" class="u-position-absolute-inset-0-6631921">
+        <div class="station-title u-position-absolute-right-28px-13022a4">
+          <span class="u-font-family-barlow-condensed-sans-fc9d3b3">FIG. 01</span>
+          <h2 class="u-margin-0-font-size-20px-5d48e7b"><span class="l-zh">閉環智慧製造產線</span><span class="l-en">Closed-loop Smart Production Line</span></h2>
         </div>
-        <div id="actPanel" class="station-panel" style="position:absolute;left:0;top:0;bottom:0;width:clamp(320px,36vw,560px);pointer-events:auto;display:flex;flex-direction:column;justify-content:center;padding:64px 40px 0 32px;background:linear-gradient(to right,var(--color-neutral-100) 0%,var(--color-neutral-100) 90%,rgba(242,242,243,0) 100%);will-change:transform,opacity">
-          <div style="position:relative;min-height:330px">
+        <div id="actPanel" class="station-panel u-position-absolute-left-0-44e226d">
+          <div class="u-position-relative-min-height-330px-131d964">
             <sc-for list="{{ stations }}" as="s" hint-placeholder-count="5">
-              <div data-panel="{{ s.i }}" style="position:absolute;left:0;right:0;top:0;opacity:0;transform:translateX(-28px);transition:opacity .45s ease,transform .45s ease">
-                <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:12px;letter-spacing:.22em;color:var(--color-accent-700);margin-bottom:8px">ACT {{ s.num }}</div>
-                <h3 style="font-size:38px;margin:0 0 6px"><span class="l-zh">{{ s.zh }}</span><span class="l-en">{{ s.en }}</span></h3>
-                <div class="l-zh" style="font-family:'Barlow Condensed',sans-serif;font-size:15px;letter-spacing:.14em;color:var(--color-accent-700);margin-bottom:16px">{{ s.en }}</div>
-                <div class="l-en" style="height:16px"></div>
-                <p class="l-zh act-inset" style="margin:0 0 18px;font-size:15.5px;line-height:1.7;color:var(--color-neutral-800)">{{ s.descZh }}</p>
-                <p class="l-en act-inset" style="margin:0 0 18px;font-size:15px;line-height:1.7;color:var(--color-neutral-800)">{{ s.descEn }}</p>
-                <div style="border-top:1px solid var(--color-divider);padding-top:14px">
-                  <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:10.5px;letter-spacing:.18em;color:var(--color-neutral-600);margin-bottom:6px">KEY TECHNOLOGIES</div>
-                  <div class="act-inset" style="font-family:'Barlow Condensed','Noto Sans TC',sans-serif;font-weight:600;font-size:17px;color:var(--color-accent-900)"><span class="l-zh">{{ s.areaZh }}</span><span class="l-en">{{ s.areaEn }}</span></div>
+              <div data-panel="{{ s.i }}" class="u-position-absolute-left-0-9ae4d7f">
+                <div class="u-font-family-barlow-condensed-sans-bca8fe5">ACT {{ s.num }}</div>
+                <h3 class="u-font-size-38px-margin-0-0-6px-7cc2171"><span class="l-zh">{{ s.zh }}</span><span class="l-en">{{ s.en }}</span></h3>
+                <div class="l-zh u-font-family-barlow-condensed-sans-a30a43f">{{ s.en }}</div>
+                <div class="l-en u-height-16px-18add01"></div>
+                <p class="l-zh act-inset u-margin-0-0-18px-font-size-15-5px-8f5123f">{{ s.descZh }}</p>
+                <p class="l-en act-inset u-margin-0-0-18px-font-size-15px-10efec0">{{ s.descEn }}</p>
+                <div class="u-border-top-1px-solid-var-color-div-cd58fd3">
+                  <div class="u-font-family-barlow-condensed-sans-c56992f">KEY TECHNOLOGIES</div>
+                  <div class="act-inset u-font-family-barlow-condensed-noto-7d161c8"><span class="l-zh">{{ s.areaZh }}</span><span class="l-en">{{ s.areaEn }}</span></div>
                 </div>
               </div>
             </sc-for>
@@ -350,19 +197,19 @@ button,a,select{touch-action:manipulation}
     </div>
   </div>
 
-  <div class="mobile-page-content" style="max-width:1320px;margin:0 auto;padding:78px 28px">
-    <div style="display:flex;align-items:baseline;justify-content:space-between;gap:16px;margin-bottom:28px">
-      <h2 style="font-size:32px;margin:0"><span class="l-zh">精選論文</span><span class="l-en">Featured Publications</span></h2>
-      <button type="button" onClick="{{ goPubs }}" style="background:transparent;border:0;cursor:pointer;font-family:'Barlow Condensed','Noto Sans TC',sans-serif;font-weight:600;font-size:15px;color:var(--color-accent-700)"><span class="l-zh">查看全部</span><span class="l-en">View All</span> →</button>
+  <div class="mobile-page-content u-max-width-1320px-margin-0-auto-d643ad9">
+    <div class="u-display-flex-align-items-baseline-5e1665e">
+      <h2 class="u-font-size-32px-margin-0-c74603e"><span class="l-zh">精選論文</span><span class="l-en">Featured Publications</span></h2>
+      <button type="button" onClick="{{ goPubs }}" class="u-background-transparent-border-0-6cb5f9b"><span class="l-zh">查看全部</span><span class="l-en">View All</span> →</button>
     </div>
-    <div id="g-feat" style="display:grid;grid-template-columns:repeat(2,1fr);gap:20px">
+    <div id="g-feat" class="u-display-grid-grid-template-columns-3ca07eb">
       <sc-for list="{{ featured }}" as="p" hint-placeholder-count="4">
-        <article class="blueprint soft-card" data-reveal="" style="position:relative;padding:22px 24px;background:#fff">
+        <article class="blueprint soft-card u-position-relative-padding-22px-24p-8deb607" data-reveal="">
           <div class="pub-meta"><span class="pill pill-date">{{ p.year }}</span><span class="pill pill-type">{{ p.typeLabel }}</span></div>
-          <h3 style="font-size:19px;line-height:1.28;margin:0 0 8px">{{ p.title }}</h3>
-          <p style="margin:0 0 4px;font-size:13px;color:var(--color-neutral-700)">{{ p.authorLine }}</p>
-          <p style="margin:0;font-size:12.5px;color:var(--color-neutral-600);font-style:italic">{{ p.venue }}</p>
-          <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+          <h3 class="u-font-size-19px-line-height-1-28-1245468">{{ p.title }}</h3>
+          <p class="u-margin-0-0-4px-font-size-13px-fa46edf">{{ p.authorLine }}</p>
+          <p class="u-margin-0-font-size-12-5px-af33de1">{{ p.venue }}</p>
+
         </article>
       </sc-for>
     </div>
@@ -373,73 +220,79 @@ button,a,select{touch-action:manipulation}
 
 <sc-if value="{{ atAbout }}" hint-placeholder-val="{{ false }}">
 <section>
-  <div class="mobile-page-content" style="max-width:1320px;margin:0 auto;padding:74px 28px 36px">
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px">
-      <span style="width:34px;height:1px;background:var(--color-accent)"></span>
-      <span style="font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--color-accent-700)">About</span>
+  <div class="mobile-page-content u-max-width-1320px-margin-0-auto-af2eec7">
+    <div class="u-display-flex-align-items-center-e514fbf">
+      <span class="u-width-34px-height-1px-ae9a487"></span>
+      <span class="u-font-size-11px-letter-spacing-16em-ff739cf">About</span>
     </div>
-    <h2 style="font-size:44px;margin:0 0 24px"><span class="l-zh">關於我們</span><span class="l-en">About Us</span></h2>
-    <div class="about-content-grid" style="display:grid;grid-template-columns:1fr 372px;gap:32px;align-items:start">
+    <h1 class="u-font-size-44px-margin-0-0-24px-89f1e97"><span class="l-zh">關於我們</span><span class="l-en">About Us</span></h1>
+    <div class="about-content-grid u-display-grid-grid-template-columns-facfb35">
     <div>
-    <p class="l-zh" style="font-size:16px;line-height:1.85;color:var(--color-neutral-800);margin:0">本實驗室整合了製程控制理論、智能設備設計與 AI 技術，致力於解決現代製造業對高精度、高效率的挑戰。並進一步導入 AI Agent（智慧代理人）概念，將大型語言模型（LLM）、最佳化與工業知識（SOP／規範／設備參數）融合為可執行的決策單元，透過任務分解、工具調度、推理驗證與人機協作，實現從「被動分析」走向「主動決策支援」的閉環式智慧製造。我們透過與業界的緊密合作，將數位雙生、流程優化與多代理協作等研究成果導入真實場域，旨在成為先進控制與智慧製造的頂尖創新中心。</p>
-    <p class="l-en" style="font-size:16px;line-height:1.8;color:var(--color-neutral-800);margin:0">Our laboratory focuses on developing AI agent applications that integrate large language models, optimization methods, and industrial information systems to enable autonomous decision-making and collaborative problem solving. Our research encompasses agent architectures, multi-agent coordination, task planning, tool integration, and human–AI collaboration, with applications in intelligent scheduling, defect detection, predictive maintenance, and knowledge-based management using real-time data from MES, ERP, PLM, and IoT platforms.</p>
+    <p class="l-zh u-font-size-16px-line-height-1-85-7755d25">本實驗室以智慧製造中的分析、最佳化與決策支援為研究主軸，涵蓋設備健康監測與預測性維護、排程與系統最佳化，以及運用深度學習進行影像辨識與瑕疵檢測。近期研究進一步結合大型語言模型、知識圖譜與檢索增強生成，探討如何將製造領域知識融入瑕疵分析與決策支援。</p>
+    <p class="l-en u-font-size-16px-line-height-1-8-4df81d9">Our research focuses on analytics, optimization, and decision support for smart manufacturing. Topics include equipment health monitoring and predictive maintenance, scheduling and system optimization, and deep learning for image recognition and defect detection. Recent work also combines large language models, knowledge graphs, and retrieval-augmented generation to explore how manufacturing knowledge can support defect analysis and decision-making.</p>
     </div>
 
-    <figure class="blueprint soft-card about-photo" style="position:relative;margin:0;height:294px;background:#fff;overflow:hidden;display:flex;flex-direction:column">
-      <div style="position:relative;flex:1;min-height:0;border-bottom:1px solid var(--color-divider);overflow:hidden;background:var(--color-neutral-200)">
+    <figure class="blueprint soft-card about-photo u-position-relative-margin-0-f0b5a95">
+      <div class="u-position-relative-flex-1-1f8ac0e">
         <sc-for list="{{ labPhotos }}" as="ph" hint-placeholder-count="4">
-          <img src="{{ ph.src }}" alt="{{ ph.alt }}" loading="lazy" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;transition:opacity .6s ease;opacity: {{ ph.op }}">
+          <img class="about-photo-image" src="{{ ph.src }}" alt="{{ ph.alt }}" loading="lazy" style="opacity: {{ ph.op }}">
         </sc-for>
-        <button type="button" onClick="{{ prevPhoto }}" aria-label="上一張 Previous" style="position:absolute;left:0;top:0;bottom:0;width:52px;border:0;background:transparent;cursor:pointer;color:var(--color-accent-900);display:grid;place-items:center;font-size:18px" style-hover="background:rgba(242,242,243,.55)">‹</button>
-        <button type="button" onClick="{{ nextPhoto }}" aria-label="下一張 Next" style="position:absolute;right:0;top:0;bottom:0;width:52px;border:0;background:transparent;cursor:pointer;color:var(--color-accent-900);display:grid;place-items:center;font-size:18px" style-hover="background:rgba(242,242,243,.55)">›</button>
+        <button type="button" class="photo-arrow u-position-absolute-left-0-8308794" onClick="{{ prevPhoto }}" aria-label="上一張 Previous">‹</button>
+        <button type="button" class="photo-arrow u-position-absolute-right-0-e743adf" onClick="{{ nextPhoto }}" aria-label="下一張 Next">›</button>
       </div>
-      <figcaption style="flex:none;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 15px">
-        <span style="font-family:'Barlow Condensed','Noto Sans TC',sans-serif;font-weight:600;font-size:12px;letter-spacing:.06em;color:var(--color-accent-700)"><span class="l-zh">{{ labCaptionZh }}</span><span class="l-en">{{ labCaptionEn }}</span></span>
-        <span style="display:flex;gap:5px">
+      <figcaption class="u-flex-none-display-flex-2c79c9a">
+        <span class="u-font-family-barlow-condensed-noto-dc03fcb"><span class="l-zh">{{ labCaptionZh }}</span><span class="l-en">{{ labCaptionEn }}</span></span>
+        <span class="u-display-flex-gap-5px-3374cc7">
           <sc-for list="{{ labDots }}" as="d" hint-placeholder-count="4">
-            <button type="button" onClick="{{ d.go }}" aria-label="{{ d.label }}" style="width:20px;height:3px;border:0;padding:0;cursor:pointer;background: {{ d.bg }}"></button>
+            <button type="button" class="photo-indicator" onClick="{{ d.go }}" aria-label="{{ d.label }}" style="background: {{ d.bg }}"></button>
           </sc-for>
         </span>
       </figcaption>
-      <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+
     </figure>
     </div>
   </div>
 
-  <div class="mobile-page-content" style="max-width:1320px;margin:0 auto;padding:24px 28px 88px">
-    <h3 style="font-size:32px;margin:0"><span class="l-zh">核心技術與應用</span><span class="l-en">Core Techniques &amp; Applications</span></h3>
-    <div style="display:flex;align-items:center;gap:12px;margin:18px 0 0">
-      <span style="font-family:'Barlow Condensed','Noto Sans TC',sans-serif;font-weight:600;font-size:11px;letter-spacing:.16em;color:var(--color-neutral-600)"><span class="l-zh">滑鼠移入翻面 · 技術 ⇄ 應用</span><span class="l-en">HOVER TO FLIP · TECHNIQUES ⇄ APPLICATIONS</span></span>
-      <span style="flex:1;height:1px;background:var(--color-divider)"></span>
+  <div class="mobile-page-content u-max-width-1320px-margin-0-auto-13df817">
+    <h2 class="u-font-size-32px-margin-0-c74603e"><span class="l-zh">核心技術與應用</span><span class="l-en">Core Techniques &amp; Applications</span></h2>
+    <div class="u-display-flex-align-items-center-86765ae">
+      <span class="u-font-family-barlow-condensed-noto-afa9105"><span class="l-zh">滑鼠移入翻面 · 技術 ⇄ 應用</span><span class="l-en">HOVER TO FLIP · TECHNIQUES ⇄ APPLICATIONS</span></span>
+      <span class="u-flex-1-height-1px-358ea9b"></span>
     </div>
 
-    <div id="g-tech" style="display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-top:26px">
+    <div id="g-tech" class="u-display-grid-grid-template-columns-8f821e0">
       <sc-for list="{{ techCards }}" as="c" hint-placeholder-count="4">
-        <div data-card="" style="position:relative;height:474px;perspective:1400px">
-          <div data-inner="" style="position:absolute;inset:0;transform-style:preserve-3d;transition:transform .7s cubic-bezier(.4,0,.2,1)">
-            <div class="blueprint soft-card" style="position:absolute;inset:0;backface-visibility:hidden;transform:translateZ(2px);padding:22px 20px;background:#fff;display:flex;flex-direction:column;overflow:hidden">
-              <span style="display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;background:var(--color-accent);color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:17px;flex:none">{{ c.n }}</span>
-              <h4 style="font-size:20px;line-height:1.22;margin:16px 0 4px"><span class="l-zh">{{ c.titleZh }}</span><span class="l-en">{{ c.titleEn }}</span></h4>
-              <p class="l-zh" style="margin:0 0 16px;font-size:12px;line-height:1.45;color:var(--color-accent-700)">{{ c.titleEn }}</p>
-              <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:11px;letter-spacing:.16em;color:var(--color-neutral-600);margin:8px 0 10px">CORE TECHNIQUES</div>
-              <ul style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px">
+        <div data-card="" class="u-position-relative-height-660px-82c270b">
+          <div data-inner="" class="u-position-absolute-inset-0-d304d4d">
+            <div class="blueprint soft-card u-position-absolute-inset-0-f7e557c">
+              <span class="u-display-inline-flex-align-items-ce-98079ec">{{ c.n }}</span>
+              <h3 class="u-font-size-20px-line-height-1-22-9f71063"><span class="l-zh">{{ c.titleZh }}</span><span class="l-en">{{ c.titleEn }}</span></h3>
+              <p class="l-zh u-margin-0-0-16px-font-size-12px-668d96f">{{ c.titleEn }}</p>
+              <div class="u-font-family-barlow-condensed-sans-86a07e9"><span class="l-zh">核心技術</span><span class="l-en">CORE TECHNIQUES</span></div>
+              <ul class="u-margin-0-padding-0-b8660f2">
                 <sc-for list="{{ c.tq }}" as="t" hint-placeholder-count="4">
-                  <li style="display:flex;gap:8px;font-size:13.5px;line-height:1.45;color:var(--color-neutral-800)"><span style="color:var(--color-accent);flex:none">—</span><span><span class="l-zh">{{ t.zh }}</span><span class="l-en">{{ t.en }}</span></span></li>
+                  <li class="u-display-flex-gap-8px-9ed7b5c"><span class="u-color-var-color-accent-flex-none-0127baa">—</span><span><span class="l-zh">{{ t.zh }}</span><span class="l-en">{{ t.en }}</span></span></li>
                 </sc-for>
               </ul>
-              <div style="margin-top:auto;padding-top:14px;font-family:'Barlow Condensed','Noto Sans TC',sans-serif;font-size:11px;letter-spacing:.14em;color:var(--color-accent-700)">↻ <span class="l-zh">翻面看應用</span><span class="l-en">FLIP FOR APPLICATIONS</span></div>
-              <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+              <div class="u-margin-top-auto-padding-top-14px-1c9765f">↻ <span class="l-zh">翻面看應用</span><span class="l-en">FLIP FOR APPLICATIONS</span></div>
+
             </div>
-            <div class="blueprint soft-card" style="position:absolute;inset:0;backface-visibility:hidden;transform:rotateY(180deg);padding:22px 20px;background:var(--color-accent-900);color:#f2f2f3;display:flex;flex-direction:column;overflow:hidden">
-              <span style="display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border:1px solid rgba(242,242,243,.45);color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:17px;flex:none">{{ c.n }}</span>
-              <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:11px;letter-spacing:.16em;opacity:.65;margin:16px 0 12px">KEY APPLICATIONS</div>
-              <ul style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:14px">
-                <sc-for list="{{ c.ap }}" as="a" hint-placeholder-count="3">
-                  <li style="font-size:14px;line-height:1.55"><span class="l-zh">{{ a.zh }}</span><span class="l-en">{{ a.en }}</span></li>
+            <div class="blueprint soft-card u-position-absolute-inset-0-f5b3767">
+              <span class="u-display-inline-flex-align-items-ce-9c82bb5">{{ c.n }}</span>
+              <div class="u-font-family-barlow-condensed-noto-fd088fd"><span class="l-zh">延伸研究方向</span><span class="l-en">POSSIBLE RESEARCH DIRECTIONS</span></div>
+              <ol data-directions="" class="u-margin-0-0-14px-padding-left-22px-d666c36">
+                <sc-for list="{{ c.directions }}" as="d" hint-placeholder-count="3">
+                  <li class="u-font-size-13px-line-height-1-45-ab2e796"><span class="l-zh">{{ d.zh }}</span><span class="l-en">{{ d.en }}</span></li>
+                </sc-for>
+              </ol>
+              <div class="u-font-family-barlow-condensed-noto-0774457"><span class="l-zh">研究成果</span><span class="l-en">RESEARCH OUTPUTS</span></div>
+              <ul data-references="" class="u-margin-0-padding-0-0-0-18px-aa2664f">
+                <sc-for list="{{ c.cases }}" as="r" hint-placeholder-count="2">
+                  <li class="u-font-size-11-5px-line-height-1-4-3e40948"><a href="{{ r.href }}" target="_blank" rel="noopener noreferrer" class="u-color-inherit-text-decoration-unde-dabbe65"><em>{{ r.title }}</em></a><div class="u-margin-top-3px-3d494aa"><span class="l-zh">{{ r.zh }}</span><span class="l-en">{{ r.en }}</span></div></li>
                 </sc-for>
               </ul>
-              <div style="margin-top:auto;padding-top:14px;font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:.14em;opacity:.6">{{ c.titleEn }}</div>
-              <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+              <div class="u-margin-top-auto-padding-top-12px-9aabf32">{{ c.titleEn }}</div>
+
             </div>
           </div>
         </div>
@@ -450,127 +303,127 @@ button,a,select{touch-action:manipulation}
 </sc-if>
 
 <sc-if value="{{ atPubs }}" hint-placeholder-val="{{ false }}">
-<section style="background:var(--color-neutral-100)">
-  <div class="mobile-page-content" style="max-width:1320px;margin:0 auto;padding:74px 28px 92px">
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px">
-      <span style="width:34px;height:1px;background:var(--color-accent)"></span>
-      <span style="font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--color-accent-700)">Publications</span>
+<section class="u-background-var-color-neutral-100-0ab2434">
+  <div class="mobile-page-content u-max-width-1320px-margin-0-auto-23512bf">
+    <div class="u-display-flex-align-items-center-e514fbf">
+      <span class="u-width-34px-height-1px-ae9a487"></span>
+      <span class="u-font-size-11px-letter-spacing-16em-ff739cf">Publications</span>
     </div>
-    <h2 style="font-size:44px;margin:0 0 16px"><span class="l-zh">研究成果</span><span class="l-en">Publications</span></h2>
-    <p class="l-zh" style="font-size:16px;line-height:1.75;margin:0;color:var(--color-neutral-800)">實驗室歷年發表之期刊與研討會論文，可切換「清單模式」瀏覽完整內容，或透過「關聯圖」探索論文之間共享的研究方法、主題與技術。</p>
-    <p class="l-en" style="font-size:16px;line-height:1.75;margin:0;color:var(--color-neutral-800)">Journal and conference publications from our lab. Switch to List Mode for the full view, or Graph View to explore how research fields co-occur across papers.</p>
+    <h1 class="u-font-size-44px-margin-0-0-16px-dea0b90"><span class="l-zh">研究成果</span><span class="l-en">Publications</span></h1>
+    <p class="l-zh u-font-size-16px-line-height-1-75-e8c7dd7">實驗室歷年發表之期刊與研討會論文，可切換「清單模式」瀏覽完整內容，或透過「關聯圖」探索論文之間共享的研究方法、主題與技術。</p>
+    <p class="l-en u-font-size-16px-line-height-1-75-e8c7dd7">Journal and conference publications from our lab. Switch to List Mode for the full view, or Graph View to explore how research fields co-occur across papers.</p>
 
-    <div class="radio-inputs" style="margin-top:26px">
+    <div class="radio-inputs u-margin-top-26px-59989cc">
       <label class="radio">
         <input type="radio" name="pubview" onChange="{{ setList }}">
-        <span class="name" style="background: {{ listBg }};color: {{ listFg }};font-weight: {{ listFw }}"><span class="l-zh">清單模式</span><span class="l-en">List</span></span>
+        <span class="name {{ listClass }}"><span class="l-zh">清單模式</span><span class="l-en">List</span></span>
       </label>
       <label class="radio">
         <input type="radio" name="pubview" onChange="{{ setGraph }}">
-        <span class="name" style="background: {{ graphBg }};color: {{ graphFg }};font-weight: {{ graphFw }}"><span class="l-zh">關聯圖</span><span class="l-en">Graph</span></span>
+        <span class="name {{ graphClass }}"><span class="l-zh">關聯圖</span><span class="l-en">Graph</span></span>
       </label>
     </div>
 
     <sc-if value="{{ isList }}" hint-placeholder-val="{{ true }}">
       <div>
-        <div class="blueprint soft-card" style="position:relative;margin-top:20px;padding:18px 20px;background:#fff">
-          <div style="display:flex;flex-wrap:wrap;align-items:center;gap:18px">
-            <label style="display:flex;align-items:center;gap:8px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--color-neutral-600)">Type
-              <select class="input" onChange="{{ onType }}" style="width:auto;padding:6px 10px;font-size:13px">
-                <option value="all">All</option><option value="journal">Journal</option><option value="conference">Conference</option>
+        <div class="blueprint soft-card u-position-relative-margin-top-20px-0f5c323">
+          <div class="u-display-flex-flex-wrap-wrap-9eee333">
+            <label class="u-display-flex-align-items-center-82d3ef3"><span class="l-zh">類型</span><span class="l-en">Type</span>
+              <select class="input u-width-auto-padding-6px-10px-bf35699" onChange="{{ onType }}">
+                <option value="all">全部 / All</option><option value="journal">期刊 / Journal</option><option value="conference">研討會 / Conference</option>
               </select>
             </label>
-            <label style="display:flex;align-items:center;gap:8px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--color-neutral-600)">Per page
-              <select class="input" onChange="{{ onPerPage }}" style="width:auto;padding:6px 10px;font-size:13px">
-                <option value="10">10</option><option value="25">25</option><option value="50">50</option><option value="9999">All</option>
+            <label class="u-display-flex-align-items-center-82d3ef3"><span class="l-zh">每頁筆數</span><span class="l-en">Per page</span>
+              <select class="input u-width-auto-padding-6px-10px-bf35699" onChange="{{ onPerPage }}">
+                <option value="10">10</option><option value="25">25</option><option value="50">50</option><option value="9999">全部 / All</option>
               </select>
             </label>
-            <button type="button" class="btn btn-secondary" onClick="{{ toggleSort }}" style="font-size:13px">{{ sortLabel }}</button>
-            <button type="button" class="btn btn-ghost" onClick="{{ resetAll }}" style="font-size:13px">Clear</button>
-            <span style="margin-left:auto;font-family:'Barlow Condensed',sans-serif;font-size:13px;letter-spacing:.1em;color:var(--color-neutral-600)">{{ countLabel }}</span>
+            <button type="button" class="btn btn-secondary u-font-size-13px-5e461f0" onClick="{{ toggleSort }}">{{ sortLabel }}</button>
+            <button type="button" class="btn btn-ghost u-font-size-13px-5e461f0" onClick="{{ resetAll }}"><span class="l-zh">清除篩選</span><span class="l-en">Clear</span></button>
+            <span class="u-margin-left-auto-font-family-barlo-158cfeb">{{ countLabel }}</span>
           </div>
-          <div id="pubTagFilters" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:14px">
+          <div id="pubTagFilters" class="u-display-flex-flex-wrap-wrap-f8cc98e">
             <sc-for list="{{ chips }}" as="c" hint-placeholder-count="12">
-              <button type="button" onClick="{{ c.onClick }}" style="cursor:pointer;border:1px solid var(--color-accent-300);border-radius:999px;padding:4px 12px;font-size:12px;background: {{ c.bg }};color: {{ c.fg }}">{{ c.label }}</button>
+              <button type="button" class="filter-chip" onClick="{{ c.onClick }}" style="background: {{ c.bg }};color: {{ c.fg }}">{{ c.label }}</button>
             </sc-for>
           </div>
-          <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+
         </div>
-        <div id="g-pubs" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:18px;margin-top:22px;align-items:stretch">
+        <div id="g-pubs" class="u-display-grid-grid-template-columns-dd3718b">
           <sc-for list="{{ pagePapers }}" as="p" hint-placeholder-count="10">
-            <article class="blueprint soft-card" data-reveal="" style="position:relative;padding:20px 22px;background:#fff">
+            <article class="blueprint soft-card u-position-relative-padding-20px-22p-a867a53" data-reveal="">
               <div class="pub-meta"><span class="pill pill-date">{{ p.year }}</span><span class="pill pill-type">{{ p.typeLabel }}</span></div>
-              <h3 style="font-size:17px;line-height:1.32;margin:0 0 8px">{{ p.title }}</h3>
-              <p style="margin:0 0 4px;font-size:13px;color:var(--color-neutral-700)">{{ p.authorLine }}</p>
-              <p style="margin:0 0 12px;font-size:12.5px;color:var(--color-neutral-600);font-style:italic">{{ p.venue }}</p>
-              <div style="display:flex;flex-wrap:wrap;gap:6px">
+              <h2 class="u-font-size-17px-line-height-1-32-236cfbb">{{ p.title }}</h2>
+              <p class="u-margin-0-0-4px-font-size-13px-fa46edf">{{ p.authorLine }}</p>
+              <p class="u-margin-0-0-12px-font-size-12-5px-fcbac00">{{ p.venue }}</p>
+              <div class="u-display-flex-flex-wrap-wrap-f26d0e3">
                 <sc-for list="{{ p.tagList }}" as="t" hint-placeholder-count="3"><span class="cv-tag">{{ t.label }}</span></sc-for>
               </div>
               <sc-if value="{{ p.hasDoi }}" hint-placeholder-val="{{ true }}">
-                <a href="{{ p.doi }}" target="_blank" rel="noopener noreferrer" style="display:inline-block;margin-top:14px;font-family:'Barlow Condensed','Noto Sans TC',sans-serif;font-weight:600;font-size:14px"><span class="l-zh">查看論文</span><span class="l-en">View Paper</span> →</a>
+                <a href="{{ p.doi }}" target="_blank" rel="noopener noreferrer" class="u-display-inline-block-margin-top-14-5f0b59b"><span class="l-zh">查看論文</span><span class="l-en">View Paper</span> →</a>
               </sc-if>
-              <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+
             </article>
           </sc-for>
         </div>
-        <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-top:34px">
-          <button type="button" class="btn btn-secondary" onClick="{{ prevPage }}" style="font-size:13px">←</button>
+        <div class="u-display-flex-align-items-center-d934c42">
+          <button type="button" class="btn btn-secondary u-font-size-13px-5e461f0" onClick="{{ prevPage }}">←</button>
           <sc-for list="{{ pageBtns }}" as="b" hint-placeholder-count="2">
-            <button type="button" onClick="{{ b.onClick }}" style="cursor:pointer;min-width:34px;padding:7px 9px;border-radius:999px;border:1px solid var(--color-accent-300);font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:14px;background: {{ b.bg }};color: {{ b.fg }}">{{ b.n }}</button>
+            <button type="button" class="page-button" onClick="{{ b.onClick }}" style="background: {{ b.bg }};color: {{ b.fg }}">{{ b.n }}</button>
           </sc-for>
-          <button type="button" class="btn btn-secondary" onClick="{{ nextPage }}" style="font-size:13px">→</button>
+          <button type="button" class="btn btn-secondary u-font-size-13px-5e461f0" onClick="{{ nextPage }}">→</button>
         </div>
       </div>
     </sc-if>
 
     <sc-if value="{{ isGraph }}" hint-placeholder-val="{{ false }}">
-      <div id="g-graph" style="display:flex;gap:18px;margin-top:22px;align-items:flex-start">
-        <div class="blueprint soft-card" style="position:relative;flex:1;min-width:0;background:#fff;overflow:hidden">
-          <div style="display:flex;align-items:center;gap:10px;padding:12px 18px;border-bottom:1px solid var(--color-divider);flex-wrap:wrap">
-            <button type="button" class="btn btn-secondary" onClick="{{ zoomOut }}" style="font-size:14px;min-width:34px">−</button>
-            <button type="button" class="btn btn-secondary" onClick="{{ zoomIn }}" style="font-size:14px;min-width:34px">＋</button>
-            <button type="button" class="btn btn-secondary" onClick="{{ resetView }}" style="font-size:13px"><span class="l-zh">重置</span><span class="l-en">Reset</span></button>
-            <span style="font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:.14em;color:var(--color-neutral-600)">{{ zoomLabel }}</span>
+      <div id="g-graph" class="u-display-flex-gap-18px-b7c99d5">
+        <div class="blueprint soft-card u-position-relative-flex-1-f502ff2">
+          <div class="u-display-flex-align-items-center-ebe3777">
+            <button type="button" class="btn btn-secondary u-font-size-14px-min-width-34px-050116c" onClick="{{ zoomOut }}">−</button>
+            <button type="button" class="btn btn-secondary u-font-size-14px-min-width-34px-050116c" onClick="{{ zoomIn }}">＋</button>
+            <button type="button" class="btn btn-secondary u-font-size-13px-5e461f0" onClick="{{ resetView }}"><span class="l-zh">重置</span><span class="l-en">Reset</span></button>
+            <span class="u-font-family-barlow-condensed-sans-91dc434">{{ zoomLabel }}</span>
           </div>
-          <div style="display:flex;align-items:center;gap:14px;padding:14px 18px;border-bottom:1px solid var(--color-divider);flex-wrap:wrap">
-            <span style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:12px;letter-spacing:.18em;color:var(--color-accent-700)">FIG. 02 — RESEARCH FIELD CO-OCCURRENCE</span>
-            <div style="display:flex;gap:14px;margin-left:auto;align-items:center;flex-wrap:wrap">
+          <div class="u-display-flex-align-items-center-9ff9799">
+            <span class="u-font-family-barlow-condensed-sans-3ac1364">FIG. 02 — RESEARCH FIELD CO-OCCURRENCE</span>
+            <div class="u-display-flex-gap-14px-87e0039">
               <sc-for list="{{ legendCats }}" as="g" hint-placeholder-count="4">
-                <span style="display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--color-neutral-700)"><span style="width:10px;height:10px;border-radius:50%;background: {{ g.color }}"></span><span class="l-zh">{{ g.zh }}</span><span class="l-en">{{ g.en }}</span></span>
+                <span class="u-display-flex-align-items-center-6129ed6"><span class="legend-dot" style="background: {{ g.color }}"></span><span class="l-zh">{{ g.zh }}</span><span class="l-en">{{ g.en }}</span></span>
               </sc-for>
             </div>
           </div>
-          <svg id="graphsvg" viewBox="0 0 900 640" style="display:block;width:100%;height:640px;touch-action:none;cursor:grab">
+          <svg id="graphsvg" viewBox="0 0 900 640" class="u-display-block-width-100-e2ca9eb">
             <g transform="translate(0,0) scale(1)" data-graph-transform="{{ gTransform }}">{{ graphLayer }}</g>
           </svg>
-          <div style="display:flex;align-items:center;gap:16px;padding:12px 18px;border-top:1px solid var(--color-divider);flex-wrap:wrap">
-            <span style="display:flex;align-items:center;gap:8px;font-size:11.5px;color:var(--color-neutral-700)">
-              <svg viewBox="0 0 78 28" style="width:78px;height:28px" fill="none" stroke="var(--color-accent-500)"><circle cx="9" cy="14" r="6"></circle><circle cx="32" cy="14" r="10"></circle><circle cx="61" cy="14" r="13"></circle></svg>
+          <div class="u-display-flex-align-items-center-e9388e3">
+            <span class="u-display-flex-align-items-center-e89276a">
+              <svg viewBox="0 0 78 28" fill="none" stroke="var(--color-accent-500)" class="u-width-78px-height-28px-e801348"><circle cx="9" cy="14" r="6"></circle><circle cx="32" cy="14" r="10"></circle><circle cx="61" cy="14" r="13"></circle></svg>
               <span class="l-zh">節點大小 = 該領域論文數</span><span class="l-en">Node size = papers in field</span>
             </span>
-            <span style="display:flex;align-items:center;gap:8px;font-size:11.5px;color:var(--color-neutral-700)"><span style="width:26px;border-top:3px solid var(--color-accent-400)"></span><span class="l-zh">連線粗細 = 共同出現篇數</span><span class="l-en">Edge width = co-occurrences</span></span>
+            <span class="u-display-flex-align-items-center-e89276a"><span class="u-width-26px-border-top-3px-solid-va-d8fb4e2"></span><span class="l-zh">連線粗細 = 共同出現篇數</span><span class="l-en">Edge width = co-occurrences</span></span>
           </div>
-          <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+
         </div>
 
-        <aside class="blueprint soft-card" style="position:relative;width:336px;flex:none;background:#fff;display:flex;flex-direction:column;height:790px;overflow:hidden">
-          <div style="flex:none;padding:20px 20px 14px">
-            <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:11px;letter-spacing:.18em;color:var(--color-accent-700);margin-bottom:10px">SELECTED FIELD</div>
-            <h4 style="font-size:24px;margin:0 0 2px">{{ selTitle }}</h4>
-            <p style="margin:0;font-size:12.5px;color:var(--color-neutral-600)">{{ selSub }}</p>
+        <aside class="blueprint soft-card u-position-relative-width-336px-1e46360">
+          <div class="u-flex-none-padding-20px-20px-14px-7290e32">
+            <div class="u-font-family-barlow-condensed-sans-0e73964">SELECTED FIELD</div>
+            <h2 class="u-font-size-24px-margin-0-0-2px-53f7fc9">{{ selTitle }}</h2>
+            <p class="u-margin-0-font-size-12-5px-f536d80">{{ selSub }}</p>
           </div>
-          <div style="flex:1;min-height:0;overflow-y:auto;padding:0 20px 20px;display:flex;flex-direction:column;gap:14px">
+          <div class="u-flex-1-min-height-0-73cd35a">
             <sc-for list="{{ selPapers }}" as="p" hint-placeholder-count="4">
-              <div style="border-top:1px solid var(--color-divider);padding-top:12px">
-                <div style="font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:.1em;color:var(--color-accent-700);margin-bottom:4px">{{ p.date }} · {{ p.venue }}</div>
-                <p style="margin:0 0 9px;font-size:13.5px;line-height:1.42">{{ p.title }}</p>
+              <div class="u-border-top-1px-solid-var-color-div-1897fdd">
+                <div class="u-font-family-barlow-condensed-sans-8579b19">{{ p.date }} · {{ p.venue }}</div>
+                <p class="u-margin-0-0-9px-font-size-13-5px-a2d9488">{{ p.title }}</p>
                 <sc-if value="{{ p.hasDoi }}" hint-placeholder-val="{{ true }}">
-                  <a href="{{ p.doi }}" target="_blank" rel="noopener noreferrer" class="btn btn-secondary" style="font-size:12px;padding:5px 11px"><span class="l-zh">查看論文</span><span class="l-en">View Paper</span> →</a>
+                  <a href="{{ p.doi }}" target="_blank" rel="noopener noreferrer" class="btn btn-secondary u-font-size-12px-padding-5px-11px-5a6a2ae"><span class="l-zh">查看論文</span><span class="l-en">View Paper</span> →</a>
                 </sc-if>
               </div>
             </sc-for>
           </div>
-          <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+
         </aside>
       </div>
     </sc-if>
@@ -583,21 +436,21 @@ button,a,select{touch-action:manipulation}
   <div class="cv">
     <aside class="cv-side">
       <img class="cv-photo" src="assets/images/prof.jpg" alt="鄧志峰 Jr-Fong Dang" width="176" height="176" loading="lazy" decoding="async">
-      <h2 class="cv-name"><span class="l-zh">鄧志峰 博士</span><span class="l-en">Jr-Fong Dang, Ph.D.</span></h2>
+      <h1 class="cv-name"><span class="l-zh">鄧志峰 博士</span><span class="l-en">Jr-Fong Dang, Ph.D.</span></h1>
       <p class="cv-name-alt"><span class="l-zh">Jr-Fong Dang, Ph.D.</span><span class="l-en">鄧志峰 博士</span></p>
       <p class="cv-role"><span class="l-zh">副教授・智慧製造科技研究所</span><span class="l-en">Associate Professor, Institute of Intelligent Manufacturing Technology</span></p>
       <p class="cv-role cv-role-org"><span class="l-zh">國立臺灣科技大學</span><span class="l-en">National Taiwan University of Science and Technology</span></p>
       <a class="cv-mail" href="mailto:jfdang@mail.ntust.edu.tw">jfdang@mail.ntust.edu.tw</a>
       <p class="cv-loc"><span class="l-zh">研究室 C209-1</span><span class="l-zh">實驗室 C219</span><span class="l-en">Office C209-1</span><span class="l-en">Lab C219</span></p>
 
-      <h3 class="cv-h"><span class="l-zh">學歷</span><span class="l-en">Education</span></h3>
+      <h2 class="cv-h"><span class="l-zh">學歷</span><span class="l-en">Education</span></h2>
       <ul class="cv-list">
         <sc-for list="{{ education }}" as="e" hint-placeholder-count="3">
           <li><b>{{ e.y }}</b><span class="l-zh">{{ e.zh }}</span><span class="l-en">{{ e.en }}</span></li>
         </sc-for>
       </ul>
 
-      <h3 class="cv-h"><span class="l-zh">經歷</span><span class="l-en">Professional Experience</span></h3>
+      <h2 class="cv-h"><span class="l-zh">經歷</span><span class="l-en">Professional Experience</span></h2>
       <ul class="cv-list">
         <sc-for list="{{ experience }}" as="x" hint-placeholder-count="6">
           <li><b>{{ x.p }}</b><span class="l-zh">{{ x.orgZh }}・{{ x.zh }}</span><span class="l-en">{{ x.orgEn }}, {{ x.en }}</span></li>
@@ -606,13 +459,13 @@ button,a,select{touch-action:manipulation}
     </aside>
 
     <div class="cv-main">
-      <h3 class="cv-title"><span class="l-zh">關於</span><span class="l-en">About</span></h3>
-      <p class="cv-text l-zh">鄧志峰博士現任國立臺灣科技大學智慧製造科技研究所副教授，並獲國立交通大學工業工程與管理學博士學位。研究聚焦於整合大型語言模型、最佳化方法與工業資訊系統之 AI Agent 應用，涵蓋機器學習、深度學習、異常與缺陷偵測、設備健康監測與智慧排程。曾任職於台灣積體電路製造與戴樂格半導體，具備半導體製造資訊系統與巨量資料分析之產業實務經驗，致力於將工業領域知識轉化為可落地的自主決策系統。</p>
-      <p class="cv-text l-en">Dr. Jr-Fong Dang is an Associate Professor at the Institute of Intelligent Manufacturing Technology, National Taiwan University of Science and Technology, and holds a Ph.D. in Industrial Engineering and Management from National Chiao Tung University. His research focuses on AI agent applications that integrate large language models, optimization methods and industrial information systems, spanning machine learning, deep learning, anomaly and defect detection, equipment health monitoring and intelligent scheduling. With prior industry experience at TSMC and Dialog Semiconductor in manufacturing information systems and big-data analytics, he translates domain knowledge into deployable autonomous decision-making systems.</p>
+      <h2 class="cv-title"><span class="l-zh">關於</span><span class="l-en">About</span></h2>
+      <p class="cv-text l-zh">鄧志峰博士現任國立臺灣科技大學智慧製造科技研究所副教授，獲國立交通大學工業工程與管理博士學位。研究結合工業工程與人工智慧，涵蓋排程最佳化、設備健康監測、深度學習與瑕疵檢測，近期並延伸至大型語言模型與知識圖譜輔助的製造決策。曾任台灣積體電路製造主任工程師及戴樂格半導體 Principal IT Applications Architect，具半導體製造資訊系統與巨量資料分析經驗。</p>
+      <p class="cv-text l-en">Dr. Jr-Fong Dang is an Associate Professor at the Institute of Intelligent Manufacturing Technology, National Taiwan University of Science and Technology. He holds a Ph.D. in Industrial Engineering and Management from National Chiao Tung University. His research brings together industrial engineering and AI, spanning scheduling optimization, equipment health monitoring, deep learning, and defect detection, and more recently language-model and knowledge-graph support for manufacturing decisions. He previously worked as a Principal Engineer at TSMC and a Principal IT Applications Architect at Dialog Semiconductor, with experience in semiconductor manufacturing information systems and big-data analytics.</p>
 
-      <h3 class="cv-title"><span class="l-zh">研究領域</span><span class="l-en">Research Field</span></h3>
-      <p class="cv-text l-zh">本實驗室致力於發展結合大型語言模型（LLM）、最佳化方法與工業資訊系統之 AI Agent 應用，以實現自主決策與協作式問題求解。研究涵蓋 Agent 架構、多 Agent 協作、任務規劃、工具整合與人機協作，並運用 MES、ERP、PLM 與 IoT 平台之即時資料，應用於智慧排程、缺陷偵測、預測性維護與知識管理。</p>
-      <p class="cv-text l-en">Our laboratory focuses on developing AI agent applications that integrate large language models (LLMs), optimization methods, and industrial information systems to enable autonomous decision-making and collaborative problem solving. Our research encompasses agent architectures, multi-agent coordination, task planning, tool integration, and human–AI collaboration, with applications in intelligent scheduling, defect detection, predictive maintenance, and knowledge-based management using real-time data from MES, ERP, PLM, and IoT platforms.</p>
+      <h2 class="cv-title"><span class="l-zh">研究領域</span><span class="l-en">Research Field</span></h2>
+      <p class="cv-text l-zh">研究主題包括以最佳化方法支援排程與派工、運用深度學習進行設備健康監測與影像瑕疵辨識，以及將專家知識融入分析模型。近期研究計畫進一步探索生成式 AI、多代理協作、神經符號 AI 與動態知識圖譜在工業決策支援中的應用。</p>
+      <p class="cv-text l-en">Research topics include optimization for scheduling and dispatching, deep learning for equipment health monitoring and visual defect detection, and the integration of expert knowledge into analytical models. Recent projects explore generative AI, multi-agent collaboration, neuro-symbolic AI, and dynamic knowledge graphs for industrial decision support.</p>
       <div class="cv-tags">
         <sc-for list="{{ profTags }}" as="t" hint-placeholder-count="6"><span class="cv-tag">{{ t.label }}</span></sc-for>
       </div>
@@ -622,7 +475,7 @@ button,a,select{touch-action:manipulation}
         <figcaption><span class="l-zh">圖：本實驗室之多 Agent 決策架構示意</span><span class="l-en">Fig. Multi-agent decision architecture of the laboratory</span></figcaption>
       </figure>
 
-      <h3 class="cv-title"><span class="l-zh">研究計畫</span><span class="l-en">Research Projects</span></h3>
+      <h2 class="cv-title"><span class="l-zh">研究計畫</span><span class="l-en">Research Projects</span></h2>
       <ul class="cv-proj">
         <sc-for list="{{ projects }}" as="j" hint-placeholder-count="6">
           <li><b>{{ j.y }}</b><span class="l-zh">{{ j.zh }}<i>{{ j.typeZh }}</i></span><span class="l-en">{{ j.en }}<i>{{ j.typeEn }}</i></span></li>
@@ -630,14 +483,14 @@ button,a,select{touch-action:manipulation}
       </ul>
 
       <div class="cv-pubhead">
-        <h3 class="cv-title"><span class="l-zh">代表著作</span><span class="l-en">Representative Publications</span></h3>
+        <h2 class="cv-title"><span class="l-zh">代表著作</span><span class="l-en">Representative Publications</span></h2>
         <button type="button" class="cv-more" onClick="{{ goPubs }}"><span class="l-zh">查看完整論文列表</span><span class="l-en">All publications</span> →</button>
       </div>
       <div class="cv-pubs">
         <sc-for list="{{ recentPapers }}" as="p" hint-placeholder-count="6">
           <article class="cv-pub" data-reveal="">
             <div class="pub-meta"><span class="pill pill-date">{{ p.year }}</span><span class="pill pill-type">{{ p.typeLabel }}</span></div>
-            <h4>{{ p.title }}</h4>
+            <h3>{{ p.title }}</h3>
             <p>{{ p.authorLine }}</p>
             <p class="cv-venue">{{ p.venue }}</p>
             <sc-if value="{{ p.hasDoi }}" hint-placeholder-val="{{ true }}">
@@ -653,50 +506,50 @@ button,a,select{touch-action:manipulation}
 
 <sc-if value="{{ atTeam }}" hint-placeholder-val="{{ false }}">
 <section>
-  <div id="teamWrap" style="position:relative;max-width:1320px;margin:0 auto;padding:74px 28px 90px">
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px">
-      <span style="width:34px;height:1px;background:var(--color-accent)"></span>
-      <span style="font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--color-accent-700)">Team</span>
+  <div id="teamWrap" class="u-position-relative-max-width-1320px-df86380">
+    <div class="u-display-flex-align-items-center-e514fbf">
+      <span class="u-width-34px-height-1px-ae9a487"></span>
+      <span class="u-font-size-11px-letter-spacing-16em-ff739cf">Team</span>
     </div>
-    <h2 style="font-size:44px;margin:0 0 14px"><span class="l-zh">團隊成員</span><span class="l-en">Team Members</span></h2>
-    <p class="l-zh" style="font-size:16px;line-height:1.75;margin:0;color:var(--color-neutral-800)">實驗室現有博士班與碩士班研究生，研究方向涵蓋影像識別、深度學習、智慧製造與 AI Agent。</p>
-    <p class="l-en" style="font-size:16px;line-height:1.75;margin:0;color:var(--color-neutral-800)">Our doctoral and master’s students work across image recognition, deep learning, smart manufacturing and AI agents.</p>
+    <h1 class="u-font-size-44px-margin-0-0-14px-e7d7550"><span class="l-zh">團隊成員</span><span class="l-en">Team Members</span></h1>
+    <p class="l-zh u-font-size-16px-line-height-1-75-e8c7dd7">團隊研究涵蓋影像辨識、機器學習、深度學習與智慧製造，部分研究亦延伸至 AI Agent、網頁開發及資料庫管理。</p>
+    <p class="l-en u-font-size-16px-line-height-1-75-e8c7dd7">The team works across image recognition, machine learning, deep learning, and smart manufacturing, with some projects also involving AI agents, web development, and database management.</p>
 
     <sc-for list="{{ memberGroups }}" as="g" hint-placeholder-count="2">
-      <div style="margin-top:44px">
-        <div class="member-group-heading" style="display:flex;align-items:center;gap:14px;margin-bottom:20px">
-          <h3 style="font-size:26px;margin:0"><span class="l-zh">{{ g.zh }}</span><span class="l-en">{{ g.en }}</span></h3>
-          <span style="font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:12px;letter-spacing:.16em;color:var(--color-accent-700)">{{ g.count }}</span>
+      <div class="u-margin-top-44px-c056ce2">
+        <div class="member-group-heading u-display-flex-align-items-center-f7dcb2b">
+          <h2 class="u-font-size-26px-margin-0-219e576"><span class="l-zh">{{ g.zh }}</span><span class="l-en">{{ g.en }}</span></h2>
+          <span class="u-font-family-barlow-condensed-sans-607293f">{{ g.count }}</span>
           <sc-if value="{{ g.showYear }}" hint-placeholder-val="{{ false }}">
-            <select class="input" value="{{ mYear }}" onChange="{{ setYear }}" style="width:auto;padding:6px 10px;font-family:'Barlow Condensed','Noto Sans TC',sans-serif;font-weight:600;font-size:13.5px">
+            <select class="input u-width-auto-padding-6px-10px-b77d69b" value="{{ mYear }}" onChange="{{ setYear }}" aria-label="選擇學年 / Select academic year">
               <sc-for list="{{ yearOptions }}" as="o" hint-placeholder-count="4">
                 <option value="{{ o.v }}">{{ o.label }}</option>
               </sc-for>
             </select>
           </sc-if>
-          <span style="flex:1;height:1px;background:var(--color-divider)"></span>
+          <span class="u-flex-1-height-1px-358ea9b"></span>
         </div>
         <sc-if value="{{ g.empty }}" hint-placeholder-val="{{ false }}">
-          <p style="margin:0 0 4px;font-size:14.5px;color:var(--color-neutral-600)"><span class="l-zh">此學年尚無成員。</span><span class="l-en">No members for this class year yet.</span></p>
+          <p class="u-margin-0-0-4px-font-size-14-5px-3a37604"><span class="l-zh">此學年尚無成員。</span><span class="l-en">No members for this class year yet.</span></p>
         </sc-if>
-        <div class="member-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(286px,1fr));gap:18px;align-items:stretch">
+        <div class="member-grid u-display-grid-grid-template-columns-a831546">
           <sc-for list="{{ g.list }}" as="m" hint-placeholder-count="4">
-            <article class="blueprint soft-card" data-reveal="" style="position:relative;height:280px;padding:20px;background:#fff;display:flex;flex-direction:column">
-              <div style="display:flex;gap:16px;align-items:center">
-                <div class="member-photo-frame" style="flex:none;width:106px;height:142px;border:1px solid var(--color-accent-300);background:var(--color-accent-100);overflow:hidden">
-                  <img src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" data-member-photo="{{ m.photo }}" alt="{{ m.name }}" loading="eager" decoding="async" style="width:100%;height:100%;object-fit:cover;object-position:{{ m.photoPosition }};display:block">
+            <article class="blueprint soft-card u-position-relative-height-280px-10de043" data-reveal="">
+              <div class="u-display-flex-gap-16px-4ef0c56">
+                <div class="member-photo-frame u-flex-none-width-106px-c37c7e1">
+                  <img class="member-photo" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" data-member-photo="{{ m.photo }}" alt="{{ m.name }}" loading="eager" decoding="async" style="object-position:{{ m.photoPosition }}">
                 </div>
-                <div style="min-width:0">
-                  <h4 style="font-size:23px;margin:0;line-height:1.1">{{ m.name }}</h4>
+                <div class="u-min-width-0-22a08c8">
+                  <h3 class="u-font-size-23px-margin-0-746c65f">{{ m.name }}</h3>
                   <sc-if value="{{ m.hasThesis }}" hint-placeholder-val="{{ false }}">
-                    <a href="{{ m.thesis }}" target="_blank" rel="noopener noreferrer" style="display:inline-block;margin-top:8px;font-family:'Barlow Condensed','Noto Sans TC',sans-serif;font-weight:600;font-size:13px"><span class="l-zh">論文</span><span class="l-en">Thesis</span> →</a>
+                    <a href="{{ m.thesis }}" target="_blank" rel="noopener noreferrer" class="u-display-inline-block-margin-top-8p-f2d9a72"><span class="l-zh">論文</span><span class="l-en">Thesis</span> →</a>
                   </sc-if>
                 </div>
               </div>
-              <div style="display:flex;flex-wrap:wrap;gap:6px;align-content:flex-start;margin-top:18px;padding-top:16px;border-top:1px solid var(--color-divider);flex:1;overflow:hidden">
-                <sc-for list="{{ m.tagList }}" as="t" hint-placeholder-count="3"><span class="cv-tag" style="font-size:12px">{{ t.label }}</span></sc-for>
+              <div class="u-display-flex-flex-wrap-wrap-b3abaca">
+                <sc-for list="{{ m.tagList }}" as="t" hint-placeholder-count="3"><span class="cv-tag u-font-size-12px-a49cca5">{{ t.label }}</span></sc-for>
               </div>
-              <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+
             </article>
           </sc-for>
         </div>
@@ -708,87 +561,89 @@ button,a,select{touch-action:manipulation}
 
 <sc-if value="{{ atContact }}" hint-placeholder-val="{{ false }}">
 <section>
-  <div style="max-width:1320px;margin:0 auto;padding:74px 28px 30px">
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px">
-      <span style="width:34px;height:1px;background:var(--color-accent)"></span>
-      <span style="font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--color-accent-700)">Contact</span>
+  <div class="u-max-width-1320px-margin-0-auto-b730241">
+    <div class="u-display-flex-align-items-center-e514fbf">
+      <span class="u-width-34px-height-1px-ae9a487"></span>
+      <span class="u-font-size-11px-letter-spacing-16em-ff739cf">Contact</span>
     </div>
-    <h2 style="font-size:44px;margin:0 0 14px"><span class="l-zh">聯絡我們</span><span class="l-en">Contact Us</span></h2>
-    <p class="l-zh" style="font-size:16px;line-height:1.75;margin:0;color:var(--color-neutral-800)">無論是研究合作、產學交流，或是想加入實驗室，歡迎與我們聯繫。</p>
-    <p class="l-en" style="font-size:16px;line-height:1.75;margin:0;color:var(--color-neutral-800)">Whether it is research collaboration, industry partnership, or joining the lab, feel free to reach out.</p>
+    <h1 class="u-font-size-44px-margin-0-0-14px-e7d7550"><span class="l-zh">聯絡我們</span><span class="l-en">Contact Us</span></h1>
+    <p class="l-zh u-font-size-16px-line-height-1-75-e8c7dd7">無論是研究合作、產學交流，或是想加入實驗室，歡迎與我們聯繫。</p>
+    <p class="l-en u-font-size-16px-line-height-1-75-e8c7dd7">Whether it is research collaboration, industry partnership, or joining the lab, feel free to reach out.</p>
 
-    <div id="contactDetails" style="display:grid;grid-template-columns:repeat(2,1fr);gap:18px;margin-top:28px">
-      <div class="blueprint soft-card" style="position:relative;padding:20px 22px;background:#fff">
-        <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:11px;letter-spacing:.18em;color:var(--color-accent-700);margin-bottom:8px">EMAIL</div>
-        <a href="mailto:zaira4edu@gmail.com" style="font-size:19px;font-family:'Barlow Condensed',sans-serif;letter-spacing:.01em">zaira4edu@gmail.com</a>
-        <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+    <div id="contactDetails" class="u-display-grid-grid-template-columns-17c559e">
+      <div class="blueprint soft-card u-position-relative-padding-20px-22p-a867a53">
+        <div class="u-font-family-barlow-condensed-sans-2f03c6c">EMAIL</div>
+        <a href="mailto:zaira4edu@gmail.com" class="u-font-size-19px-font-family-barlow-636eab2">zaira4edu@gmail.com</a>
+
       </div>
-      <div class="blueprint soft-card" style="position:relative;padding:20px 22px;background:#fff">
-        <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:11px;letter-spacing:.18em;color:var(--color-accent-700);margin-bottom:8px">ADDRESS</div>
-        <p class="l-zh" style="margin:0;font-size:14.5px;line-height:1.6;color:var(--color-neutral-800)">235307 新北市中和區工專路111號　臺灣科技大學 華夏校區教學大樓 2 樓 C219</p>
-        <p class="l-en" style="margin:0;font-size:14px;line-height:1.6;color:var(--color-neutral-800)">General Education Building 2F C219, No. 111, Gongzhuan Rd., Zhonghe Dist., New Taipei City 235307, Taiwan</p>
-        <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+      <div class="blueprint soft-card u-position-relative-padding-20px-22p-a867a53">
+        <div class="u-font-family-barlow-condensed-sans-2f03c6c">ADDRESS</div>
+        <p class="l-zh u-margin-0-font-size-14-5px-f4999a8">235307 新北市中和區工專路111號　臺灣科技大學 華夏校區教學大樓 2 樓 C219</p>
+        <p class="l-en u-margin-0-font-size-14px-5df1433">General Education Building 2F C219, No. 111, Gongzhuan Rd., Zhonghe Dist., New Taipei City 235307, Taiwan</p>
+
       </div>
     </div>
   </div>
 
-  <div style="max-width:1320px;margin:0 auto;padding:22px 28px 90px">
-    <div id="g-contact" style="display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:stretch">
-      <figure class="blueprint soft-card" style="position:relative;margin:0;background:#fff;overflow:hidden;display:flex;flex-direction:column;min-height:580px">
-        <div style="flex:none;display:flex;align-items:center;justify-content:space-between;padding:13px 16px;border-bottom:1px solid var(--color-divider)">
-          <span style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:11px;letter-spacing:.18em;color:var(--color-accent-700)">MAP · 24.9816 N, 121.5077 E</span>
-          <a href="https://www.google.com/maps/search/?api=1&amp;query=24.981617,121.507716" target="_blank" rel="noopener noreferrer" style="font-family:'Barlow Condensed','Noto Sans TC',sans-serif;font-weight:600;font-size:12.5px"><span class="l-zh">在 Google 地圖開啟</span><span class="l-en">Open in Google Maps</span> →</a>
+  <div class="u-max-width-1320px-margin-0-auto-3459941">
+    <div id="g-contact" class="u-display-grid-grid-template-columns-dff5c78">
+      <figure class="blueprint soft-card u-position-relative-margin-0-5621553">
+        <div class="u-flex-none-display-flex-500ae53">
+          <span class="u-font-family-barlow-condensed-sans-fc2c1ed">MAP · 24.9816 N, 121.5077 E</span>
+          <a href="https://www.google.com/maps/search/?api=1&amp;query=24.981617,121.507716" target="_blank" rel="noopener noreferrer" class="u-font-family-barlow-condensed-noto-e803291"><span class="l-zh">在 Google 地圖開啟</span><span class="l-en">Open in Google Maps</span> →</a>
         </div>
-        <div style="position:relative;flex:1;display:flex">
-          <iframe src="about:blank" data-map-src="{{ mapSrc }}" title="實驗室位置 Lab location" loading="lazy" referrerpolicy="no-referrer-when-downgrade" style="flex:1;width:100%;border:0;display:block"></iframe>
-          <div aria-hidden="true" style="position:absolute;inset:0;background:transparent;cursor:default"></div>
+        <div class="u-position-relative-flex-1-57a8ab6">
+          <iframe src="about:blank" data-map-src="{{ mapSrc }}" title="實驗室位置 Lab location" loading="lazy" referrerpolicy="no-referrer-when-downgrade" class="u-flex-1-width-100-af09914"></iframe>
+          <div aria-hidden="true" class="u-position-absolute-inset-0-3d0591f"></div>
         </div>
-        <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+
       </figure>
 
-      <div class="blueprint soft-card" style="position:relative;background:#fff;display:flex;flex-direction:column;min-height:580px;overflow:hidden">
-        <div style="flex:none;padding:20px 22px 0">
-          <h3 style="font-size:26px;margin:0 0 4px"><span class="l-zh">交通方式</span><span class="l-en">Getting Here</span></h3>
-          <p style="margin:0 0 16px;font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:.16em;color:var(--color-neutral-600)">SELECT A MODE · 點選標籤切換</p>
-          <div style="display:flex;flex-wrap:wrap;gap:6px;border-bottom:1px solid var(--color-divider);padding-bottom:14px">
+      <div class="blueprint soft-card u-position-relative-background-fff-45d2d09">
+        <div class="u-flex-none-padding-20px-22px-0-55916eb">
+          <h2 class="u-font-size-26px-margin-0-0-4px-a148429"><span class="l-zh">交通方式</span><span class="l-en">Getting Here</span></h2>
+          <p class="u-margin-0-0-16px-font-family-barlow-da7fd50">SELECT A MODE · 點選標籤切換</p>
+          <div class="u-display-flex-flex-wrap-wrap-d75d95f">
             <sc-for list="{{ transitTabs }}" as="t" hint-placeholder-count="5">
-              <button type="button" onClick="{{ t.onClick }}" style="cursor:pointer;border:1px solid var(--color-accent-300);border-radius:999px;padding:6px 14px;font-family:'Barlow Condensed','Noto Sans TC',sans-serif;font-weight:600;font-size:13.5px;background: {{ t.bg }};color: {{ t.fg }}">{{ t.label }}</button>
+              <button type="button" class="transit-tab" onClick="{{ t.onClick }}" style="background: {{ t.bg }};color: {{ t.fg }}">{{ t.label }}</button>
             </sc-for>
           </div>
         </div>
-        <div style="flex:1;min-height:0;overflow-y:auto;padding:18px 22px 22px">
-          <ul style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:14px">
+        <div class="u-flex-1-min-height-0-91ce755">
+          <ul class="u-margin-0-padding-0-2e57213">
             <sc-for list="{{ transitItems }}" as="i" hint-placeholder-count="4">
-              <li style="display:flex;gap:12px;font-size:14.5px;line-height:1.65;color:var(--color-neutral-800)">
-                <span style="flex:none;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;letter-spacing:.08em;color:var(--color-accent)">{{ i.n }}</span>
+              <li class="u-display-flex-gap-12px-32f2435">
+                <span class="u-flex-none-font-family-barlow-conde-8d8551e">{{ i.n }}</span>
                 <span><span class="l-zh">{{ i.zh }}</span><span class="l-en">{{ i.en }}</span></span>
               </li>
             </sc-for>
           </ul>
           <sc-if value="{{ hasTransitLink }}" hint-placeholder-val="{{ false }}">
-            <a href="{{ transitLinkUrl }}" target="_blank" rel="noopener noreferrer" class="btn btn-secondary" style="margin-top:18px;font-size:13.5px"><span class="l-zh">{{ transitLinkZh }}</span><span class="l-en">{{ transitLinkEn }}</span> →</a>
+            <a href="{{ transitLinkUrl }}" target="_blank" rel="noopener noreferrer" class="btn btn-secondary u-margin-top-18px-font-size-13-5px-9e0c33c"><span class="l-zh">{{ transitLinkZh }}</span><span class="l-en">{{ transitLinkEn }}</span> →</a>
           </sc-if>
-          <div style="margin-top:22px;padding-top:16px;border-top:1px solid var(--color-divider)">
-            <a href="{{ campusLink }}" target="_blank" rel="noopener noreferrer" style="font-family:'Barlow Condensed','Noto Sans TC',sans-serif;font-weight:600;font-size:13px"><span class="l-zh">華夏校區交通路線指引（校方頁面）</span><span class="l-en">Hwa Hsia Campus travel guide (official)</span> →</a>
+          <div class="u-margin-top-22px-padding-top-16px-3834887">
+            <a href="{{ campusLink }}" target="_blank" rel="noopener noreferrer" class="u-font-family-barlow-condensed-noto-012c320"><span class="l-zh">華夏校區交通路線指引（校方頁面）</span><span class="l-en">Hwa Hsia Campus travel guide (official)</span> →</a>
           </div>
         </div>
-        <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+
       </div>
     </div>
   </div>
 </section>
 </sc-if>
 
-<footer style="border-top:1px solid var(--color-divider);background:var(--color-bg)">
-  <div id="g-foot" style="max-width:1320px;margin:0 auto;padding:52px 28px;display:grid;grid-template-columns:1.3fr .7fr;gap:44px">
+</main>
+
+<footer class="u-border-top-1px-solid-var-color-div-7ff96d2">
+  <div id="g-foot" class="u-max-width-1320px-margin-0-auto-097e20d">
     <div>
-      <h3 style="font-size:22px;margin:0 0 12px"><span class="l-zh">先進製程與設備智能輔助實驗室</span><span class="l-en">Advanced Process Control &amp; Intelligent Equipment Lab</span></h3>
-      <p class="l-zh" style="margin:0;font-size:14px;line-height:1.65;color:var(--color-neutral-700)">235307 新北市中和區工專路111號　臺灣科技大學 華夏校區教學大樓 2 樓 C219</p>
-      <p class="l-en" style="margin:0;font-size:14px;line-height:1.65;color:var(--color-neutral-700)">General Education Building 2F C219, No. 111, Gongzhuan Rd., Zhonghe Dist., New Taipei City 235307, Taiwan</p>
+      <h2 class="u-font-size-22px-margin-0-0-12px-8994ce4"><span class="l-zh">先進製程與設備智能輔助實驗室</span><span class="l-en">Advanced Process Control &amp; Intelligent Equipment Lab</span></h2>
+      <p class="l-zh u-margin-0-font-size-14px-e87a40a">235307 新北市中和區工專路111號　臺灣科技大學 華夏校區教學大樓 2 樓 C219</p>
+      <p class="l-en u-margin-0-font-size-14px-e87a40a">General Education Building 2F C219, No. 111, Gongzhuan Rd., Zhonghe Dist., New Taipei City 235307, Taiwan</p>
     </div>
     <div>
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:11px;letter-spacing:.18em;color:var(--color-accent-700);margin-bottom:8px">EMAIL</div>
-      <a href="mailto:zaira4edu@gmail.com" style="font-size:15px">zaira4edu@gmail.com</a>
+      <div class="u-font-family-barlow-condensed-sans-2f03c6c">EMAIL</div>
+      <a href="mailto:zaira4edu@gmail.com" class="u-font-size-15px-a3970b9">zaira4edu@gmail.com</a>
     </div>
   </div>
 </footer>
@@ -802,8 +657,8 @@ const CAT={domain:{zh:'研究領域',en:'Domain',color:'#075263'},method:{zh:'�
 const CAT_ORDER=['domain','method','topic','tech'];
 
 const PAPERS=[
-{t:'A closed-loop cGAN-based framework for surface defect detection in industrial LPG rubber hoses',a:['Dang, Jr-Fong','Tzu-Li Chen','Bing-Yi Lin'],y:2026,m:8,v:'International Journal of Advanced Manufacturing Technology',ty:'journal',f:true,doi:'',g:['defect-detection','smart-manufacturing','deep-learning','anomaly-detection','gan']},
-{t:'Intelligent defect-detection framework integrating a modified YOLO algorithm, a domain knowledge graph, and RAG-enabled large language model',a:['Dang, Jr-Fong','Li-Na Wang','Tzu-Li Chen'],y:2026,m:4,v:'Advanced Engineering Informatics',ty:'journal',f:true,doi:'',g:['defect-detection','smart-manufacturing','deep-learning','llm','rag','yolo','knowledge-graph']},
+{t:'A closed-loop cGAN-based framework for surface defect detection in industrial LPG rubber hoses',a:['Dang, Jr-Fong','Tzu-Li Chen','Bing-Yi Lin'],y:2026,m:8,v:'International Journal of Advanced Manufacturing Technology',ty:'journal',f:true,doi:'https://link.springer.com/article/10.1007/s00170-026-18976-9',g:['defect-detection','smart-manufacturing','deep-learning','anomaly-detection','gan']},
+{t:'Intelligent defect-detection framework integrating a modified YOLO algorithm, a domain knowledge graph, and RAG-enabled large language model',a:['Dang, Jr-Fong','Li-Na Wang','Tzu-Li Chen'],y:2026,m:4,v:'Advanced Engineering Informatics',ty:'journal',f:true,doi:'https://www.sciencedirect.com/science/article/abs/pii/S1474034626004015',g:['defect-detection','smart-manufacturing','deep-learning','llm','rag','yolo','knowledge-graph']},
 {t:'The intelligent wafer bin map pattern recognition framework integrating attention-based deep learning network with information fusion',a:['Dang, Jr-Fong','Cheng-Chien Wu'],y:2026,m:3,v:'International Journal of Pattern Recognition and Artificial Intelligence',ty:'journal',f:true,doi:'https://www.worldscientific.com/doi/abs/10.1142/S0218001426500230',g:['defect-detection','smart-manufacturing','deep-learning','attention-mechanism','anomaly-detection','image-recognition']},
 {t:'From product specifications to smart manufacturing: Generative AI-driven process innovation for BOM digitization and its applications',a:['Lin, Yu-Chi','Jr-Fong Dang'],y:2026,m:2,v:'Advanced Engineering Informatics',ty:'journal',f:false,doi:'https://www.sciencedirect.com/science/article/pii/S1474034626001436',g:['smart-manufacturing','deep-learning','generative-ai','llm','rag']},
 {t:'Thick walls, hidden stories: Integrating scRNA-seq and snRNA-seq with spatial transcriptomics to complete the xylem puzzle',a:['Wei, Mingke','Jo-Wei Allison Hsieh','Jr-Fong Dang','Botong Tong','Hui Li','Ronald Sederof','Ying-Chung Jimmy Lin','Quanzi Li'],y:2026,m:2,v:'Genome Biology',ty:'journal',f:false,doi:'https://link.springer.com/article/10.1186/s13059-026-04007-z',g:['plant-biology','single-cell-genomics','spatial-transcriptomics']},
@@ -830,16 +685,20 @@ const STATIONS=window.STORY_DATA.acts.map(a=>{
 const TECH=[
 {n:'1',titleZh:'生成式 AI 與 LLM 智慧製造應用',titleEn:'Generative AI & LLM in Smart Manufacturing',
  tq:[{zh:'大型語言模型（LLM）',en:'Large language models'},{zh:'RAG 檢索增強生成',en:'Retrieval-augmented generation'},{zh:'知識圖譜',en:'Domain knowledge graphs'},{zh:'改進型 YOLO／cGAN 生成模型',en:'Modified YOLO / cGAN models'}],
- ap:[{zh:'結合領域專家知識進行智慧瑕疵檢測',en:'Defect detection informed by domain expertise'},{zh:'自動將規格書轉化為 BOM 數位化',en:'Specification-to-BOM digitization'},{zh:'具任務分解與人機協作能力之 AI Agent',en:'AI agents with task decomposition and human collaboration'}]},
+ directions:[{zh:'整合瑕疵影像、SOP 與歷史案例，協助分析缺陷原因。',en:'Combine defect images, SOPs, and past cases to support cause analysis.'},{zh:'將生成式 AI 延伸至其他製造文件的數位化。',en:'Extend generative AI to digitize other manufacturing documents.'},{zh:'探索 AI Agent 如何協助工程師處理製造任務。',en:'Explore how AI agents can help engineers carry out manufacturing tasks.'}],
+cases:[{title:'Intelligent defect-detection framework integrating a modified YOLO algorithm, a domain knowledge graph, and RAG-enabled large language model',href:'https://www.sciencedirect.com/science/article/abs/pii/S1474034626004015',authors:'Dang, Jr-Fong; Li-Na Wang; Tzu-Li Chen',year:'2026',venue:'Advanced Engineering Informatics',zh:'整合改良 YOLO、領域知識圖譜與 RAG 大型語言模型進行智慧瑕疵檢測。',en:'Integrates modified YOLO, a domain knowledge graph, and a RAG-enabled large language model for intelligent defect detection.'},{title:'From product specifications to smart manufacturing: Generative AI-driven process innovation for BOM digitization and its applications',href:'https://www.sciencedirect.com/science/article/pii/S1474034626001436',authors:'Lin, Yu-Chi; Jr-Fong Dang',year:'2026',venue:'Advanced Engineering Informatics',zh:'研究以生成式 AI 將產品規格轉為 BOM 數位化流程。',en:'Studies a generative AI-driven process for digitizing BOMs from product specifications.'}]},
 {n:'2',titleZh:'設備健康監測與預測性維修',titleEn:'Equipment Health Monitoring & Predictive Maintenance',
  tq:[{zh:'多感測器資訊融合',en:'Multi-sensor information fusion'},{zh:'知識蒸餾',en:'Knowledge distillation'},{zh:'微調機制',en:'Fine-tuning mechanisms'},{zh:'閉環式條件生成對抗網路',en:'Closed-loop conditional GANs'}],
- ap:[{zh:'即時設備狀態監控與異常診斷',en:'Real-time condition monitoring and diagnosis'},{zh:'以人為本的輕量化模型落地',en:'Human-centric lightweight model deployment'},{zh:'工業組件表面瑕疵辨識',en:'Surface defect recognition on industrial components'}]},
+ directions:[{zh:'延伸至不同設備或感測器組合的健康監測。',en:'Extend health monitoring to different machines and sensor combinations.'},{zh:'探索模型如何協助維護人員理解異常判斷。',en:'Explore how models can help maintenance staff interpret anomaly assessments.'},{zh:'研究監測結果如何支援設備保養安排。',en:'Study how monitoring results can support maintenance planning.'}],
+cases:[{title:'The multisensor information fusion-based deep learning model for equipment health monitor integrating subject matter expert knowledge',href:'https://link.springer.com/article/10.1007/s10845-024-02338-x',authors:'Dang, Jr-Fong',year:'2024',venue:'Journal of Intelligent Manufacturing',zh:'融合多感測器資料與專家知識，建立設備健康監測模型。',en:'Combines multi-sensor data and expert knowledge in an equipment health monitoring model.'},{title:'The human-centric framework integrating knowledge distillation architecture with fine-tuning mechanism for equipment health monitoring',href:'https://www.sciencedirect.com/science/article/pii/S1474034625000606',authors:'Dang, Jr-Fong; Tzu-Li Chen; Hung-Yi Huang',year:'2025',venue:'Advanced Engineering Informatics',zh:'研究結合知識蒸餾與微調機制的設備健康監測架構。',en:'Studies an equipment health monitoring framework integrating knowledge distillation and fine-tuning.'},{title:'A closed-loop cGAN-based framework for surface defect detection in industrial LPG rubber hoses',href:'https://link.springer.com/article/10.1007/s00170-026-18976-9',authors:'Jr-Fong Dang; Tzu-Li Chen; Bing-Yi Lin',year:'2026',venue:'The International Journal of Advanced Manufacturing Technology',zh:'以工業 LPG 橡膠管為對象，提出閉環式 cGAN 表面瑕疵檢測框架。',en:'Presents a closed-loop cGAN framework for surface-defect detection in industrial LPG rubber hoses.'}]},
 {n:'3',titleZh:'電腦視覺與晶圓影像識別',titleEn:'Computer Vision & Wafer Image Recognition',
  tq:[{zh:'注意力機制深度學習',en:'Attention-based deep learning'},{zh:'巨量資料與影像資訊融合',en:'Large-scale data and image fusion'},{zh:'自動化影像處理演算法',en:'Automated image-processing algorithms'}],
- ap:[{zh:'高精確度晶圓圖樣識別',en:'High-accuracy wafer bin map recognition'},{zh:'複雜產線之品質分類與智慧監控',en:'Quality classification and monitoring on complex lines'}]},
+ directions:[{zh:'延伸至更多晶圓圖樣或缺陷類型。',en:'Extend recognition to more wafer-map patterns or defect types.'},{zh:'探索結合影像與其他製程資料進行辨識。',en:'Explore recognition that combines images with other process data.'},{zh:'研究辨識結果如何支援產線品質監控。',en:'Study how recognition results can support production-line quality monitoring.'}],
+cases:[{title:'The intelligent wafer bin map pattern recognition framework integrating attention-based deep learning network with information fusion',href:'https://www.worldscientific.com/doi/abs/10.1142/S0218001426500230',authors:'Dang, Jr-Fong; Cheng-Chien Wu',year:'2026',venue:'International Journal of Pattern Recognition and Artificial Intelligence',zh:'結合注意力式深度學習與資訊融合，建立晶圓圖樣辨識框架。',en:'Combines attention-based deep learning and information fusion in a wafer-map pattern recognition framework.'}]},
 {n:'4',titleZh:'系統最佳化與智慧排程',titleEn:'System Optimization & Smart Scheduling',
  tq:[{zh:'變異鄰域搜尋法與超啟發式演算法',en:'Variable neighborhood search and hyper-heuristics'},{zh:'佇列理論與動態排程',en:'Queueing theory and dynamic scheduling'},{zh:'賽局理論與合約模型',en:'Game theory and contract models'}],
- ap:[{zh:'工業 4.0 智慧排程與動態流程車間',en:'Industry 4.0 scheduling and dynamic flow shops'},{zh:'複雜資源排班與裝配線平衡',en:'Complex workforce rostering and line balancing'},{zh:'供應鏈庫存與服務系統最佳化',en:'Supply-chain inventory and service optimization'}]}];
+ directions:[{zh:'探索即時插單或交期變動下的排程。',en:'Explore scheduling under rush orders or changing due dates.'},{zh:'延伸至不同工序與資源限制的動態流程車間。',en:'Extend dynamic flow-shop scheduling to different operations and resource constraints.'},{zh:'研究智慧排程系統如何支援現場調度。',en:'Study how smart scheduling systems can support shop-floor dispatching.'}],
+cases:[{title:'Fulfilling a smart scheduling system prototype based on an Industry 4.0 framework: A case study',href:'https://www.tandfonline.com/doi/full/10.1080/02533839.2026.2626274',authors:'Chen, Ping-Shun; Jr-Fong Dang; Yu-Chieh Chuang; Dah-Chuan Gong',year:'2025',venue:'Journal of the Chinese Institute of Engineers',zh:'以工業 4.0 架構發展智慧排程系統原型，並進行案例研究。',en:'Develops and studies a smart scheduling system prototype based on an Industry 4.0 framework.'},{title:'The dynamic flow shop scheduling problem with JIT philosophy and common due-date',href:'https://onlinelibrary.wiley.com/doi/full/10.1155/2022/9970988',authors:'Huang, Wen-Tso; Ping-Shun Chen; Gary Yu-Hsin Chen; Jr-Fong Dang',year:'2022',venue:'Mathematical Problems in Engineering',zh:'研究即時生產與共同交期條件下的動態流程車間排程。',en:'Studies dynamic flow-shop scheduling with just-in-time production and a common due date.'}]}];
 
 const ART=[
 /* 01 sensing — sensor stack emitting signal arcs */
@@ -870,7 +729,7 @@ const ART=[
 '<rect x="108" y="40" width="44" height="20"></rect>'+
 '<path d="M130 60v34" stroke-width="1.8"></path>'+
 '<rect x="112" y="94" width="36" height="18"></rect>'+
-'<path d="M118 112l-9 26M142 112l9 26" stroke-width="2.4" style="animation:clawbob 2.4s ease-in-out infinite"></path>'+
+'<path class="claw-bob" d="M118 112l-9 26M142 112l9 26" stroke-width="2.4"></path>'+
 '<rect x="112" y="142" width="36" height="14" stroke-width="1.5"></rect>'+
 '<path d="M84 172h92M62 150v22M198 150v22" stroke-width="1.8"></path>',
 /* 05 feedback — knowledge base with a return arc */
@@ -880,7 +739,7 @@ const ART=[
 '<g stroke-width="1.4" opacity=".75"><path d="M112 78h36M122 64h16"></path></g>'+
 '<path d="M130 142v30M84 172h92" stroke-width="1.8"></path>'];
 
-const TYPE_LABEL={journal:'Journal',conference:'Conference'};
+const TYPE_LABEL={journal:{zh:'期刊',en:'Journal'},conference:{zh:'研討會',en:'Conference'}};
 const NAV=[['home','首頁','Home'],['about','關於我們','About'],['professor','指導教授','Professor'],['team','團隊成員','Team'],['publications','研究成果','Publications'],['contact','聯絡我們','Contact']];
 
 const EDU=[
@@ -959,8 +818,8 @@ function fmt(p){
   const shown=p.a.length>5?p.a.slice(0,3):p.a;
   const extra=p.a.length-shown.length;
   const en=document.documentElement.dataset.lang==='en';
-  return {title:p.t,venue:p.v,date:p.y+'/'+pad(p.m),year:String(p.y),typeLabel:TYPE_LABEL[p.ty]||p.ty,
-    authorLine:shown.join(en?', ':'、')+(extra>0?' et al. (+'+extra+')':''),
+  return {title:p.t,venue:p.v,date:p.y+'/'+pad(p.m),year:String(p.y),typeLabel:(TYPE_LABEL[p.ty]||{zh:p.ty,en:p.ty})[en?'en':'zh'],
+    authorLine:shown.join(en?', ':'、')+(extra>0?(en?' et al. (+'+extra+')':' 等（+'+extra+'）'):''),
     doi:p.doi||'', hasDoi:!!p.doi, noDoi:!p.doi,
     tagList:p.g.map(s=>({label:(TAGS[s]||[s,s,'tech'])[en?1:0]}))};
 }
@@ -981,6 +840,7 @@ class Component extends DCLogic {
     /* App 已掛載：靜態首屏畫面淡出並移除（它與 React 的首屏外觀一致，不會跳動） */
     requestAnimationFrame(()=>requestAnimationFrame(()=>{const b=document.getElementById('boot');if(b){b.classList.add('bye');setTimeout(()=>b.remove(),400);}}));
     document.documentElement.dataset.lang='zh';
+    document.documentElement.lang='zh-Hant';
     document.documentElement.classList.add('rev-on');
     this.buildGraph();
     this._onKeyDown=this.onKeyDown;
@@ -1016,6 +876,7 @@ class Component extends DCLogic {
   toggleLang=()=>{
     const next=this.state.lang==='zh'?'en':'zh';
     document.documentElement.dataset.lang=next;
+    document.documentElement.lang=next==='en'?'en':'zh-Hant';
     this.setState({lang:next,mobileMenuOpen:false});
   };
   go=p=>()=>{
@@ -1543,7 +1404,7 @@ class Component extends DCLogic {
       transitLinkZh:tmode.link?tmode.link.zh:'',
       transitLinkEn:tmode.link?tmode.link.en:'',
       navItems:NAV.map(([k,z,e])=>({zh:z,en:e,on:s.page===k?'1':'0',go:this.go(k)})),
-      mobileMenuDisplay:s.mobileMenuOpen?'block':'none',
+      mobileMenuClass:s.mobileMenuOpen?'is-open':'',
       mobileMenuHidden:s.mobileMenuOpen?'false':'true',
       mobileMenuExpanded:s.mobileMenuOpen?'true':'false',
       mobileMenuIcon:s.mobileMenuOpen?'×':'☰',
@@ -1557,8 +1418,8 @@ class Component extends DCLogic {
       featured:PAPERS.filter(p=>p.f).map(fmt),
       techCards:TECH,
       isList:s.view==='list', isGraph:s.view==='graph',
-      listBg:s.view==='list'?'#fff':'transparent', listFg:s.view==='list'?'var(--color-accent)':'var(--color-neutral-700)', listFw:s.view==='list'?'600':'400',
-      graphBg:s.view==='graph'?'#fff':'transparent', graphFg:s.view==='graph'?'var(--color-accent)':'var(--color-neutral-700)', graphFw:s.view==='graph'?'600':'400',
+      listClass:s.view==='list'?'is-selected':'',
+      graphClass:s.view==='graph'?'is-selected':'',
       setList:this.setList, setGraph:this.setGraph,
       onType:this.onType, onPerPage:this.onPerPage,
       toggleSort:this.toggleSort, resetAll:this.resetAll,
