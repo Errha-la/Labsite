@@ -13,7 +13,7 @@ for (const path of ['/', '/Lab-Website/']) {
 
     await page.goto(path, { waitUntil: 'load' });
     await expect(page).toHaveTitle('先進製程與設備智能輔助實驗室');
-    await page.waitForFunction(() => window.React && window.ReactDOM && window.STORY_DATA);
+    await page.waitForFunction(() => window.React && window.ReactDOM && window.STORY_DATA && window.RESEARCH_DATA);
     await expect(page.locator('#dc-root')).toBeVisible();
     await expect(page.locator('h1').first()).toContainText('實驗室');
 

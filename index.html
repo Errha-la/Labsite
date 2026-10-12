@@ -78,6 +78,7 @@ html[data-lang="en"] .l-en{display:revert}
 <script vite-ignore defer src="assets/vendor/react.production.min.js"></script>
 <script vite-ignore defer src="assets/vendor/react-dom.production.min.js"></script>
 <script vite-ignore defer src="assets/data/story-data.js"></script>
+<script vite-ignore defer src="assets/data/research-data.js"></script>
 <script vite-ignore defer src="./assets/js/runtime.js"></script>
 </head>
 <body>
@@ -307,12 +308,13 @@ html[data-lang="en"] .l-en{display:revert}
   <div class="mobile-page-content u-max-width-1320px-margin-0-auto-23512bf">
     <div class="u-display-flex-align-items-center-e514fbf">
       <span class="u-width-34px-height-1px-ae9a487"></span>
-      <span class="u-font-size-11px-letter-spacing-16em-ff739cf">Publications</span>
+      <span class="u-font-size-11px-letter-spacing-16em-ff739cf">Research</span>
     </div>
-    <h1 class="u-font-size-44px-margin-0-0-16px-dea0b90"><span class="l-zh">研究成果</span><span class="l-en">Publications</span></h1>
-    <p class="l-zh u-font-size-16px-line-height-1-75-e8c7dd7">實驗室歷年發表之期刊與研討會論文，可切換「清單模式」瀏覽完整內容，或透過「關聯圖」探索論文之間共享的研究方法、主題與技術。</p>
-    <p class="l-en u-font-size-16px-line-height-1-75-e8c7dd7">Journal and conference publications from our lab. Switch to List Mode for the full view, or Graph View to explore how research fields co-occur across papers.</p>
+    <h1 class="u-font-size-44px-margin-0-0-16px-dea0b90"><span class="l-zh">研究成果</span><span class="l-en">Research</span></h1>
+    <p class="l-zh u-font-size-16px-line-height-1-75-e8c7dd7">彙整實驗室的論文、研究計畫與產學／學術合作。可用類型選單篩選，或透過論文關聯圖探索共享的研究方法、主題與技術。</p>
+    <p class="l-en u-font-size-16px-line-height-1-75-e8c7dd7">Explore our publications, research projects, and industry–academia and academic collaborations. Filter by type, or use the publication graph to explore shared research fields.</p>
 
+    <sc-if value="{{ showPublicationFilters }}" hint-placeholder-val="{{ true }}">
     <div class="radio-inputs u-margin-top-26px-59989cc">
       <label class="radio">
         <input type="radio" name="pubview" onChange="{{ setList }}">
@@ -323,39 +325,57 @@ html[data-lang="en"] .l-en{display:revert}
         <span class="name {{ graphClass }}"><span class="l-zh">關聯圖</span><span class="l-en">Graph</span></span>
       </label>
     </div>
+    </sc-if>
 
     <sc-if value="{{ isList }}" hint-placeholder-val="{{ true }}">
       <div>
         <div class="blueprint soft-card u-position-relative-margin-top-20px-0f5c323">
           <div class="u-display-flex-flex-wrap-wrap-9eee333">
             <label class="u-display-flex-align-items-center-82d3ef3"><span class="l-zh">類型</span><span class="l-en">Type</span>
-              <select class="input u-width-auto-padding-6px-10px-bf35699" onChange="{{ onType }}">
+              <select id="researchType" class="input u-width-auto-padding-6px-10px-bf35699" value="{{ researchType }}" onChange="{{ onType }}">
                 <option value="all">全部 / All</option><option value="journal">期刊 / Journal</option><option value="conference">研討會 / Conference</option>
+                <option value="project">研究計畫 / Projects</option><option value="collaboration">合作 / Collaborations</option>
               </select>
             </label>
             <label class="u-display-flex-align-items-center-82d3ef3"><span class="l-zh">每頁筆數</span><span class="l-en">Per page</span>
-              <select class="input u-width-auto-padding-6px-10px-bf35699" onChange="{{ onPerPage }}">
+              <select class="input u-width-auto-padding-6px-10px-bf35699" value="{{ researchPerPage }}" onChange="{{ onPerPage }}">
                 <option value="10">10</option><option value="25">25</option><option value="50">50</option><option value="9999">全部 / All</option>
               </select>
             </label>
-            <button type="button" class="btn btn-secondary u-font-size-13px-5e461f0" onClick="{{ toggleSort }}">{{ sortLabel }}</button>
+            <button type="button" class="research-sort btn btn-secondary u-font-size-13px-5e461f0" onClick="{{ toggleSort }}">{{ sortLabel }}</button>
             <button type="button" class="btn btn-ghost u-font-size-13px-5e461f0" onClick="{{ resetAll }}"><span class="l-zh">清除篩選</span><span class="l-en">Clear</span></button>
-            <span class="u-margin-left-auto-font-family-barlo-158cfeb">{{ countLabel }}</span>
+            <span class="research-count u-margin-left-auto-font-family-barlo-158cfeb">{{ countLabel }}</span>
           </div>
+          <sc-if value="{{ showPublicationFilters }}" hint-placeholder-val="{{ true }}">
           <div id="pubTagFilters" class="u-display-flex-flex-wrap-wrap-f8cc98e">
             <sc-for list="{{ chips }}" as="c" hint-placeholder-count="12">
               <button type="button" class="filter-chip" onClick="{{ c.onClick }}" style="background: {{ c.bg }};color: {{ c.fg }}">{{ c.label }}</button>
             </sc-for>
           </div>
+          </sc-if>
 
         </div>
         <div id="g-pubs" class="u-display-grid-grid-template-columns-dd3718b">
           <sc-for list="{{ pagePapers }}" as="p" hint-placeholder-count="10">
-            <article class="blueprint soft-card u-position-relative-padding-20px-22p-a867a53" data-reveal="">
+            <article class="blueprint soft-card u-position-relative-padding-20px-22p-a867a53" data-reveal="" data-research-type="{{ p.type }}">
               <div class="pub-meta"><span class="pill pill-date">{{ p.year }}</span><span class="pill pill-type">{{ p.typeLabel }}</span></div>
               <h2 class="u-font-size-17px-line-height-1-32-236cfbb">{{ p.title }}</h2>
-              <p class="u-margin-0-0-4px-font-size-13px-fa46edf">{{ p.authorLine }}</p>
-              <p class="u-margin-0-0-12px-font-size-12-5px-fcbac00">{{ p.venue }}</p>
+              <sc-if value="{{ p.isPublication }}" hint-placeholder-val="{{ true }}">
+                <p class="u-margin-0-0-4px-font-size-13px-fa46edf">{{ p.authorLine }}</p>
+                <p class="u-margin-0-0-12px-font-size-12-5px-fcbac00">{{ p.venue }}</p>
+              </sc-if>
+              <sc-if value="{{ p.isActivity }}" hint-placeholder-val="{{ false }}">
+                <dl class="research-details">
+                  <div><dt>{{ p.organizationLabel }}</dt><dd>{{ p.organization }}</dd></div>
+                  <sc-if value="{{ p.hasGrant }}" hint-placeholder-val="{{ false }}">
+                    <div><dt><span class="l-zh">計畫編號</span><span class="l-en">Grant number</span></dt><dd>{{ p.grant }}</dd></div>
+                  </sc-if>
+                  <sc-if value="{{ p.isCollaboration }}" hint-placeholder-val="{{ false }}">
+                    <div><dt><span class="l-zh">合作類型</span><span class="l-en">Collaboration type</span></dt><dd>{{ p.activityKind }}</dd></div>
+                    <div><dt><span class="l-zh">期間</span><span class="l-en">Period</span></dt><dd>{{ p.period }}</dd></div>
+                  </sc-if>
+                </dl>
+              </sc-if>
               <div class="u-display-flex-flex-wrap-wrap-f26d0e3">
                 <sc-for list="{{ p.tagList }}" as="t" hint-placeholder-count="3"><span class="cv-tag">{{ t.label }}</span></sc-for>
               </div>
@@ -537,7 +557,7 @@ html[data-lang="en"] .l-en{display:revert}
             <article class="blueprint soft-card u-position-relative-height-280px-10de043" data-reveal="">
               <div class="u-display-flex-gap-16px-4ef0c56">
                 <div class="member-photo-frame u-flex-none-width-106px-c37c7e1">
-                  <img class="member-photo" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" data-member-photo="{{ m.photo }}" alt="{{ m.name }}" loading="eager" decoding="async" style="object-position:{{ m.photoPosition }}">
+                  <img class="member-photo" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" data-member-photo="{{ m.photo }}" alt="{{ m.name }}" width="106" height="106" loading="lazy" decoding="async" style="object-position:{{ m.photoPosition }}">
                 </div>
                 <div class="u-min-width-0-22a08c8">
                   <h3 class="u-font-size-23px-margin-0-746c65f">{{ m.name }}</h3>
@@ -674,6 +694,15 @@ const PAPERS=[
 {t:'Applying meta-heuristics algorithm to solve assembly line balancing problem with labor skill level in garment industry',a:['Chen, Gary Yu-Hsin','Ping-Shun Chen','Jr-Fong Dang','Sung-Lien Kang','Li-Jen Cheng'],y:2021,m:4,v:'International Journal of Computational Intelligence Systems',ty:'journal',f:false,doi:'https://www.atlantis-press.com/journals/ijcis/125955859',g:['smart-manufacturing','meta-heuristics','optimization','scheduling']},
 {t:'The equilibrium contract rent and reward money under incomplete information in reverse supply chains: A game theoretical approach and computational study',a:['Hong, I-Husan','Jr-Fong Dang','Kuan-Wen Lin'],y:2016,m:12,v:'Computers & Industrial Engineering',ty:'journal',f:false,doi:'https://www.sciencedirect.com/science/article/pii/S0360835216303710',g:['optimization']}];
 
+// Older publications supplied in research.docx; no month was supplied.
+PAPERS.push(
+{t:'MIMO detection for high order QAM by Canonical dual approach',a:['Tian, Y.','J.-F. Dang*'],y:2015,m:0,v:'Journal of Applied Mathematics, 2015, 1–8',ty:'journal',f:false,doi:'https://doi.org/10.1155/2015/201369',g:['optimization']},
+{t:'The Cournot production game with multiple firms under an ambiguous decision environment',a:['Dang, J.-F.','I-H. Hong*','J.-M. Lin'],y:2014,m:0,v:'Information Sciences, 266(10), 186–198',ty:'journal',f:false,doi:'https://doi.org/10.1016/j.ins.2013.12.033',g:['optimization']},
+{t:'The equilibrium quantity and production strategy in a fuzzy random decision environment: Game approach and case study in glass substrates industries',a:['Dang, J.-F.','I-H. Hong*'],y:2013,m:0,v:'International Journal of Production Economics, 145(2), 724–732',ty:'journal',f:false,doi:'https://doi.org/10.1016/j.ijpe.2013.06.002',g:['optimization']},
+{t:'An RFID application in the food supply chain: A case study of convenience stores in Taiwan',a:['Hong*, I-H.','J.-F. Dang','Y.-H. Tsai','C.-S. Liu','W.-T. Lee','P.-C. Chen'],y:2011,m:0,v:'Journal of Food Engineering, 106(2), 119–126',ty:'journal',f:false,doi:'https://doi.org/10.1016/j.jfoodeng.2011.04.014',g:['optimization']},
+{t:'The Cournot game under a fuzzy decision environment',a:['Dang, J.-F.','I-H. Hong*'],y:2010,m:0,v:'Computers and Mathematics with Applications, 59(9), 3099–3109',ty:'journal',f:false,doi:'https://doi.org/10.1016/j.camwa.2010.02.031',g:['optimization']},
+{t:'A variable spread fuzzy linear regression model with higher explanatory power and forecasting accuracy',a:['Chen*, S.-P.','J.-F. Dang'],y:2008,m:0,v:'Information Sciences, 178(20), 3973–3988',ty:'journal',f:false,doi:'https://doi.org/10.1016/j.ins.2008.06.005',g:['optimization']});
+
 const STATIONS=window.STORY_DATA.acts.map(a=>{
   const steps=(a.stepsZh||[]).map((t,i)=>(i+1)+'. '+t).join(' ');
   const stepsEn=(a.stepsEn||[]).map((t,i)=>(i+1)+'. '+t).join(' ');
@@ -739,8 +768,8 @@ const ART=[
 '<g stroke-width="1.4" opacity=".75"><path d="M112 78h36M122 64h16"></path></g>'+
 '<path d="M130 142v30M84 172h92" stroke-width="1.8"></path>'];
 
-const TYPE_LABEL={journal:{zh:'期刊',en:'Journal'},conference:{zh:'研討會',en:'Conference'}};
-const NAV=[['home','首頁','Home'],['about','關於我們','About'],['professor','指導教授','Professor'],['team','團隊成員','Team'],['publications','研究成果','Publications'],['contact','聯絡我們','Contact']];
+const TYPE_LABEL={journal:{zh:'期刊',en:'Journal'},conference:{zh:'研討會',en:'Conference'},project:{zh:'研究計畫',en:'Project'},collaboration:{zh:'合作',en:'Collaboration'}};
+const NAV=[['home','首頁','Home'],['about','關於我們','About'],['professor','指導教授','Professor'],['team','團隊成員','Team'],['publications','研究成果','Research'],['contact','聯絡我們','Contact']];
 
 const EDU=[
 {y:'2012',zh:'國立交通大學 工業工程與管理學系 博士',en:'Ph.D., Industrial Engineering and Management, National Chiao Tung University'},
@@ -763,6 +792,18 @@ const PROJECTS=[
 {y:'2021',zh:'深度學習在預測保養與排程模式之研究',en:'Deep Learning for Predictive Maintenance and Scheduling Models',typeZh:'國科會專題研究計畫（新進人員研究計畫）',typeEn:'NSTC Research Project (New Investigator)'},
 {y:'2020',zh:'考量機台健康狀況下之排程派工模型',en:'Dispatching and Scheduling Models Considering Machine Health Conditions',typeZh:'國科會專題研究計畫（新進人員研究計畫）',typeEn:'NSTC Research Project (New Investigator)'}];
 
+// Enrich existing projects by year; the four supplied grants are not new records.
+const RESEARCH_PROJECTS=PROJECTS.map(p=>{
+  const detail=window.RESEARCH_DATA.projectDetails[p.y]||{};
+  return {ty:'project',y:Number(p.y),m:0,g:[],
+    titleZh:detail.titleZh||p.zh,titleEn:detail.titleEn||p.en,
+    orgZh:detail.funderZh||'國家科學及技術委員會',orgEn:detail.funderEn||'National Science and Technology Council (NSTC)',
+    grant:detail.grant||''};
+});
+const RESEARCH_COLLABORATIONS=window.RESEARCH_DATA.collaborations.map(c=>({...c,
+  ty:'collaboration',y:c.start?Number(c.start.slice(0,4)):0,m:c.start?Number(c.start.slice(5,7)):0,g:[]}));
+const RESEARCH_ITEMS=PAPERS.concat(RESEARCH_PROJECTS,RESEARCH_COLLABORATIONS);
+
 const PROF_TAGS=['machine-learning','deep-learning','anomaly-detection','defect-detection','smart-manufacturing','equipment-health-monitoring'];
 
 const MEMBERS=[
@@ -777,6 +818,25 @@ const MEMBERS=[
 {name:'林家仟',photo:'assets/images/m-lin-jiaqian.jpg',deg:'master',yr:114,descZh:'碩士班學生，研究涵蓋影像識別、深度學習與機器學習於智慧製造場域之應用，並延伸至 AI Agent 與資料庫管理。',descEn:'Master\u2019s student spanning image recognition, deep learning and machine learning for smart manufacturing, extending into AI agents and database management.',tags:['image-recognition','deep-learning','smart-manufacturing','ai-agent']},
 {name:'王亮凱',photo:'assets/images/m-wang-liangkai.png',deg:'master',yr:114,descZh:'碩士班學生，研究方向聚焦於影像識別與深度學習於智慧製造之應用，並具備 AI Agent、網頁開發與資料庫管理之整合能力。',descEn:'Master\u2019s student focused on image recognition and deep learning for smart manufacturing, integrating AI agents, web development and database management.',tags:['image-recognition','deep-learning','smart-manufacturing','ai-agent']},
 {name:'陳楷綸',photo:'assets/images/m-chen-kailun.jpg',deg:'master',yr:114,descZh:'碩士班學生，研究方向結合影像識別與機器學習於智慧製造場域之應用，並延伸至 AI Agent、網頁開發與資料庫管理。',descEn:'Master\u2019s student combining image recognition and machine learning for smart manufacturing, extending into AI agents, web development and database management.',tags:['image-recognition','machine-learning','smart-manufacturing','ai-agent']}];
+
+MEMBERS.push(
+{name:'呂冠廷',photo:'assets/images/呂冠廷.jpg',deg:'master',yr:115,tags:[],photoPosition:'center 40%'},
+{name:'廖彥誠',photo:'assets/images/廖彥誠.jpg',deg:'master',yr:115,tags:[],photoPosition:'center 65%'},
+{name:'蔡尚宇',photo:'assets/images/蔡尚宇.jpg',deg:'master',yr:115,tags:[],photoPosition:'center 50%'},
+{name:'陳佑瀧',photo:'assets/images/陳佑瀧.jpg',deg:'master',yr:115,tags:[],photoPosition:'center 55%'},
+{name:'陳柏臻',photo:'assets/images/陳柏臻.jpg',deg:'master',yr:115,tags:[],photoPosition:'center 60%'},
+{name:'陳筱棠',photo:'assets/images/陳筱棠.jpg',deg:'master',yr:115,tags:[],photoPosition:'center 65%'});
+
+const taipeiDateParts=Object.fromEntries(new Intl.DateTimeFormat('en-US',{
+  timeZone:'Asia/Taipei',year:'numeric',month:'numeric'
+}).formatToParts(new Date()).map(part=>[part.type,part.value]));
+const currentAcademicYear=Number(taipeiDateParts.year)-1911-(Number(taipeiDateParts.month)<8?1:0);
+const compareAcademicYears=(a,b)=>{
+  const cohortGroup=year=>year===currentAcademicYear||year===currentAcademicYear-1?0:year<currentAcademicYear-1?1:2;
+  const groupDifference=cohortGroup(a)-cohortGroup(b);
+  if(groupDifference)return groupDifference;
+  return cohortGroup(a)===0||cohortGroup(a)===2?a-b:b-a;
+};
 
 const DEG={phd:{zh:'博士班',en:'Ph.D. Student'},master:{zh:'碩士班',en:'Master\u2019s Student'}};
 
@@ -818,10 +878,27 @@ function fmt(p){
   const shown=p.a.length>5?p.a.slice(0,3):p.a;
   const extra=p.a.length-shown.length;
   const en=document.documentElement.dataset.lang==='en';
-  return {title:p.t,venue:p.v,date:p.y+'/'+pad(p.m),year:String(p.y),typeLabel:(TYPE_LABEL[p.ty]||{zh:p.ty,en:p.ty})[en?'en':'zh'],
+  return {title:p.t,venue:p.v,date:p.m?p.y+'/'+pad(p.m):String(p.y),year:String(p.y),typeLabel:(TYPE_LABEL[p.ty]||{zh:p.ty,en:p.ty})[en?'en':'zh'],
     authorLine:shown.join(en?', ':'、')+(extra>0?(en?' et al. (+'+extra+')':' 等（+'+extra+'）'):''),
     doi:p.doi||'', hasDoi:!!p.doi, noDoi:!p.doi,
     tagList:p.g.map(s=>({label:(TAGS[s]||[s,s,'tech'])[en?1:0]}))};
+}
+
+function fmtResearch(p){
+  const zh=document.documentElement.dataset.lang!=='en';
+  if(p.ty==='journal'||p.ty==='conference')return {...fmt(p),type:p.ty,isPublication:true,isActivity:false};
+  const collaboration=p.ty==='collaboration';
+  const kinds={academic:{zh:'學術合作',en:'Academic collaboration'},industry:{zh:'產學合作',en:'Industry–academia collaboration'},advisory:{zh:'顧問與兼任職務',en:'Advisory and concurrent roles'}};
+  const kind=kinds[p.kind];
+  const endYear=p.end?Number(p.end.slice(0,4)):p.y;
+  return {type:p.ty,isPublication:false,isActivity:true,isCollaboration:collaboration,
+    title:zh?p.titleZh:p.titleEn,year:p.y?(endYear!==p.y?p.y+'–'+endYear:String(p.y)):'—',
+    typeLabel:TYPE_LABEL[p.ty][zh?'zh':'en'],
+    organization:zh?p.orgZh:p.orgEn,
+    organizationLabel:collaboration?(p.kind==='advisory'?(zh?'任職單位':'Organization'):(zh?'合作單位':'Partner')):(zh?'補助單位':'Funding body'),
+    hasGrant:!!p.grant,grant:p.grant||'',activityKind:kind?kind[zh?'zh':'en']:'',
+    period:p.start&&p.end?p.start.replaceAll('-','/')+' – '+p.end.replaceAll('-','/'):(zh?'文件未提供期間':'Period not provided'),
+    tagList:[],hasDoi:false};
 }
 
 class Component extends DCLogic {
@@ -883,7 +960,8 @@ class Component extends DCLogic {
     const ol=document.getElementById('exp'); if(ol)ol.__wired=false;
     this.setState({page:p,mobileMenuOpen:false}); window.scrollTo(0,0);
   };
-  goHome=this.go('home'); goContact=this.go('contact'); goPubs=this.go('publications');
+  goHome=this.go('home'); goContact=this.go('contact');
+  goPubs=()=>{this.setState({page:'publications',view:'list',type:'journal',tag:null,pg:1,mobileMenuOpen:false});window.scrollTo(0,0);};
 
   /* ---------- graph ---------- */
   buildGraph(){
@@ -1304,7 +1382,7 @@ class Component extends DCLogic {
 
   setList=()=>this.setState({view:'list'});
   setGraph=()=>this.setState({view:'graph'});
-  onType=e=>this.setState({type:e.target.value,pg:1});
+  onType=e=>this.setState({type:e.target.value,tag:null,view:'list',pg:1});
   onPerPage=e=>this.setState({perPage:parseInt(e.target.value,10),pg:1});
   toggleSort=()=>this.setState({asc:!this.state.asc,pg:1});
   resetAll=()=>this.setState({type:'all',tag:null,pg:1});
@@ -1317,9 +1395,13 @@ class Component extends DCLogic {
 
   filtered(){
     const s=this.state;
-    let list=PAPERS.filter(p=>(s.type==='all'||p.ty===s.type)&&(!s.tag||p.g.indexOf(s.tag)>=0));
-    list=list.slice().sort((a,b)=>a.y!==b.y?b.y-a.y:b.m-a.m);
-    if(s.asc)list.reverse();
+    const list=RESEARCH_ITEMS.filter(p=>(s.type==='all'||p.ty===s.type)&&(!s.tag||p.g.indexOf(s.tag)>=0));
+    list.sort((a,b)=>{
+      // Undated source records stay last in both directions.
+      if(!a.y||!b.y)return a.y?-1:b.y?1:0;
+      const order=b.y-a.y||b.m-a.m;
+      return s.asc?-order:order;
+    });
     return list;
   }
   totalPages(){return Math.max(1,Math.ceil(this.filtered().length/this.state.perPage));}
@@ -1371,7 +1453,10 @@ class Component extends DCLogic {
 
     return {
       atProf:s.page==='professor', atTeam:s.page==='team', atContact:s.page==='contact',
-      education:EDU, experience:EXP, projects:PROJECTS,
+      education:EDU, experience:EXP, projects:PROJECTS.map(p=>{
+        const detail=window.RESEARCH_DATA.projectDetails[p.y];
+        return detail?{...p,zh:detail.titleZh,en:detail.titleEn,typeZh:detail.funderZh+' · '+detail.grant,typeEn:detail.funderEn+' · '+detail.grant}:p;
+      }),
       recentPapers:PAPERS.slice().sort((a,b)=>a.y!==b.y?b.y-a.y:b.m-a.m).slice(0,6).map(fmt),
       profTags:PROF_TAGS.map(k=>({label:(TAGS[k]||[k,k])[zh?0:1]})),
       labPhotos:LAB_PHOTOS.map((p,i)=>({src:p.src,alt:zh?p.zh:p.en,op:i===s.photo?1:0})),
@@ -1380,16 +1465,16 @@ class Component extends DCLogic {
         bg:i===s.photo?'var(--color-accent)':'var(--color-accent-200)'})),
       nextPhoto:this.nextPhoto, prevPhoto:this.prevPhoto,
       mYear:s.mYear,
-      yearOptions:[{v:'all',label:zh?'全部學年':'All years'}].concat([113,114,115].map(y=>({v:String(y),label:zh?y+' 學年入學':'Class of '+y}))),
+      yearOptions:[{v:'all',label:zh?'全部學年':'All years'}].concat([...new Set(MEMBERS.filter(m=>m.deg==='master').map(m=>Number(m.yr)).filter(Number.isFinite))].sort(compareAcademicYears).map(y=>({v:String(y),label:zh?y+' 學年入學':'Class of '+y}))),
       setYear:this.setYear,
       memberGroups:['phd','master'].map(d=>{
         let list=MEMBERS.filter(m=>m.deg===d);
-        if(d==='master')list=list.slice().sort((a,b)=>(Number(b.yr)||0)-(Number(a.yr)||0));
+        if(d==='master')list=list.slice().sort((a,b)=>compareAcademicYears(Number(a.yr)||0,Number(b.yr)||0));
         if(d==='master'&&s.mYear!=='all')list=list.filter(m=>String(m.yr)===s.mYear);
         return {zh:d==='phd'?'博士班':'碩士班', en:d==='phd'?'Doctoral Students':'Master\u2019s Students',
           showYear:d==='master', empty:!list.length,
           count:list.length+(zh?' 位':(list.length>1?' MEMBERS':' MEMBER')),
-          list:list.map(m=>({name:m.name,degLabel:DEG[m.deg][zh?'zh':'en'],photo:m.photo||'',photoPosition:m.name==='林郁庭'?'16% 25%':'center 25%',
+          list:list.map(m=>({name:m.name,degLabel:DEG[m.deg][zh?'zh':'en'],photo:m.photo||'',photoPosition:m.photoPosition||(m.name==='林郁庭'?'16% 25%':'center 25%'),
             hasThesis:!!m.thesis, thesis:m.thesis||'',
             tagList:m.tags.map(t=>({label:(TAGS[t]||[t,t])[zh?0:1]}))}))};
       }).filter(g=>g.list.length||g.showYear),
@@ -1418,18 +1503,20 @@ class Component extends DCLogic {
       featured:PAPERS.filter(p=>p.f).map(fmt),
       techCards:TECH,
       isList:s.view==='list', isGraph:s.view==='graph',
+      showPublicationFilters:s.type!=='project'&&s.type!=='collaboration',
+      researchType:s.type,researchPerPage:String(s.perPage),
       listClass:s.view==='list'?'is-selected':'',
       graphClass:s.view==='graph'?'is-selected':'',
       setList:this.setList, setGraph:this.setGraph,
       onType:this.onType, onPerPage:this.onPerPage,
       toggleSort:this.toggleSort, resetAll:this.resetAll,
       sortLabel:s.asc?(zh?'舊到新':'Oldest first'):(zh?'新到舊':'Newest first'),
-      countLabel:(zh?'共 ':'')+list.length+(zh?' 篇 · 第 ':' of '+PAPERS.length+' · page ')+pg+(zh?' / ':' / ')+total+(zh?' 頁':''),
+      countLabel:(zh?'共 ':'')+list.length+(zh?(s.type==='journal'||s.type==='conference'?' 篇 · 第 ':' 項 · 第 '):' of '+RESEARCH_ITEMS.length+' · page ')+pg+' / '+total+(zh?' 頁':''),
       chips:chipSlugs.map(k=>({label:(TAGS[k]||[k,k])[zh?0:1],
         bg:s.tag===k?'var(--color-accent)':'transparent',
         fg:s.tag===k?'#fff':'var(--color-neutral-700)',
         onClick:()=>this.setState({tag:s.tag===k?null:k,pg:1})})),
-      pagePapers:list.slice(start,start+s.perPage).map(fmt),
+      pagePapers:list.slice(start,start+s.perPage).map(fmtResearch),
       pageBtns:Array.from({length:total},(_,i)=>({n:i+1,
         bg:pg===i+1?'var(--color-accent)':'transparent',
         fg:pg===i+1?'#fff':'var(--color-neutral-700)',

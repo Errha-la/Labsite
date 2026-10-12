@@ -93,20 +93,76 @@ async function checkTeam(page) {
   expect(photoState.length).toBeGreaterThan(0);
   expect(photoState.every((photo) => photo.loaded && photo.fit === 'cover')).toBe(true);
   expect(photoState.every((photo) => photo.width >= 96 && photo.height >= 96 && photo.width <= 112 && photo.height <= 112)).toBe(true);
+
+  // Older students retain their research tags; the new class has none yet.
+  expect(await page.locator('#teamWrap .cv-tag').count()).toBeGreaterThan(0);
+  await filter.selectOption('115');
+  const newMembers = page.locator('#teamWrap .member-grid').last().locator('article');
+  await expect(newMembers).toHaveCount(6);
+  await expect(newMembers.locator('.cv-tag')).toHaveCount(0);
+  await expect(newMembers.locator('h3')).toHaveText(['呂冠廷', '廖彥誠', '蔡尚宇', '陳佑瀧', '陳柏臻', '陳筱棠']);
+  for (const photo of await newMembers.locator('img').all()) {
+    await photo.scrollIntoViewIfNeeded();
+    await expect.poll(() => photo.evaluate((img) => img.complete && img.naturalWidth > 0)).toBe(true);
+  }
 }
 
 async function checkPublications(page) {
   const filters = page.locator('select.input');
+  const language = await page.locator('html').getAttribute('data-lang');
+  if (language === 'en') {
+    await expect(page.locator('.mobile-page-content h1 .l-en')).toHaveText('Research');
+    await expect(page.locator('#mobileNavPanel .navlink').nth(4).locator('.l-en')).toHaveText('Research');
+  }
   await filters.nth(0).selectOption('journal');
   await expect(page.locator('#g-pubs article')).not.toHaveCount(0);
   await filters.nth(1).selectOption('25');
+  await expect(page.locator('#g-pubs article')).toHaveCount(22);
+  await expect(page.locator('#g-pubs a[href="https://doi.org/10.1016/j.ins.2008.06.005"]')).toHaveCount(1);
   const sort = page.locator('.mobile-page-content .btn-secondary').first();
   const newest = await sort.textContent();
   await sort.click();
   await expect(sort).not.toHaveText(newest);
   await page.locator('#pubTagFilters button').first().click();
   await expect(page.locator('#g-pubs article')).not.toHaveCount(0);
+
+  // Activity filters clear any publication tag and use their own metadata.
+  await filters.nth(0).selectOption('project');
+  await expect(page.locator('#g-pubs article')).toHaveCount(6);
+  await expect(page.locator('#pubTagFilters')).toHaveCount(0);
+  await expect(page.locator('.radio-inputs')).toHaveCount(0);
+  await expect(page.locator('#g-pubs a')).toHaveCount(0);
+  for (const grant of ['114-2221-E-011-112-', '112-2221-E-005-081-', '110-2221-E-005-087-', '109-2222-E-035-007-']) {
+    await expect(page.locator('#g-pubs')).toContainText(grant);
+  }
+  await expect(page.locator('#g-pubs')).toContainText(language === 'zh' ? '科技部' : 'Ministry of Science and Technology');
+  await filters.nth(0).selectOption('collaboration');
+  await expect(page.locator('#g-pubs article')).toHaveCount(13);
+  await expect(page.locator('#g-pubs .cv-tag')).toHaveCount(0);
+  await expect(page.locator('#g-pubs a')).toHaveCount(0);
+  await expect(page.locator('#g-pubs')).toContainText('2026/01/01 – 2026/12/31');
+  await expect(page.locator('#g-pubs')).toContainText('2025/12/01 – 2026/11/30');
+  await expect(page.locator('#g-pubs')).toContainText(language === 'zh' ? '文件未提供期間' : 'Period not provided');
+  const oldest = await sort.textContent();
+  await sort.click();
+  await expect(sort).not.toHaveText(oldest);
+  // Undated Micron record stays last for either date order.
+  await expect(page.locator('#g-pubs article').last()).toContainText('Micron');
+  await sort.click();
+  await expect(page.locator('#g-pubs article').last()).toContainText('Micron');
+  await filters.nth(1).selectOption('10');
+  await expect(page.locator('#g-pubs article')).toHaveCount(10);
+  await page.locator('.page-button').filter({hasText: /^2$/}).click();
+  await expect(page.locator('#g-pubs article')).toHaveCount(3);
+  await filters.nth(0).selectOption('project');
+  await expect(page.locator('#g-pubs article')).toHaveCount(6);
+  await filters.nth(1).selectOption('50');
   await page.locator('.mobile-page-content .btn-ghost').click();
+  await expect(filters.nth(0)).toHaveValue('all');
+  await expect(page.locator('#g-pubs article')).toHaveCount(41);
+  await expect(page.locator('#g-pubs article[data-research-type="journal"]')).toHaveCount(22);
+  await expect(page.locator('#g-pubs article[data-research-type="project"]')).toHaveCount(6);
+  await expect(page.locator('#g-pubs article[data-research-type="collaboration"]')).toHaveCount(13);
   await page.locator('.radio-inputs .radio').nth(1).click();
   await expect(page.locator('#graphsvg')).toBeVisible();
   const graph = page.locator('#graphsvg g[data-graph-transform]');

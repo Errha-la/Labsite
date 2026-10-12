@@ -555,6 +555,30 @@ textarea.input {
   align-items: center;
   margin-bottom: 10px;
 }
+.research-details {
+  display: grid;
+  gap: 10px;
+  margin: 12px 0 0;
+  font-size: 13px;
+  line-height: 1.6;
+}
+.research-details > div {
+  display: grid;
+  grid-template-columns: 76px minmax(0, 1fr);
+  gap: 6px 12px;
+}
+.research-details dt {
+  color: var(--color-neutral-600);
+}
+.research-details dd {
+  min-width: 0;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.mobile-page-content .btn,
+.mobile-page-content .research-count {
+  font-family: "Barlow Condensed", "Noto Sans TC", system-ui, sans-serif;
+}
 /* 柔和圓角卡片（團隊、核心技術、研究成果）：取代藍圖角標方框 */
 .blueprint.soft-card {
   border: 1px solid var(--card-line);

@@ -12,6 +12,7 @@ function copySiteAssets() {
     closeBundle() {
       const files = [
         'assets/data/story-data.js',
+        'assets/data/research-data.js',
         'assets/js/factory-scene.js',
         'assets/js/runtime.js',
         'assets/js/story-timeline.js',
