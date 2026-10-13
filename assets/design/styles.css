@@ -759,7 +759,7 @@ html.rev-on [data-reveal].shown {
 }
 .story-scroll {
   position: relative;
-  height: 900vh;
+  height: 500vh;
   background: var(--color-neutral-100);
   border-bottom: 1px solid var(--color-divider);
 }
@@ -1205,7 +1205,7 @@ button,a,select {
     z-index: 70;
   }
   #scrollwrap {
-    height: 900vh !important;
+    height: 500vh !important;
     min-height: 100dvh;
   }
   #actNav {
