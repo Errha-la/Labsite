@@ -111,7 +111,7 @@ async function checkPublications(page) {
   const filters = page.locator('select.input');
   const language = await page.locator('html').getAttribute('data-lang');
   if (language === 'en') {
-    await expect(page.locator('.mobile-page-content h1 .l-en')).toHaveText('Research');
+    await expect(page.locator('.section-publications h1 .l-en')).toHaveText('Research');
     await expect(page.locator('#mobileNavPanel .navlink').nth(4).locator('.l-en')).toHaveText('Research');
   }
   await filters.nth(0).selectOption('journal');
@@ -119,7 +119,7 @@ async function checkPublications(page) {
   await filters.nth(1).selectOption('25');
   await expect(page.locator('#g-pubs article')).toHaveCount(22);
   await expect(page.locator('#g-pubs a[href="https://doi.org/10.1016/j.ins.2008.06.005"]')).toHaveCount(1);
-  const sort = page.locator('.mobile-page-content .btn-secondary').first();
+  const sort = page.locator('.section-publications .btn-secondary').first();
   const newest = await sort.textContent();
   await sort.click();
   await expect(sort).not.toHaveText(newest);
@@ -157,7 +157,7 @@ async function checkPublications(page) {
   await filters.nth(0).selectOption('project');
   await expect(page.locator('#g-pubs article')).toHaveCount(6);
   await filters.nth(1).selectOption('50');
-  await page.locator('.mobile-page-content .btn-ghost').click();
+  await page.locator('.section-publications .btn-ghost').click();
   await expect(filters.nth(0)).toHaveValue('all');
   await expect(page.locator('#g-pubs article')).toHaveCount(41);
   await expect(page.locator('#g-pubs article[data-research-type="journal"]')).toHaveCount(22);

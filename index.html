@@ -51,7 +51,7 @@ html[data-lang="en"] #boot .l-en{display:block}
 html[data-lang="en"] .l-zh{display:none}
 html[data-lang="en"] .l-en{display:revert}
 @media (max-width:760px){
-  .mobile-page-content{padding-left:16px !important;padding-right:16px !important;min-width:0;box-sizing:border-box}
+  .container{padding-left:16px !important;padding-right:16px !important;min-width:0;box-sizing:border-box}
   .about-content-grid{grid-template-columns:minmax(0,1fr) !important;gap:24px !important}
   .about-photo{width:100%;max-width:560px;justify-self:center}
   #contactDetails{grid-template-columns:minmax(0,1fr) !important}
@@ -113,7 +113,7 @@ html[data-lang="en"] .l-en{display:revert}
       <sc-for list="{{ navItems }}" as="n" hint-placeholder-count="5">
         <button type="button" class="navlink" data-on="{{ n.on }}" onClick="{{ n.go }}"><span class="l-zh">{{ n.zh }}</span><span class="l-en">{{ n.en }}</span></button>
       </sc-for>
-      <button type="button" class="lang-toggle u-margin-left-12px-border-radius-999-7367b0b" onClick="{{ toggleLang }}" aria-label="{{ langLabel }} 切換語言 Switch language">{{ langLabel }}</button>
+      <button type="button" class="lang-toggle" onClick="{{ toggleLang }}" aria-label="{{ langLabel }} 切換語言 Switch language">{{ langLabel }}</button>
     </nav>
     <button type="button" class="mobile-menu-button" onClick="{{ toggleMobileMenu }}" aria-controls="mobileNavPanel" aria-expanded="{{ mobileMenuExpanded }}" aria-label="{{ mobileMenuLabel }}">{{ mobileMenuIcon }}</button>
   </div>
@@ -122,7 +122,7 @@ html[data-lang="en"] .l-en{display:revert}
       <sc-for list="{{ navItems }}" as="n" hint-placeholder-count="5">
         <button type="button" class="navlink" data-on="{{ n.on }}" onClick="{{ n.go }}"><span class="l-zh">{{ n.zh }}</span><span class="l-en">{{ n.en }}</span></button>
       </sc-for>
-      <button type="button" class="mobile-lang lang-toggle u-border-radius-999px-border-1px-sol-89f7b7d" onClick="{{ toggleLang }}" aria-label="{{ langLabel }} 切換語言 Switch language">{{ langLabel }}</button>
+      <button type="button" class="mobile-lang lang-toggle" onClick="{{ toggleLang }}" aria-label="{{ langLabel }} 切換語言 Switch language">{{ langLabel }}</button>
     </nav>
   </div>
 </header>
@@ -134,61 +134,61 @@ html[data-lang="en"] .l-en{display:revert}
   <div id="scrollwrap" class="story-scroll">
     <div class="story-scroll__stage">
 
-      <div id="worldBox" class="u-position-absolute-inset-0-4a7d83b">
-        <canvas id="lineCanvas" class="u-position-absolute-inset-0-8f868de"></canvas>
-        <div id="lineFallback" aria-hidden="true" class="u-position-absolute-inset-0-ee3a069">
+      <div id="worldBox" class="story-world" aria-hidden="true">
+        <canvas id="lineCanvas" class="story-canvas" aria-hidden="true"></canvas>
+        <div id="lineFallback" aria-hidden="true" class="story-fallback">
           <picture>
             <source media="(max-width:760px)" srcset="assets/images/hero-mobile.webp" type="image/webp">
-            <img src="assets/images/hero-desktop.webp" alt="" width="1440" height="900" fetchpriority="high" decoding="async" class="u-position-absolute-inset-0-886a8b0">
+            <img src="assets/images/hero-desktop.webp" alt="" width="1440" height="900" fetchpriority="high" decoding="async" class="story-fallback__image">
           </picture>
         </div>
       </div>
 
-      <div id="bleedFrame" aria-hidden="true" class="u-position-absolute-inset-0-d9bdb33"></div>
+      <div id="bleedFrame" aria-hidden="true" class="story-bleed-frame"></div>
 
-      <div id="heroFrame" class="u-position-absolute-left-0-afbd2c5">
-        <span class="u-position-absolute-left-28px-8504d94">FIG. 01 — CLOSED LOOP LINE</span>
-        <span class="u-position-absolute-right-28px-31a1cf2">ISOMETRIC · NTUST APC LAB</span>
+      <div id="heroFrame" class="story-frame" aria-hidden="true">
+        <span class="story-frame__label--left">FIG. 01 — CLOSED LOOP LINE</span>
+        <span class="story-frame__label--right">ISOMETRIC · NTUST APC LAB</span>
       </div>
 
-      <div id="heroTitle" class="u-position-absolute-left-0-afbe29d">
+      <div id="heroTitle" class="story-title">
         <div>
-          <div class="hero-kicker u-display-flex-align-items-center-5437597">
-            <span class="u-width-40px-height-1px-8d98d94"></span>
-            <span class="hero-kicker-text u-font-size-11px-letter-spacing-2em-8a33be1">National Taiwan University of Science and Technology</span>
-            <span class="u-width-40px-height-1px-8d98d94"></span>
+          <div class="hero-kicker">
+            <span class="hero-kicker__rule" aria-hidden="true"></span>
+            <span class="hero-kicker-text">National Taiwan University of Science and Technology</span>
+            <span class="hero-kicker__rule" aria-hidden="true"></span>
           </div>
-          <h1 class="l-zh u-font-size-clamp-38px-5vw-76px-line-c27766d">先進製程與設備智能輔助實驗室</h1>
-          <h1 class="l-en u-font-size-clamp-32px-4vw-62px-line-b32f764">Advanced Process Control &amp; Intelligent Equipment Lab</h1>
-          <p class="hero-subtitle l-zh u-font-size-clamp-13px-1-35vw-17px-l-7a0aca6">以 AI Agent 與數位雙生為核心，打造自主決策與人機協作的閉環智慧製造。</p>
-          <p class="hero-subtitle l-en u-font-size-16px-line-height-1-75-f27a36e">Closed-loop smart manufacturing built on AI agents and digital twins, for autonomous decisions and human–AI collaboration.</p>
-          <div class="u-margin-top-26px-font-family-barlow-4acf456">↓ <span class="l-zh">向下捲動展開產線</span><span class="l-en">SCROLL TO EXPAND THE LINE</span></div>
+          <h1 class="l-zh hero-heading--zh">先進製程與設備智能輔助實驗室</h1>
+          <h1 class="l-en hero-heading--en">Advanced Process Control &amp; Intelligent Equipment Lab</h1>
+          <p class="hero-subtitle l-zh hero-subtitle--zh">以 AI Agent 與數位雙生為核心，打造自主決策與人機協作的閉環智慧製造。</p>
+          <p class="hero-subtitle l-en hero-subtitle--en">Closed-loop smart manufacturing built on AI agents and digital twins, for autonomous decisions and human–AI collaboration.</p>
+          <div class="hero-scroll-hint">↓ <span class="l-zh">向下捲動展開產線</span><span class="l-en">SCROLL TO EXPAND THE LINE</span></div>
         </div>
       </div>
 
-      <nav id="actNav" aria-label="故事章節 Story chapters" class="u-position-absolute-left-32px-fe9cff1">
+      <nav id="actNav" aria-label="故事章節 Story chapters" class="story-chapter-nav">
         <sc-for list="{{ stations }}" as="s" hint-placeholder-count="6">
-          <button type="button" data-actjump="{{ s.i }}" aria-label="{{ s.num }} {{ s.en }}" title="{{ s.en }}" class="u-min-width-44px-height-44px-baf111c">{{ s.num }}</button>
+          <button type="button" data-actjump="{{ s.i }}" aria-label="{{ s.num }} {{ s.en }}" title="{{ s.en }}" class="story-chapter-button">{{ s.num }}</button>
         </sc-for>
       </nav>
-      <div id="stationUI" class="u-position-absolute-inset-0-6631921">
-        <div class="station-title u-position-absolute-right-28px-13022a4">
-          <span class="u-font-family-barlow-condensed-sans-fc9d3b3">FIG. 01</span>
-          <h2 class="u-margin-0-font-size-20px-5d48e7b"><span class="l-zh">閉環智慧製造產線</span><span class="l-en">Closed-loop Smart Production Line</span></h2>
+      <div id="stationUI" class="station-overlay">
+        <div class="station-title">
+          <span class="station-title__figure">FIG. 01</span>
+          <h2 class="station-title__heading"><span class="l-zh">閉環智慧製造產線</span><span class="l-en">Closed-loop Smart Production Line</span></h2>
         </div>
-        <div id="actPanel" class="station-panel u-position-absolute-left-0-44e226d">
-          <div class="u-position-relative-min-height-330px-131d964">
+        <div id="actPanel" class="station-panel">
+          <div class="station-panel__body">
             <sc-for list="{{ stations }}" as="s" hint-placeholder-count="5">
-              <div data-panel="{{ s.i }}" class="u-position-absolute-left-0-9ae4d7f">
-                <div class="u-font-family-barlow-condensed-sans-bca8fe5">ACT {{ s.num }}</div>
-                <h3 class="u-font-size-38px-margin-0-0-6px-7cc2171"><span class="l-zh">{{ s.zh }}</span><span class="l-en">{{ s.en }}</span></h3>
-                <div class="l-zh u-font-family-barlow-condensed-sans-a30a43f">{{ s.en }}</div>
-                <div class="l-en u-height-16px-18add01"></div>
-                <p class="l-zh act-inset u-margin-0-0-18px-font-size-15-5px-8f5123f">{{ s.descZh }}</p>
-                <p class="l-en act-inset u-margin-0-0-18px-font-size-15px-10efec0">{{ s.descEn }}</p>
-                <div class="u-border-top-1px-solid-var-color-div-cd58fd3">
-                  <div class="u-font-family-barlow-condensed-sans-c56992f">KEY TECHNOLOGIES</div>
-                  <div class="act-inset u-font-family-barlow-condensed-noto-7d161c8"><span class="l-zh">{{ s.areaZh }}</span><span class="l-en">{{ s.areaEn }}</span></div>
+              <div data-panel="{{ s.i }}" class="station-panel__item">
+                <div class="station-panel__act">ACT {{ s.num }}</div>
+                <h3 class="station-panel__heading"><span class="l-zh">{{ s.zh }}</span><span class="l-en">{{ s.en }}</span></h3>
+                <div class="l-zh station-panel__subtitle">{{ s.en }}</div>
+                <div class="l-en station-panel__spacer"></div>
+                <p class="l-zh act-inset station-panel__description--zh">{{ s.descZh }}</p>
+                <p class="l-en act-inset station-panel__description--en">{{ s.descEn }}</p>
+                <div class="station-panel__technologies">
+                  <div class="station-panel__label">KEY TECHNOLOGIES</div>
+                  <div class="act-inset station-panel__technology"><span class="l-zh">{{ s.areaZh }}</span><span class="l-en">{{ s.areaEn }}</span></div>
                 </div>
               </div>
             </sc-for>
@@ -198,18 +198,18 @@ html[data-lang="en"] .l-en{display:revert}
     </div>
   </div>
 
-  <div class="mobile-page-content u-max-width-1320px-margin-0-auto-d643ad9">
-    <div class="u-display-flex-align-items-baseline-5e1665e">
-      <h2 class="u-font-size-32px-margin-0-c74603e"><span class="l-zh">精選論文</span><span class="l-en">Featured Publications</span></h2>
-      <button type="button" onClick="{{ goPubs }}" class="u-background-transparent-border-0-6cb5f9b"><span class="l-zh">查看全部</span><span class="l-en">View All</span> →</button>
+  <div class="container section-featured">
+    <div class="section-heading-row">
+      <h2 class="section-heading"><span class="l-zh">精選論文</span><span class="l-en">Featured Publications</span></h2>
+      <button type="button" onClick="{{ goPubs }}" class="featured-more"><span class="l-zh">查看全部</span><span class="l-en">View All</span> →</button>
     </div>
-    <div id="g-feat" class="u-display-grid-grid-template-columns-3ca07eb">
+    <div id="g-feat" class="grid-featured">
       <sc-for list="{{ featured }}" as="p" hint-placeholder-count="4">
-        <article class="blueprint soft-card u-position-relative-padding-22px-24p-8deb607" data-reveal="">
+        <article class="blueprint soft-card featured-card" data-reveal="">
           <div class="pub-meta"><span class="pill pill-date">{{ p.year }}</span><span class="pill pill-type">{{ p.typeLabel }}</span></div>
-          <h3 class="u-font-size-19px-line-height-1-28-1245468">{{ p.title }}</h3>
-          <p class="u-margin-0-0-4px-font-size-13px-fa46edf">{{ p.authorLine }}</p>
-          <p class="u-margin-0-font-size-12-5px-af33de1">{{ p.venue }}</p>
+          <h3 class="featured-card__title">{{ p.title }}</h3>
+          <p class="publication-authors">{{ p.authorLine }}</p>
+          <p class="featured-card__venue">{{ p.venue }}</p>
 
         </article>
       </sc-for>
@@ -221,29 +221,29 @@ html[data-lang="en"] .l-en{display:revert}
 
 <sc-if value="{{ atAbout }}" hint-placeholder-val="{{ false }}">
 <section>
-  <div class="mobile-page-content u-max-width-1320px-margin-0-auto-af2eec7">
-    <div class="u-display-flex-align-items-center-e514fbf">
-      <span class="u-width-34px-height-1px-ae9a487"></span>
-      <span class="u-font-size-11px-letter-spacing-16em-ff739cf">About</span>
+  <div class="container section-about">
+    <div class="section-kicker">
+      <span class="section-kicker__rule" aria-hidden="true"></span>
+      <span class="section-kicker__label">About</span>
     </div>
-    <h1 class="u-font-size-44px-margin-0-0-24px-89f1e97"><span class="l-zh">關於我們</span><span class="l-en">About Us</span></h1>
-    <div class="about-content-grid u-display-grid-grid-template-columns-facfb35">
+    <h1 class="page-title page-title--about"><span class="l-zh">關於我們</span><span class="l-en">About Us</span></h1>
+    <div class="about-content-grid">
     <div>
-    <p class="l-zh u-font-size-16px-line-height-1-85-7755d25">本實驗室以智慧製造中的分析、最佳化與決策支援為研究主軸，涵蓋設備健康監測與預測性維護、排程與系統最佳化，以及運用深度學習進行影像辨識與瑕疵檢測。近期研究進一步結合大型語言模型、知識圖譜與檢索增強生成，探討如何將製造領域知識融入瑕疵分析與決策支援。</p>
-    <p class="l-en u-font-size-16px-line-height-1-8-4df81d9">Our research focuses on analytics, optimization, and decision support for smart manufacturing. Topics include equipment health monitoring and predictive maintenance, scheduling and system optimization, and deep learning for image recognition and defect detection. Recent work also combines large language models, knowledge graphs, and retrieval-augmented generation to explore how manufacturing knowledge can support defect analysis and decision-making.</p>
+    <p class="l-zh about-copy--zh">本實驗室以智慧製造中的分析、最佳化與決策支援為研究主軸，涵蓋設備健康監測與預測性維護、排程與系統最佳化，以及運用深度學習進行影像辨識與瑕疵檢測。近期研究進一步結合大型語言模型、知識圖譜與檢索增強生成，探討如何將製造領域知識融入瑕疵分析與決策支援。</p>
+    <p class="l-en about-copy--en">Our research focuses on analytics, optimization, and decision support for smart manufacturing. Topics include equipment health monitoring and predictive maintenance, scheduling and system optimization, and deep learning for image recognition and defect detection. Recent work also combines large language models, knowledge graphs, and retrieval-augmented generation to explore how manufacturing knowledge can support defect analysis and decision-making.</p>
     </div>
 
-    <figure class="blueprint soft-card about-photo u-position-relative-margin-0-f0b5a95">
-      <div class="u-position-relative-flex-1-1f8ac0e">
+    <figure class="blueprint soft-card about-photo">
+      <div class="about-photo__viewport">
         <sc-for list="{{ labPhotos }}" as="ph" hint-placeholder-count="4">
           <img class="about-photo-image" src="{{ ph.src }}" alt="{{ ph.alt }}" loading="lazy" style="opacity: {{ ph.op }}">
         </sc-for>
-        <button type="button" class="photo-arrow u-position-absolute-left-0-8308794" onClick="{{ prevPhoto }}" aria-label="上一張 Previous">‹</button>
-        <button type="button" class="photo-arrow u-position-absolute-right-0-e743adf" onClick="{{ nextPhoto }}" aria-label="下一張 Next">›</button>
+        <button type="button" class="photo-arrow photo-arrow--previous" onClick="{{ prevPhoto }}" aria-label="上一張 Previous">‹</button>
+        <button type="button" class="photo-arrow photo-arrow--next" onClick="{{ nextPhoto }}" aria-label="下一張 Next">›</button>
       </div>
-      <figcaption class="u-flex-none-display-flex-2c79c9a">
-        <span class="u-font-family-barlow-condensed-noto-dc03fcb"><span class="l-zh">{{ labCaptionZh }}</span><span class="l-en">{{ labCaptionEn }}</span></span>
-        <span class="u-display-flex-gap-5px-3374cc7">
+      <figcaption class="about-photo__caption">
+        <span class="about-photo__caption-text"><span class="l-zh">{{ labCaptionZh }}</span><span class="l-en">{{ labCaptionEn }}</span></span>
+        <span class="about-photo__indicators">
           <sc-for list="{{ labDots }}" as="d" hint-placeholder-count="4">
             <button type="button" class="photo-indicator" onClick="{{ d.go }}" aria-label="{{ d.label }}" style="background: {{ d.bg }}"></button>
           </sc-for>
@@ -254,45 +254,45 @@ html[data-lang="en"] .l-en{display:revert}
     </div>
   </div>
 
-  <div class="mobile-page-content u-max-width-1320px-margin-0-auto-13df817">
-    <h2 class="u-font-size-32px-margin-0-c74603e"><span class="l-zh">核心技術與應用</span><span class="l-en">Core Techniques &amp; Applications</span></h2>
-    <div class="u-display-flex-align-items-center-86765ae">
-      <span class="u-font-family-barlow-condensed-noto-afa9105"><span class="l-zh">滑鼠移入翻面 · 技術 ⇄ 應用</span><span class="l-en">HOVER TO FLIP · TECHNIQUES ⇄ APPLICATIONS</span></span>
-      <span class="u-flex-1-height-1px-358ea9b"></span>
+  <div class="container section-techniques">
+    <h2 class="section-heading"><span class="l-zh">核心技術與應用</span><span class="l-en">Core Techniques &amp; Applications</span></h2>
+    <div class="technique-intro">
+      <span class="technique-intro__label"><span class="l-zh">滑鼠移入翻面 · 技術 ⇄ 應用</span><span class="l-en">HOVER TO FLIP · TECHNIQUES ⇄ APPLICATIONS</span></span>
+      <span class="section-divider"></span>
     </div>
 
-    <div id="g-tech" class="u-display-grid-grid-template-columns-8f821e0">
+    <div id="g-tech" class="grid-techniques">
       <sc-for list="{{ techCards }}" as="c" hint-placeholder-count="4">
-        <div data-card="" class="u-position-relative-height-660px-82c270b">
-          <div data-inner="" class="u-position-absolute-inset-0-d304d4d">
-            <div class="blueprint soft-card u-position-absolute-inset-0-f7e557c">
-              <span class="u-display-inline-flex-align-items-ce-98079ec">{{ c.n }}</span>
-              <h3 class="u-font-size-20px-line-height-1-22-9f71063"><span class="l-zh">{{ c.titleZh }}</span><span class="l-en">{{ c.titleEn }}</span></h3>
-              <p class="l-zh u-margin-0-0-16px-font-size-12px-668d96f">{{ c.titleEn }}</p>
-              <div class="u-font-family-barlow-condensed-sans-86a07e9"><span class="l-zh">核心技術</span><span class="l-en">CORE TECHNIQUES</span></div>
-              <ul class="u-margin-0-padding-0-b8660f2">
+        <div data-card="" class="technique-card">
+          <div data-inner="" class="technique-card__inner">
+            <div class="blueprint soft-card technique-card__face--front">
+              <span class="technique-card__number--front">{{ c.n }}</span>
+              <h3 class="technique-card__title"><span class="l-zh">{{ c.titleZh }}</span><span class="l-en">{{ c.titleEn }}</span></h3>
+              <p class="l-zh technique-card__translation">{{ c.titleEn }}</p>
+              <div class="technique-card__section-label"><span class="l-zh">核心技術</span><span class="l-en">CORE TECHNIQUES</span></div>
+              <ul class="technique-list">
                 <sc-for list="{{ c.tq }}" as="t" hint-placeholder-count="4">
-                  <li class="u-display-flex-gap-8px-9ed7b5c"><span class="u-color-var-color-accent-flex-none-0127baa">—</span><span><span class="l-zh">{{ t.zh }}</span><span class="l-en">{{ t.en }}</span></span></li>
+                  <li class="technique-list__item"><span class="technique-list__marker" aria-hidden="true">—</span><span><span class="l-zh">{{ t.zh }}</span><span class="l-en">{{ t.en }}</span></span></li>
                 </sc-for>
               </ul>
-              <div class="u-margin-top-auto-padding-top-14px-1c9765f">↻ <span class="l-zh">翻面看應用</span><span class="l-en">FLIP FOR APPLICATIONS</span></div>
+              <div class="technique-card__flip-hint">↻ <span class="l-zh">翻面看應用</span><span class="l-en">FLIP FOR APPLICATIONS</span></div>
 
             </div>
-            <div class="blueprint soft-card u-position-absolute-inset-0-f5b3767">
-              <span class="u-display-inline-flex-align-items-ce-9c82bb5">{{ c.n }}</span>
-              <div class="u-font-family-barlow-condensed-noto-fd088fd"><span class="l-zh">延伸研究方向</span><span class="l-en">POSSIBLE RESEARCH DIRECTIONS</span></div>
-              <ol data-directions="" class="u-margin-0-0-14px-padding-left-22px-d666c36">
+            <div class="blueprint soft-card technique-card__face--back">
+              <span class="technique-card__number--back">{{ c.n }}</span>
+              <div class="technique-card__back-heading"><span class="l-zh">延伸研究方向</span><span class="l-en">POSSIBLE RESEARCH DIRECTIONS</span></div>
+              <ol data-directions="" class="technique-card__directions">
                 <sc-for list="{{ c.directions }}" as="d" hint-placeholder-count="3">
-                  <li class="u-font-size-13px-line-height-1-45-ab2e796"><span class="l-zh">{{ d.zh }}</span><span class="l-en">{{ d.en }}</span></li>
+                  <li class="technique-card__direction"><span class="l-zh">{{ d.zh }}</span><span class="l-en">{{ d.en }}</span></li>
                 </sc-for>
               </ol>
-              <div class="u-font-family-barlow-condensed-noto-0774457"><span class="l-zh">研究成果</span><span class="l-en">RESEARCH OUTPUTS</span></div>
-              <ul data-references="" class="u-margin-0-padding-0-0-0-18px-aa2664f">
+              <div class="technique-card__outputs-heading"><span class="l-zh">研究成果</span><span class="l-en">RESEARCH OUTPUTS</span></div>
+              <ul data-references="" class="technique-card__outputs">
                 <sc-for list="{{ c.cases }}" as="r" hint-placeholder-count="2">
-                  <li class="u-font-size-11-5px-line-height-1-4-3e40948"><a href="{{ r.href }}" target="_blank" rel="noopener noreferrer" class="u-color-inherit-text-decoration-unde-dabbe65"><em>{{ r.title }}</em></a><div class="u-margin-top-3px-3d494aa"><span class="l-zh">{{ r.zh }}</span><span class="l-en">{{ r.en }}</span></div></li>
+                  <li class="technique-card__output"><a href="{{ r.href }}" target="_blank" rel="noopener noreferrer" class="technique-card__output-link"><em>{{ r.title }}</em></a><div class="technique-card__output-detail"><span class="l-zh">{{ r.zh }}</span><span class="l-en">{{ r.en }}</span></div></li>
                 </sc-for>
               </ul>
-              <div class="u-margin-top-auto-padding-top-12px-9aabf32">{{ c.titleEn }}</div>
+              <div class="technique-card__back-title">{{ c.titleEn }}</div>
 
             </div>
           </div>
@@ -304,18 +304,18 @@ html[data-lang="en"] .l-en{display:revert}
 </sc-if>
 
 <sc-if value="{{ atPubs }}" hint-placeholder-val="{{ false }}">
-<section class="u-background-var-color-neutral-100-0ab2434">
-  <div class="mobile-page-content u-max-width-1320px-margin-0-auto-23512bf">
-    <div class="u-display-flex-align-items-center-e514fbf">
-      <span class="u-width-34px-height-1px-ae9a487"></span>
-      <span class="u-font-size-11px-letter-spacing-16em-ff739cf">Research</span>
+<section class="publications-page">
+  <div class="container section-publications">
+    <div class="section-kicker">
+      <span class="section-kicker__rule" aria-hidden="true"></span>
+      <span class="section-kicker__label">Research</span>
     </div>
-    <h1 class="u-font-size-44px-margin-0-0-16px-dea0b90"><span class="l-zh">研究成果</span><span class="l-en">Research</span></h1>
-    <p class="l-zh u-font-size-16px-line-height-1-75-e8c7dd7">彙整實驗室的論文、研究計畫與產學／學術合作。可用類型選單篩選，或透過論文關聯圖探索共享的研究方法、主題與技術。</p>
-    <p class="l-en u-font-size-16px-line-height-1-75-e8c7dd7">Explore our publications, research projects, and industry–academia and academic collaborations. Filter by type, or use the publication graph to explore shared research fields.</p>
+    <h1 class="page-title--research"><span class="l-zh">研究成果</span><span class="l-en">Research</span></h1>
+    <p class="l-zh research-intro--zh">彙整實驗室的論文、研究計畫與產學／學術合作。可用類型選單篩選，或透過論文關聯圖探索共享的研究方法、主題與技術。</p>
+    <p class="l-en research-intro--en">Explore our publications, research projects, and industry–academia and academic collaborations. Filter by type, or use the publication graph to explore shared research fields.</p>
 
     <sc-if value="{{ showPublicationFilters }}" hint-placeholder-val="{{ true }}">
-    <div class="radio-inputs u-margin-top-26px-59989cc">
+    <div class="radio-inputs">
       <label class="radio">
         <input type="radio" name="pubview" onChange="{{ setList }}">
         <span class="name {{ listClass }}"><span class="l-zh">清單模式</span><span class="l-en">List</span></span>
@@ -329,25 +329,25 @@ html[data-lang="en"] .l-en{display:revert}
 
     <sc-if value="{{ isList }}" hint-placeholder-val="{{ true }}">
       <div>
-        <div class="blueprint soft-card u-position-relative-margin-top-20px-0f5c323">
-          <div class="u-display-flex-flex-wrap-wrap-9eee333">
-            <label class="u-display-flex-align-items-center-82d3ef3"><span class="l-zh">類型</span><span class="l-en">Type</span>
-              <select id="researchType" class="input u-width-auto-padding-6px-10px-bf35699" value="{{ researchType }}" onChange="{{ onType }}">
+        <div class="blueprint soft-card publication-filters">
+          <div class="publication-filters__row">
+            <label class="publication-filter"><span class="l-zh">類型</span><span class="l-en">Type</span>
+              <select id="researchType" class="input research-filter__select" value="{{ researchType }}" onChange="{{ onType }}">
                 <option value="all">全部 / All</option><option value="journal">期刊 / Journal</option><option value="conference">研討會 / Conference</option>
                 <option value="project">研究計畫 / Projects</option><option value="collaboration">合作 / Collaborations</option>
               </select>
             </label>
-            <label class="u-display-flex-align-items-center-82d3ef3"><span class="l-zh">每頁筆數</span><span class="l-en">Per page</span>
-              <select class="input u-width-auto-padding-6px-10px-bf35699" value="{{ researchPerPage }}" onChange="{{ onPerPage }}">
+            <label class="publication-filter"><span class="l-zh">每頁筆數</span><span class="l-en">Per page</span>
+              <select class="input research-filter__select" value="{{ researchPerPage }}" onChange="{{ onPerPage }}">
                 <option value="10">10</option><option value="25">25</option><option value="50">50</option><option value="9999">全部 / All</option>
               </select>
             </label>
-            <button type="button" class="research-sort btn btn-secondary u-font-size-13px-5e461f0" onClick="{{ toggleSort }}">{{ sortLabel }}</button>
-            <button type="button" class="btn btn-ghost u-font-size-13px-5e461f0" onClick="{{ resetAll }}"><span class="l-zh">清除篩選</span><span class="l-en">Clear</span></button>
-            <span class="research-count u-margin-left-auto-font-family-barlo-158cfeb">{{ countLabel }}</span>
+            <button type="button" class="research-sort btn btn-secondary btn-compact" onClick="{{ toggleSort }}">{{ sortLabel }}</button>
+            <button type="button" class="btn btn-ghost btn-compact" onClick="{{ resetAll }}"><span class="l-zh">清除篩選</span><span class="l-en">Clear</span></button>
+            <span class="research-count publication-count">{{ countLabel }}</span>
           </div>
           <sc-if value="{{ showPublicationFilters }}" hint-placeholder-val="{{ true }}">
-          <div id="pubTagFilters" class="u-display-flex-flex-wrap-wrap-f8cc98e">
+          <div id="pubTagFilters" class="publication-tag-filters">
             <sc-for list="{{ chips }}" as="c" hint-placeholder-count="12">
               <button type="button" class="filter-chip" onClick="{{ c.onClick }}" style="background: {{ c.bg }};color: {{ c.fg }}">{{ c.label }}</button>
             </sc-for>
@@ -355,14 +355,14 @@ html[data-lang="en"] .l-en{display:revert}
           </sc-if>
 
         </div>
-        <div id="g-pubs" class="u-display-grid-grid-template-columns-dd3718b">
+        <div id="g-pubs" class="grid-pubs">
           <sc-for list="{{ pagePapers }}" as="p" hint-placeholder-count="10">
-            <article class="blueprint soft-card u-position-relative-padding-20px-22p-a867a53" data-reveal="" data-research-type="{{ p.type }}">
+            <article class="blueprint soft-card research-card" data-reveal="" data-research-type="{{ p.type }}">
               <div class="pub-meta"><span class="pill pill-date">{{ p.year }}</span><span class="pill pill-type">{{ p.typeLabel }}</span></div>
-              <h2 class="u-font-size-17px-line-height-1-32-236cfbb">{{ p.title }}</h2>
+              <h2 class="publication-card__title">{{ p.title }}</h2>
               <sc-if value="{{ p.isPublication }}" hint-placeholder-val="{{ true }}">
-                <p class="u-margin-0-0-4px-font-size-13px-fa46edf">{{ p.authorLine }}</p>
-                <p class="u-margin-0-0-12px-font-size-12-5px-fcbac00">{{ p.venue }}</p>
+                <p class="research-card__authors">{{ p.authorLine }}</p>
+                <p class="research-card__venue">{{ p.venue }}</p>
               </sc-if>
               <sc-if value="{{ p.isActivity }}" hint-placeholder-val="{{ false }}">
                 <dl class="research-details">
@@ -376,69 +376,69 @@ html[data-lang="en"] .l-en{display:revert}
                   </sc-if>
                 </dl>
               </sc-if>
-              <div class="u-display-flex-flex-wrap-wrap-f26d0e3">
+              <div class="publication-card__tags">
                 <sc-for list="{{ p.tagList }}" as="t" hint-placeholder-count="3"><span class="cv-tag">{{ t.label }}</span></sc-for>
               </div>
               <sc-if value="{{ p.hasDoi }}" hint-placeholder-val="{{ true }}">
-                <a href="{{ p.doi }}" target="_blank" rel="noopener noreferrer" class="u-display-inline-block-margin-top-14-5f0b59b"><span class="l-zh">查看論文</span><span class="l-en">View Paper</span> →</a>
+                <a href="{{ p.doi }}" target="_blank" rel="noopener noreferrer" class="publication-card__link"><span class="l-zh">查看論文</span><span class="l-en">View Paper</span> →</a>
               </sc-if>
 
             </article>
           </sc-for>
         </div>
-        <div class="u-display-flex-align-items-center-d934c42">
-          <button type="button" class="btn btn-secondary u-font-size-13px-5e461f0" onClick="{{ prevPage }}">←</button>
+        <div class="pagination">
+          <button type="button" class="btn btn-secondary btn-compact" onClick="{{ prevPage }}">←</button>
           <sc-for list="{{ pageBtns }}" as="b" hint-placeholder-count="2">
             <button type="button" class="page-button" onClick="{{ b.onClick }}" style="background: {{ b.bg }};color: {{ b.fg }}">{{ b.n }}</button>
           </sc-for>
-          <button type="button" class="btn btn-secondary u-font-size-13px-5e461f0" onClick="{{ nextPage }}">→</button>
+          <button type="button" class="btn btn-secondary btn-compact" onClick="{{ nextPage }}">→</button>
         </div>
       </div>
     </sc-if>
 
     <sc-if value="{{ isGraph }}" hint-placeholder-val="{{ false }}">
-      <div id="g-graph" class="u-display-flex-gap-18px-b7c99d5">
-        <div class="blueprint soft-card u-position-relative-flex-1-f502ff2">
-          <div class="u-display-flex-align-items-center-ebe3777">
-            <button type="button" class="btn btn-secondary u-font-size-14px-min-width-34px-050116c" onClick="{{ zoomOut }}">−</button>
-            <button type="button" class="btn btn-secondary u-font-size-14px-min-width-34px-050116c" onClick="{{ zoomIn }}">＋</button>
-            <button type="button" class="btn btn-secondary u-font-size-13px-5e461f0" onClick="{{ resetView }}"><span class="l-zh">重置</span><span class="l-en">Reset</span></button>
-            <span class="u-font-family-barlow-condensed-sans-91dc434">{{ zoomLabel }}</span>
+      <div id="g-graph" class="publication-graph">
+        <div class="blueprint soft-card publication-graph__main">
+          <div class="graph-controls">
+            <button type="button" class="btn btn-secondary graph-zoom-button" onClick="{{ zoomOut }}">−</button>
+            <button type="button" class="btn btn-secondary graph-zoom-button" onClick="{{ zoomIn }}">＋</button>
+            <button type="button" class="btn btn-secondary btn-compact" onClick="{{ resetView }}"><span class="l-zh">重置</span><span class="l-en">Reset</span></button>
+            <span class="graph-zoom-label">{{ zoomLabel }}</span>
           </div>
-          <div class="u-display-flex-align-items-center-9ff9799">
-            <span class="u-font-family-barlow-condensed-sans-3ac1364">FIG. 02 — RESEARCH FIELD CO-OCCURRENCE</span>
-            <div class="u-display-flex-gap-14px-87e0039">
+          <div class="graph-legend">
+            <span class="graph-legend__title">FIG. 02 — RESEARCH FIELD CO-OCCURRENCE</span>
+            <div class="graph-legend__items">
               <sc-for list="{{ legendCats }}" as="g" hint-placeholder-count="4">
-                <span class="u-display-flex-align-items-center-6129ed6"><span class="legend-dot" style="background: {{ g.color }}"></span><span class="l-zh">{{ g.zh }}</span><span class="l-en">{{ g.en }}</span></span>
+                <span class="graph-legend__item"><span class="legend-dot" style="background: {{ g.color }}" aria-hidden="true"></span><span class="l-zh">{{ g.zh }}</span><span class="l-en">{{ g.en }}</span></span>
               </sc-for>
             </div>
           </div>
-          <svg id="graphsvg" viewBox="0 0 900 640" class="u-display-block-width-100-e2ca9eb">
+          <svg id="graphsvg" viewBox="0 0 900 640" class="graph-canvas">
             <g transform="translate(0,0) scale(1)" data-graph-transform="{{ gTransform }}">{{ graphLayer }}</g>
           </svg>
-          <div class="u-display-flex-align-items-center-e9388e3">
-            <span class="u-display-flex-align-items-center-e89276a">
-              <svg viewBox="0 0 78 28" fill="none" stroke="var(--color-accent-500)" class="u-width-78px-height-28px-e801348"><circle cx="9" cy="14" r="6"></circle><circle cx="32" cy="14" r="10"></circle><circle cx="61" cy="14" r="13"></circle></svg>
+          <div class="graph-scale">
+            <span class="graph-scale__item">
+              <svg viewBox="0 0 78 28" fill="none" stroke="var(--color-accent-500)" class="graph-scale__nodes" aria-hidden="true"><circle cx="9" cy="14" r="6"></circle><circle cx="32" cy="14" r="10"></circle><circle cx="61" cy="14" r="13"></circle></svg>
               <span class="l-zh">節點大小 = 該領域論文數</span><span class="l-en">Node size = papers in field</span>
             </span>
-            <span class="u-display-flex-align-items-center-e89276a"><span class="u-width-26px-border-top-3px-solid-va-d8fb4e2"></span><span class="l-zh">連線粗細 = 共同出現篇數</span><span class="l-en">Edge width = co-occurrences</span></span>
+            <span class="graph-scale__item"><span class="graph-scale__edge"></span><span class="l-zh">連線粗細 = 共同出現篇數</span><span class="l-en">Edge width = co-occurrences</span></span>
           </div>
 
         </div>
 
-        <aside class="blueprint soft-card u-position-relative-width-336px-1e46360">
-          <div class="u-flex-none-padding-20px-20px-14px-7290e32">
-            <div class="u-font-family-barlow-condensed-sans-0e73964">SELECTED FIELD</div>
-            <h2 class="u-font-size-24px-margin-0-0-2px-53f7fc9">{{ selTitle }}</h2>
-            <p class="u-margin-0-font-size-12-5px-f536d80">{{ selSub }}</p>
+        <aside class="blueprint soft-card graph-details">
+          <div class="graph-details__header">
+            <div class="graph-details__label">SELECTED FIELD</div>
+            <h2 class="graph-details__title">{{ selTitle }}</h2>
+            <p class="graph-details__subtitle">{{ selSub }}</p>
           </div>
-          <div class="u-flex-1-min-height-0-73cd35a">
+          <div class="graph-details__list">
             <sc-for list="{{ selPapers }}" as="p" hint-placeholder-count="4">
-              <div class="u-border-top-1px-solid-var-color-div-1897fdd">
-                <div class="u-font-family-barlow-condensed-sans-8579b19">{{ p.date }} · {{ p.venue }}</div>
-                <p class="u-margin-0-0-9px-font-size-13-5px-a2d9488">{{ p.title }}</p>
+              <div class="graph-details__paper">
+                <div class="graph-details__paper-meta">{{ p.date }} · {{ p.venue }}</div>
+                <p class="graph-details__paper-title">{{ p.title }}</p>
                 <sc-if value="{{ p.hasDoi }}" hint-placeholder-val="{{ true }}">
-                  <a href="{{ p.doi }}" target="_blank" rel="noopener noreferrer" class="btn btn-secondary u-font-size-12px-padding-5px-11px-5a6a2ae"><span class="l-zh">查看論文</span><span class="l-en">View Paper</span> →</a>
+                  <a href="{{ p.doi }}" target="_blank" rel="noopener noreferrer" class="btn btn-secondary graph-details__paper-link"><span class="l-zh">查看論文</span><span class="l-en">View Paper</span> →</a>
                 </sc-if>
               </div>
             </sc-for>
@@ -526,48 +526,48 @@ html[data-lang="en"] .l-en{display:revert}
 
 <sc-if value="{{ atTeam }}" hint-placeholder-val="{{ false }}">
 <section>
-  <div id="teamWrap" class="u-position-relative-max-width-1320px-df86380">
-    <div class="u-display-flex-align-items-center-e514fbf">
-      <span class="u-width-34px-height-1px-ae9a487"></span>
-      <span class="u-font-size-11px-letter-spacing-16em-ff739cf">Team</span>
+  <div id="teamWrap" class="container team-section">
+    <div class="section-kicker">
+      <span class="section-kicker__rule" aria-hidden="true"></span>
+      <span class="section-kicker__label">Team</span>
     </div>
-    <h1 class="u-font-size-44px-margin-0-0-14px-e7d7550"><span class="l-zh">團隊成員</span><span class="l-en">Team Members</span></h1>
-    <p class="l-zh u-font-size-16px-line-height-1-75-e8c7dd7">團隊研究涵蓋影像辨識、機器學習、深度學習與智慧製造，部分研究亦延伸至 AI Agent、網頁開發及資料庫管理。</p>
-    <p class="l-en u-font-size-16px-line-height-1-75-e8c7dd7">The team works across image recognition, machine learning, deep learning, and smart manufacturing, with some projects also involving AI agents, web development, and database management.</p>
+    <h1 class="page-title page-title--section"><span class="l-zh">團隊成員</span><span class="l-en">Team Members</span></h1>
+    <p class="l-zh page-intro">團隊研究涵蓋影像辨識、機器學習、深度學習與智慧製造，部分研究亦延伸至 AI Agent、網頁開發及資料庫管理。</p>
+    <p class="l-en page-intro">The team works across image recognition, machine learning, deep learning, and smart manufacturing, with some projects also involving AI agents, web development, and database management.</p>
 
     <sc-for list="{{ memberGroups }}" as="g" hint-placeholder-count="2">
-      <div class="u-margin-top-44px-c056ce2">
-        <div class="member-group-heading u-display-flex-align-items-center-f7dcb2b">
-          <h2 class="u-font-size-26px-margin-0-219e576"><span class="l-zh">{{ g.zh }}</span><span class="l-en">{{ g.en }}</span></h2>
-          <span class="u-font-family-barlow-condensed-sans-607293f">{{ g.count }}</span>
+      <div class="member-group">
+        <div class="member-group-heading">
+          <h2 class="member-group-heading__title"><span class="l-zh">{{ g.zh }}</span><span class="l-en">{{ g.en }}</span></h2>
+          <span class="member-group-heading__count">{{ g.count }}</span>
           <sc-if value="{{ g.showYear }}" hint-placeholder-val="{{ false }}">
-            <select class="input u-width-auto-padding-6px-10px-b77d69b" value="{{ mYear }}" onChange="{{ setYear }}" aria-label="選擇學年 / Select academic year">
+            <select class="input member-group-heading__select" value="{{ mYear }}" onChange="{{ setYear }}" aria-label="選擇學年 / Select academic year">
               <sc-for list="{{ yearOptions }}" as="o" hint-placeholder-count="4">
                 <option value="{{ o.v }}">{{ o.label }}</option>
               </sc-for>
             </select>
           </sc-if>
-          <span class="u-flex-1-height-1px-358ea9b"></span>
+          <span class="section-divider"></span>
         </div>
         <sc-if value="{{ g.empty }}" hint-placeholder-val="{{ false }}">
-          <p class="u-margin-0-0-4px-font-size-14-5px-3a37604"><span class="l-zh">此學年尚無成員。</span><span class="l-en">No members for this class year yet.</span></p>
+          <p class="member-group__empty"><span class="l-zh">此學年尚無成員。</span><span class="l-en">No members for this class year yet.</span></p>
         </sc-if>
-        <div class="member-grid u-display-grid-grid-template-columns-a831546">
+        <div class="member-grid grid-members">
           <sc-for list="{{ g.list }}" as="m" hint-placeholder-count="4">
-            <article class="blueprint soft-card u-position-relative-height-280px-10de043" data-reveal="">
-              <div class="u-display-flex-gap-16px-4ef0c56">
-                <div class="member-photo-frame u-flex-none-width-106px-c37c7e1">
+            <article class="blueprint soft-card member-card" data-reveal="">
+              <div class="member-card__identity">
+                <div class="member-photo-frame">
                   <img class="member-photo" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" data-member-photo="{{ m.photo }}" alt="{{ m.name }}" width="106" height="106" loading="lazy" decoding="async" style="object-position:{{ m.photoPosition }}">
                 </div>
-                <div class="u-min-width-0-22a08c8">
-                  <h3 class="u-font-size-23px-margin-0-746c65f">{{ m.name }}</h3>
+                <div class="member-card__details">
+                  <h3 class="member-card__name">{{ m.name }}</h3>
                   <sc-if value="{{ m.hasThesis }}" hint-placeholder-val="{{ false }}">
-                    <a href="{{ m.thesis }}" target="_blank" rel="noopener noreferrer" class="u-display-inline-block-margin-top-8p-f2d9a72"><span class="l-zh">論文</span><span class="l-en">Thesis</span> →</a>
+                    <a href="{{ m.thesis }}" target="_blank" rel="noopener noreferrer" class="member-card__thesis"><span class="l-zh">論文</span><span class="l-en">Thesis</span> →</a>
                   </sc-if>
                 </div>
               </div>
-              <div class="u-display-flex-flex-wrap-wrap-b3abaca">
-                <sc-for list="{{ m.tagList }}" as="t" hint-placeholder-count="3"><span class="cv-tag u-font-size-12px-a49cca5">{{ t.label }}</span></sc-for>
+              <div class="member-card__tags">
+                <sc-for list="{{ m.tagList }}" as="t" hint-placeholder-count="3"><span class="cv-tag member-card__tag">{{ t.label }}</span></sc-for>
               </div>
 
             </article>
@@ -581,68 +581,68 @@ html[data-lang="en"] .l-en{display:revert}
 
 <sc-if value="{{ atContact }}" hint-placeholder-val="{{ false }}">
 <section>
-  <div class="u-max-width-1320px-margin-0-auto-b730241">
-    <div class="u-display-flex-align-items-center-e514fbf">
-      <span class="u-width-34px-height-1px-ae9a487"></span>
-      <span class="u-font-size-11px-letter-spacing-16em-ff739cf">Contact</span>
+  <div class="container section-contact">
+    <div class="section-kicker">
+      <span class="section-kicker__rule" aria-hidden="true"></span>
+      <span class="section-kicker__label">Contact</span>
     </div>
-    <h1 class="u-font-size-44px-margin-0-0-14px-e7d7550"><span class="l-zh">聯絡我們</span><span class="l-en">Contact Us</span></h1>
-    <p class="l-zh u-font-size-16px-line-height-1-75-e8c7dd7">無論是研究合作、產學交流，或是想加入實驗室，歡迎與我們聯繫。</p>
-    <p class="l-en u-font-size-16px-line-height-1-75-e8c7dd7">Whether it is research collaboration, industry partnership, or joining the lab, feel free to reach out.</p>
+    <h1 class="page-title page-title--section"><span class="l-zh">聯絡我們</span><span class="l-en">Contact Us</span></h1>
+    <p class="l-zh page-intro">無論是研究合作、產學交流，或是想加入實驗室，歡迎與我們聯繫。</p>
+    <p class="l-en page-intro">Whether it is research collaboration, industry partnership, or joining the lab, feel free to reach out.</p>
 
-    <div id="contactDetails" class="u-display-grid-grid-template-columns-17c559e">
-      <div class="blueprint soft-card u-position-relative-padding-20px-22p-a867a53">
-        <div class="u-font-family-barlow-condensed-sans-2f03c6c">EMAIL</div>
-        <a href="mailto:zaira4edu@gmail.com" class="u-font-size-19px-font-family-barlow-636eab2">zaira4edu@gmail.com</a>
+    <div id="contactDetails" class="grid-contact-details">
+      <div class="blueprint soft-card content-card">
+        <div class="contact-label">EMAIL</div>
+        <a href="mailto:zaira4edu@gmail.com" class="contact-email">zaira4edu@gmail.com</a>
 
       </div>
-      <div class="blueprint soft-card u-position-relative-padding-20px-22p-a867a53">
-        <div class="u-font-family-barlow-condensed-sans-2f03c6c">ADDRESS</div>
-        <p class="l-zh u-margin-0-font-size-14-5px-f4999a8">235307 新北市中和區工專路111號　臺灣科技大學 華夏校區教學大樓 2 樓 C219</p>
-        <p class="l-en u-margin-0-font-size-14px-5df1433">General Education Building 2F C219, No. 111, Gongzhuan Rd., Zhonghe Dist., New Taipei City 235307, Taiwan</p>
+      <div class="blueprint soft-card content-card">
+        <div class="contact-label">ADDRESS</div>
+        <p class="l-zh contact-address--zh">235307 新北市中和區工專路111號　臺灣科技大學 華夏校區教學大樓 2 樓 C219</p>
+        <p class="l-en contact-address--en">General Education Building 2F C219, No. 111, Gongzhuan Rd., Zhonghe Dist., New Taipei City 235307, Taiwan</p>
 
       </div>
     </div>
   </div>
 
-  <div class="u-max-width-1320px-margin-0-auto-3459941">
-    <div id="g-contact" class="u-display-grid-grid-template-columns-dff5c78">
-      <figure class="blueprint soft-card u-position-relative-margin-0-5621553">
-        <div class="u-flex-none-display-flex-500ae53">
-          <span class="u-font-family-barlow-condensed-sans-fc2c1ed">MAP · 24.9816 N, 121.5077 E</span>
-          <a href="https://www.google.com/maps/search/?api=1&amp;query=24.981617,121.507716" target="_blank" rel="noopener noreferrer" class="u-font-family-barlow-condensed-noto-e803291"><span class="l-zh">在 Google 地圖開啟</span><span class="l-en">Open in Google Maps</span> →</a>
+  <div class="container section-location">
+    <div id="g-contact" class="grid-contact">
+      <figure class="blueprint soft-card location-map">
+        <div class="location-map__header">
+          <span class="location-map__coordinates">MAP · 24.9816 N, 121.5077 E</span>
+          <a href="https://www.google.com/maps/search/?api=1&amp;query=24.981617,121.507716" target="_blank" rel="noopener noreferrer" class="location-map__link"><span class="l-zh">在 Google 地圖開啟</span><span class="l-en">Open in Google Maps</span> →</a>
         </div>
-        <div class="u-position-relative-flex-1-57a8ab6">
-          <iframe src="about:blank" data-map-src="{{ mapSrc }}" title="實驗室位置 Lab location" loading="lazy" referrerpolicy="no-referrer-when-downgrade" class="u-flex-1-width-100-af09914"></iframe>
-          <div aria-hidden="true" class="u-position-absolute-inset-0-3d0591f"></div>
+        <div class="location-map__viewport">
+          <iframe src="about:blank" data-map-src="{{ mapSrc }}" title="實驗室位置 Lab location" loading="lazy" referrerpolicy="no-referrer-when-downgrade" class="location-map__frame"></iframe>
+          <div aria-hidden="true" class="map-interaction-shield"></div>
         </div>
 
       </figure>
 
-      <div class="blueprint soft-card u-position-relative-background-fff-45d2d09">
-        <div class="u-flex-none-padding-20px-22px-0-55916eb">
-          <h2 class="u-font-size-26px-margin-0-0-4px-a148429"><span class="l-zh">交通方式</span><span class="l-en">Getting Here</span></h2>
-          <p class="u-margin-0-0-16px-font-family-barlow-da7fd50">SELECT A MODE · 點選標籤切換</p>
-          <div class="u-display-flex-flex-wrap-wrap-d75d95f">
+      <div class="blueprint soft-card transit-card">
+        <div class="transit-card__header">
+          <h2 class="transit-card__title"><span class="l-zh">交通方式</span><span class="l-en">Getting Here</span></h2>
+          <p class="transit-card__prompt">SELECT A MODE · 點選標籤切換</p>
+          <div class="transit-tabs">
             <sc-for list="{{ transitTabs }}" as="t" hint-placeholder-count="5">
               <button type="button" class="transit-tab" onClick="{{ t.onClick }}" style="background: {{ t.bg }};color: {{ t.fg }}">{{ t.label }}</button>
             </sc-for>
           </div>
         </div>
-        <div class="u-flex-1-min-height-0-91ce755">
-          <ul class="u-margin-0-padding-0-2e57213">
+        <div class="transit-card__body">
+          <ul class="transit-list">
             <sc-for list="{{ transitItems }}" as="i" hint-placeholder-count="4">
-              <li class="u-display-flex-gap-12px-32f2435">
-                <span class="u-flex-none-font-family-barlow-conde-8d8551e">{{ i.n }}</span>
+              <li class="transit-list__item">
+                <span class="transit-list__number">{{ i.n }}</span>
                 <span><span class="l-zh">{{ i.zh }}</span><span class="l-en">{{ i.en }}</span></span>
               </li>
             </sc-for>
           </ul>
           <sc-if value="{{ hasTransitLink }}" hint-placeholder-val="{{ false }}">
-            <a href="{{ transitLinkUrl }}" target="_blank" rel="noopener noreferrer" class="btn btn-secondary u-margin-top-18px-font-size-13-5px-9e0c33c"><span class="l-zh">{{ transitLinkZh }}</span><span class="l-en">{{ transitLinkEn }}</span> →</a>
+            <a href="{{ transitLinkUrl }}" target="_blank" rel="noopener noreferrer" class="btn btn-secondary transit-link"><span class="l-zh">{{ transitLinkZh }}</span><span class="l-en">{{ transitLinkEn }}</span> →</a>
           </sc-if>
-          <div class="u-margin-top-22px-padding-top-16px-3834887">
-            <a href="{{ campusLink }}" target="_blank" rel="noopener noreferrer" class="u-font-family-barlow-condensed-noto-012c320"><span class="l-zh">華夏校區交通路線指引（校方頁面）</span><span class="l-en">Hwa Hsia Campus travel guide (official)</span> →</a>
+          <div class="campus-link-wrapper">
+            <a href="{{ campusLink }}" target="_blank" rel="noopener noreferrer" class="campus-link"><span class="l-zh">華夏校區交通路線指引（校方頁面）</span><span class="l-en">Hwa Hsia Campus travel guide (official)</span> →</a>
           </div>
         </div>
 
@@ -654,16 +654,16 @@ html[data-lang="en"] .l-en{display:revert}
 
 </main>
 
-<footer class="u-border-top-1px-solid-var-color-div-7ff96d2">
-  <div id="g-foot" class="u-max-width-1320px-margin-0-auto-097e20d">
+<footer class="site-footer">
+  <div id="g-foot" class="container site-footer__inner">
     <div>
-      <h2 class="u-font-size-22px-margin-0-0-12px-8994ce4"><span class="l-zh">先進製程與設備智能輔助實驗室</span><span class="l-en">Advanced Process Control &amp; Intelligent Equipment Lab</span></h2>
-      <p class="l-zh u-margin-0-font-size-14px-e87a40a">235307 新北市中和區工專路111號　臺灣科技大學 華夏校區教學大樓 2 樓 C219</p>
-      <p class="l-en u-margin-0-font-size-14px-e87a40a">General Education Building 2F C219, No. 111, Gongzhuan Rd., Zhonghe Dist., New Taipei City 235307, Taiwan</p>
+      <h2 class="site-footer__title"><span class="l-zh">先進製程與設備智能輔助實驗室</span><span class="l-en">Advanced Process Control &amp; Intelligent Equipment Lab</span></h2>
+      <p class="l-zh site-footer__address">235307 新北市中和區工專路111號　臺灣科技大學 華夏校區教學大樓 2 樓 C219</p>
+      <p class="l-en site-footer__address">General Education Building 2F C219, No. 111, Gongzhuan Rd., Zhonghe Dist., New Taipei City 235307, Taiwan</p>
     </div>
     <div>
-      <div class="u-font-family-barlow-condensed-sans-2f03c6c">EMAIL</div>
-      <a href="mailto:zaira4edu@gmail.com" class="u-font-size-15px-a3970b9">zaira4edu@gmail.com</a>
+      <div class="contact-label">EMAIL</div>
+      <a href="mailto:zaira4edu@gmail.com" class="site-footer__email">zaira4edu@gmail.com</a>
     </div>
   </div>
 </footer>
