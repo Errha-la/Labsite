@@ -1,0 +1,126 @@
+/* Keep the first-paint shell small and independent from the full site stylesheet. */
+x-dc { display: none !important; }
+
+html,
+body {
+  margin: 0;
+  background: #f2f2f3;
+}
+
+#boot {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: #f2f2f3;
+  color: #1f2d3d;
+  font-family: "Barlow", "Noto Sans TC", system-ui, sans-serif;
+  transition: opacity .35s ease;
+}
+
+#boot.bye {
+  opacity: 0;
+  pointer-events: none;
+}
+
+#boot .bh {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 66px;
+  border-bottom: 1px solid #d9d9dc;
+  display: flex;
+  align-items: center;
+  padding: 0 28px;
+  box-sizing: border-box;
+}
+
+#boot .bh img {
+  height: 44px;
+  width: auto;
+  display: block;
+}
+
+#boot .bt {
+  position: absolute;
+  inset: 66px 0 auto;
+  height: 44vh;
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  text-align: center;
+  padding: 0 28px;
+  box-sizing: border-box;
+}
+
+#boot .bk {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  font-size: 11px;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: #096a7e;
+  margin-bottom: 20px;
+}
+
+#boot .bk i {
+  display: block;
+  width: 40px;
+  height: 1px;
+  background: #0b7f97;
+}
+
+#boot .bc {
+  margin-top: 26px;
+  font-family: "Barlow Condensed", system-ui, sans-serif;
+  font-weight: 600;
+  font-size: 11px;
+  letter-spacing: .24em;
+  color: #096a7e;
+}
+
+#boot h2 {
+  font-family: "Barlow Condensed", "Noto Sans TC", system-ui, sans-serif;
+  font-weight: 800;
+  margin: 0 0 16px;
+  letter-spacing: -.02em;
+  line-height: 1.04;
+  font-size: clamp(38px, 5vw, 76px);
+}
+
+#boot .bs {
+  margin: 0;
+  font-size: clamp(13px, 1.35vw, 17px);
+  line-height: 1.7;
+  color: #424244;
+}
+
+#boot .bp {
+  position: absolute;
+  inset: 66px 0 auto;
+  height: 100vh;
+  clip-path: inset(44% 0 0);
+}
+
+#boot .bp img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+#boot .l-en { display: none; }
+html[data-lang="en"] #boot .l-zh { display: none; }
+html[data-lang="en"] #boot .l-en { display: block; }
+
+@media (max-width: 760px) {
+  #boot .bh { height: 64px; padding: 0 16px; }
+  #boot .bh img { max-height: 42px; }
+  #boot .bt { inset: 64px 0 auto; height: 42vh; padding: 0 18px; }
+  #boot .bp { inset: 64px 0 auto; clip-path: inset(42% 0 0); }
+  #boot h2 { font-size: clamp(31px, 9vw, 52px); line-height: 1.08; }
+  #boot .bs { font-size: 13px; max-width: 34ch; }
+  #boot .bk { font-size: 9px; letter-spacing: .13em; margin-bottom: 14px; gap: 7px; }
+  #boot .bk i { width: 22px; }
+}
