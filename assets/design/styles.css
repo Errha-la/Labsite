@@ -2710,4 +2710,11 @@ button,a,select {
 .technique-card__reference-link { color: inherit; text-decoration: underline; text-decoration-color: rgba(242,242,243,.55); text-underline-offset: 2px; }
 .technique-card__output-copy { margin-top: 3px; }
 .graph-scale__bar { width: 26px; border-top: 3px solid var(--color-accent-400); }
-@media (max-width:760px) { .container { padding-left: 16px; padding-right: 16px; min-width: 0; } }
+@media (max-width:760px) {
+  .container { padding-left: 16px !important; padding-right: 16px !important; min-width: 0; }
+  .about-content-grid { grid-template-columns: minmax(0,1fr) !important; gap: 24px !important; }
+  .about-photo { width: 100%; max-width: 560px; justify-self: center; }
+  #contactDetails { grid-template-columns: minmax(0,1fr) !important; }
+  #contactDetails a { overflow-wrap: anywhere; }
+  #contactDetails > .blueprint { min-width: 0; }
+}
