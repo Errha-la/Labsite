@@ -1,6 +1,12 @@
 # 首頁 3D 場景改版規格
 
-狀態：草案，待使用者審閱。尚未開始實作。
+狀態：主要首頁故事與 3D 場景已實作。本文保留原始設計目標；下方「驗收標準」標明哪些項目有程式或自動化測試證據，哪些仍待人工或外部量測。部署方式見 [README.md](../README.md#deployment)。
+
+## 實作狀態摘要
+
+- 場景由 `assets/js/factory-scene.js` 建立，六幕雙語文案由 `assets/data/story-data.js` 提供；`index.html` 負責捲動時間軸、鏡頭與文字面板。
+- `tools/production-line-3d.html` 是場景預覽頁。
+- 舊規格要求的 PageSpeed Insights 手機／桌機分數、跨裝置逐幕截圖比對及完整人工視覺驗收，不能由原始碼或一般 Playwright 測試證明，仍需另行執行。
 
 ## 1. 目標
 以「AI Agent 閉環智慧製造」故事取代首頁現有的 U 形產線 3D 區塊。訪客以捲動方式，看完一顆瑕疵晶片從檢測、運送、根因分析、模擬調參到學習回饋的完整閉環。
@@ -99,7 +105,7 @@
 ### 設備與角色
 - 輸送帶、工業相機（環形補光）、機械手臂、收納箱、AGV、分析站、控制室（螢幕牆）。
 - 工人與機器人以簡化幾何組成（膠囊、方塊），跳舞用關節正弦擺動。
-- 材質分槽、每個 mesh 具名，沿用 `line-model.js` 的慣例（`beveledBox`、`screenModule`、D 常數）。
+- 材質分槽、每個 mesh 具名；場景實作位於 `assets/js/factory-scene.js`，包含 `beveledBox`、`screenModule` 等建模 helper 與尺寸常數。
 
 ### 特殊效果
 - **OR 視覺化**：AGV 前方數條半透明路線，逐條淡出，最佳者加粗發光。
@@ -119,10 +125,13 @@
 - **可重現**：瑕疵序列使用固定亂數種子，同一個 p 永遠得到同一張畫面。
 - 鏡頭改為關鍵影格加樣條曲線，取代原本沿 U 形工站錨點移動的邏輯。
 - 對話框用畫布貼圖 Sprite，沿用現有 `signboard` 的 `draw()` 寫法。
-- 文字集中於單一資料檔 `story-data.js`（以 script 同步載入，首屏無需 fetch），取代原本 `STATIONS` 陣列與 `line-stations.json` 兩份來源。
+- 文字集中於 `assets/data/story-data.js`，以 script 同步載入，首屏無需 fetch；首頁另有用於導覽與轉乘內容的 `STATIONS` 資料。
 - 保留 `low`／`high` 兩級細節，並尊重 `prefers-reduced-motion`。
 
 ## 8. 驗收標準
+
+狀態：以下仍是目標及驗收清單，並非全部已完成的聲明。自動化測試可確認互動與程式行為；實際 PSI 分數、全裝置視覺比對及長時間資源檢查須以對應工具另行記錄。
+
 1. **通過 Google PageSpeed Insights：手機與桌機報告的 Performance、Accessibility、Best Practices、SEO 四項皆 90 分以上**。
    - three.js 與場景延遲載入。
    - LCP 元素為輕量靜態畫面，而非 WebGL 畫布。
@@ -133,15 +142,18 @@
 4. 無 console error，`dispose()` 不洩漏資源。
 5. 低細節模式與 `prefers-reduced-motion` 皆可正常運作。
 
-## 9. 檔案異動
+## 9. 實際檔案位置
+
+下表描述目前程式結構，不是尚待執行的變更清單。
+
 | 檔案 | 動作 |
 |---|---|
-| `assets/js/line-model.js` | 重寫為新場景（保留慣例） |
-| `assets/data/story-data.js` | 六幕雙語文案，唯一來源（取代 `line-stations.json`） |
-| `index.html` | 移除內嵌 `STATIONS`；鏡頭、捲動與版面改寫 |
-| `tools/production-line-3d.html` | 改為新場景預覽工具 |
-| 舊產線資料與舊預覽 | 移至 `archive/` |
-| `README.md`、`docs/GITHUB-PAGES.md` | 更新說明 |
+| `assets/js/factory-scene.js` | 建立首頁工廠場景、幾何、材質與進度更新 |
+| `assets/js/story-timeline.js` | 定義六幕／過場進度及可倒捲的時間軸函式 |
+| `assets/data/story-data.js` | 首頁故事雙語文案與對話資料 |
+| `index.html` | 首頁資料、鏡頭、捲動、面板與路由互動 |
+| `tools/production-line-3d.html` | 獨立場景預覽頁 |
+| `README.md` | 本機開發、測試及 GitHub Pages 部署說明；沒有獨立的 `docs/GITHUB-PAGES.md` |
 
 ## 10. 階段規劃
 1. **階段 0**：合併資料來源，只讀單一 JSON。

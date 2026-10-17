@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-Hant" data-lang="zh">
+<html lang="zh-TW" data-lang="zh">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -278,12 +278,12 @@
 
     <sc-if value="{{ showPublicationFilters }}" hint-placeholder-val="{{ true }}">
     <div class="radio-inputs">
-      <label class="radio">
-        <input type="radio" name="pubview" onChange="{{ setList }}">
+      <label class="radio" for="pubview-list">
+        <input id="pubview-list" type="radio" name="pubview" value="list" checked="{{ isList }}" onChange="{{ setList }}">
         <span class="name {{ listClass }}"><span class="l-zh">清單模式</span><span class="l-en">List</span></span>
       </label>
-      <label class="radio">
-        <input type="radio" name="pubview" onChange="{{ setGraph }}">
+      <label class="radio" for="pubview-graph">
+        <input id="pubview-graph" type="radio" name="pubview" value="graph" checked="{{ isGraph }}" onChange="{{ setGraph }}">
         <span class="name {{ graphClass }}"><span class="l-zh">關聯圖</span><span class="l-en">Graph</span></span>
       </label>
     </div>
@@ -635,7 +635,7 @@
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440},&quot;camTilt&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;default&quot;:0.6,&quot;min&quot;:0.25,&quot;max&quot;:1.1,&quot;step&quot;:0.05,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;3D 產線&quot;,&quot;unit&quot;:&quot;rad&quot;},&quot;camYaw&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;default&quot;:0,&quot;min&quot;:-180,&quot;max&quot;:180,&quot;step&quot;:5,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;3D 產線&quot;,&quot;unit&quot;:&quot;°&quot;},&quot;dolly&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;default&quot;:1,&quot;min&quot;:0.6,&quot;max&quot;:1.8,&quot;step&quot;:0.05,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;3D 產線&quot;},&quot;accent&quot;:{&quot;editor&quot;:&quot;color&quot;,&quot;default&quot;:&quot;#5980a6&quot;,&quot;options&quot;:[&quot;#5980a6&quot;,&quot;#2c455d&quot;,&quot;#7a8a99&quot;,&quot;#436b8f&quot;],&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;3D 產線&quot;},&quot;lightIntensity&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;default&quot;:1,&quot;min&quot;:0.5,&quot;max&quot;:1.8,&quot;step&quot;:0.05,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;3D 產線&quot;},&quot;shadows&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;3D 產線&quot;}}">
 const TAGS={'smart-manufacturing':['智慧製造','Smart Manufacturing','domain'],'defect-detection':['瑕疵檢測','Defect Detection','domain'],'equipment-health-monitoring':['設備健康監測','Equipment Health Monitoring','domain'],'plant-biology':['植物生物學','Plant Biology','domain'],'deep-learning':['深度學習','Deep Learning','method'],'machine-learning':['機器學習','Machine Learning','method'],'predictive-maintenance':['預測性維修','Predictive Maintenance','domain'],'digital-twin':['數位雙生','Digital Twin','domain'],'web-development':['網頁設計','Web Development','tech'],'database-management':['資料庫管理','Database Management','tech'],'multi-agent-system':['多代理系統','Multi-Agent System','tech'],'optimization':['最佳化','Optimization','method'],'attention-mechanism':['注意力機制','Attention Mechanism','method'],'knowledge-distillation':['知識蒸餾','Knowledge Distillation','method'],'meta-heuristics':['啟發式演算法','Meta-heuristics','method'],'single-cell-genomics':['單細胞基因體學','Single-Cell Genomics','method'],'ai-agent':['AI Agent','AI Agent','topic'],'scheduling':['排程','Scheduling','topic'],'anomaly-detection':['異常偵測','Anomaly Detection','topic'],'llm':['大型語言模型','LLM','topic'],'rag':['檢索增強生成','RAG','topic'],'generative-ai':['生成式 AI','Generative AI','topic'],'yolo':['YOLO','YOLO','tech'],'knowledge-graph':['知識圖譜','Knowledge Graph','tech'],'gan':['生成對抗網路','GAN','tech'],'image-recognition':['影像識別','Image Recognition','tech'],'spatial-transcriptomics':['空間轉錄體學','Spatial Transcriptomics','tech']};
-const CAT={domain:{zh:'研究領域',en:'Domain',color:'#075263'},method:{zh:'研究方法',en:'Method',color:'#0b7f97'},topic:{zh:'主題',en:'Topic',color:'#f2c230'},tech:{zh:'技術',en:'Tech',color:'#7a7a7d'}};
+const CAT={domain:{zh:'研究領域',en:'Domain',color:'var(--color-accent-800)'},method:{zh:'研究方法',en:'Method',color:'var(--color-accent)'},topic:{zh:'主題',en:'Topic',color:'var(--color-accent-2-400)'},tech:{zh:'技術',en:'Tech',color:'var(--color-neutral-600)'}};
 const CAT_ORDER=['domain','method','topic','tech'];
 
 const PAPERS=[
@@ -810,8 +810,8 @@ const LAB_PHOTOS=[
 
 const TRANSIT=[
 {id:'mrt',zh:'捷運',en:'MRT',
- items:[{zh:'搭乘捷運中和新蘆線至「南勢角站」，1 號出口出站後騎乘 YouBike 約 4 分鐘，或步行約 10～15 分鐘可達校區。',en:'Take the Zhonghe–Xinlu Line to Nanshijiao Station. From Exit 4, about a 4-minute YouBike ride or a 10–15 minute walk to campus.'},
- {zh:'新北市新巴士 F512 副線 — 南勢角站 1 號出口搭乘，每日上午 06:30、07:00～20:00 每整點一班。',en:'New Taipei New Bus F512 (branch line) — board at Nanshijiao Station Exit 1; daily 06:30, then hourly 07:00–20:00.'},
+ items:[{zh:'搭乘捷運中和新蘆線至「南勢角站」，4 號出口出站後騎乘 YouBike 約 4 分鐘，或步行約 10～15 分鐘可達校區。',en:'Take the Zhonghe–Xinlu Line to Nanshijiao Station. From Exit 4, about a 4-minute YouBike ride or a 10–15 minute walk to campus.'},
+ {zh:'新北市新巴士 F512 副線 — 南勢角站 4 號出口搭乘，每日上午 06:30、07:00～20:00 每整點一班。',en:'New Taipei New Bus F512 (branch line) — board at Nanshijiao Station Exit 4; daily 06:30, then hourly 07:00–20:00.'},
  {zh:'欣欣客運華夏專車 — 南勢角站 2 號出口搭乘，平日上午 06:28、06:46、07:08、07:35、07:52、08:08、08:25。',en:'Shin Shin Bus (Hwa Hsia route) — board at Exit 2; weekday mornings at 06:28, 06:46, 07:08, 07:35, 07:52, 08:08, 08:25.'},
  {zh:'圓通雅筑接駁車 — 南勢角站 2 號出口搭乘，每日 06:30～10:00、16:00～20:30 約 15 分鐘一班。',en:'Yuantong Yazhu shuttle — board at Exit 2; daily 06:30–10:00 and 16:00–20:30, roughly every 15 minutes.'}]},
 {id:'bus',zh:'公車',en:'City Bus',
@@ -827,7 +827,7 @@ const TRANSIT=[
  {zh:'停車資訊：周邊有公共停車位，可以善加利用。',en:'Parking: public parking spaces are available nearby.'}]},
 {id:'rail',zh:'高鐵／台鐵',en:'HSR / TRA',
  items:[{zh:'台北站出發：高鐵或台鐵至台北車站。1. 轉乘捷運板南線至忠孝新生站，換乘中和新蘆線至南勢角站。2. 公車249、670可以直達華夏校區',en:'From Taipei Main Station: arrive by HSR or TRA. 1. Transfer to the MRT Bannan Line to Zhongxiao Xinsheng, then the Zhonghe–Xinlu Line to Nanshijiao. 2. Bus 249 or 670 runs directly to the NTUST Hwa Hsia Campus.'},
- {zh:'板橋站出發：高鐵或台鐵至板橋站，轉乘捷運板南線至忠孝復興站，換乘中和新蘆線至南勢角站。',en:'From Banqiao Station: by HSR or TRA, transfer to the MRT Bannan Line to Zhongxiao Fuxing, then the Zhonghe–Xinlu Line to Nanshijiao.'},
+ {zh:'板橋站出發：高鐵或台鐵至板橋站，轉乘捷運板南線至忠孝新生站，換乘中和新蘆線至南勢角站。',en:'From Banqiao Station: by HSR or TRA, transfer to the MRT Bannan Line to Zhongxiao Xinsheng, then the Zhonghe–Xinlu Line to Nanshijiao.'},
  {zh:'板橋站亦可搭乘公車或計程車經環河路、111 縣道至工專路，車程約 15～20 分鐘。',en:'From Banqiao you can also take a bus or taxi via Huanhe Rd. and County Road 111 to Gongzhuan Rd. — roughly a 15–20 minute ride.'},
  {zh:'南勢角站後續接駁方式請參考「捷運」分頁。',en:'From Nanshijiao, see the MRT tab for onward connections.'}]}];
 
@@ -879,7 +879,7 @@ class Component extends DCLogic {
     /* App 已掛載：靜態首屏畫面淡出並移除（它與 React 的首屏外觀一致，不會跳動） */
     requestAnimationFrame(()=>requestAnimationFrame(()=>{const b=document.getElementById('boot');if(b){b.classList.add('bye');setTimeout(()=>b.remove(),400);}}));
     document.documentElement.dataset.lang='zh';
-    document.documentElement.lang='zh-Hant';
+    document.documentElement.lang='zh-TW';
     document.documentElement.classList.add('rev-on');
     this.buildGraph();
     this._onKeyDown=this.onKeyDown;
@@ -892,7 +892,16 @@ class Component extends DCLogic {
     this.wireGantry();
     this.__photoTimer=setInterval(()=>{ if(this.state.page==='about')this.nextPhoto(); },6000);
   }
-  componentDidUpdate(){ this.wireReveal(); this.wireGantry(); this.wireGraphInput(); this.wireExp(); }
+  componentDidUpdate(){ this.syncLineCanvas(); this.wireReveal(); this.wireGantry(); this.wireGraphInput(); this.wireExp(); }
+
+  syncLineCanvas(){
+    const current=document.getElementById('lineCanvas');
+    if(this._lineCanvas&&current!==this._lineCanvas){
+      this._lineGeneration=(this._lineGeneration||0)+1;
+      if(this._L)this.disposeLine();
+    }
+    this._lineCanvas=current;
+  }
 
   /* experience timeline: line draws, then rows slide in one by one */
   wireExp(){
@@ -910,12 +919,12 @@ class Component extends DCLogic {
       });
     },90);
   }
-  componentWillUnmount(){ if(window.__labOff)window.__labOff(); if(this.__photoTimer)clearInterval(this.__photoTimer); if(this._onKeyDown)window.removeEventListener('keydown',this._onKeyDown); if(this._onVisibility)document.removeEventListener('visibilitychange',this._onVisibility); this.disposeLine(); }
+  componentWillUnmount(){ this._lineGeneration=(this._lineGeneration||0)+1; if(window.__labOff)window.__labOff(); if(this.__photoTimer)clearInterval(this.__photoTimer); if(this._onKeyDown)window.removeEventListener('keydown',this._onKeyDown); if(this._onVisibility)document.removeEventListener('visibilitychange',this._onVisibility); this.disposeLine(); }
 
   toggleLang=()=>{
     const next=this.state.lang==='zh'?'en':'zh';
     document.documentElement.dataset.lang=next;
-    document.documentElement.lang=next==='en'?'en':'zh-Hant';
+    document.documentElement.lang=next==='en'?'en':'zh-TW';
     this.setState({lang:next,mobileMenuOpen:false});
   };
   go=p=>()=>{
@@ -1026,12 +1035,16 @@ class Component extends DCLogic {
     if(this._lineBusy||this._L)return;
     const cv=document.getElementById('lineCanvas');
     if(!cv)return;
+    this._lineCanvas=cv;
+    const generation=this._lineGeneration||0;
     this._lineBusy=true;
+    let renderer=null;
     try{
       const THREE=await import(/* @vite-ignore */ '../vendor/three/three.module.min.js');
       const mod=await import(/* @vite-ignore */ './factory-scene.js');
+      if(generation!==(this._lineGeneration||0)||!cv.isConnected||document.getElementById('lineCanvas')!==cv)return;
       const low=window.innerWidth<760;
-      const renderer=new THREE.WebGLRenderer({canvas:cv,antialias:!low});
+      renderer=new THREE.WebGLRenderer({canvas:cv,antialias:!low});
       renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,low?1.5:2));
       renderer.outputColorSpace=THREE.SRGBColorSpace;
       renderer.toneMapping=THREE.ACESFilmicToneMapping;
@@ -1062,17 +1075,20 @@ class Component extends DCLogic {
       ground.rotation.x=-Math.PI/2; ground.position.y=0.002; ground.receiveShadow=shadows; scene.add(ground);
 
       const camera=new THREE.PerspectiveCamera(low?44:38,1,0.1,260);
-      this._L={THREE:THREE,renderer:renderer,scene:scene,camera:camera,line:line,ground:ground,
+      this._L={THREE:THREE,renderer:renderer,scene:scene,camera:camera,line:line,ground:ground,canvas:cv,
         t0:performance.now(),size:{w:0,h:0}};
       const fb=document.getElementById('lineFallback'); if(fb){ fb.style.opacity='0'; setTimeout(()=>{fb.style.display='none';},450); }
       this.resizeLine();
       this.updateHero(this._lastProg||0,true);
     }catch(e){
       console.error('3D line failed',e);
-      const fb=document.getElementById('lineFallback');
-      if(fb&&fb.firstElementChild)fb.firstElementChild.textContent='3D MODEL UNAVAILABLE';
-    }
-    this._lineBusy=false;
+      if(renderer){ try{renderer.dispose();if(renderer.forceContextLoss)renderer.forceContextLoss();}catch(_){} }
+      if(generation===(this._lineGeneration||0)&&cv.isConnected&&document.getElementById('lineCanvas')===cv){
+        const fb=document.getElementById('lineFallback');
+        if(fb){ fb.style.display=''; fb.style.opacity='1'; }
+        if(fb&&fb.firstElementChild)fb.firstElementChild.textContent='3D MODEL UNAVAILABLE';
+      }
+    }finally{ this._lineBusy=false; }
   }
 
   resizeLine(){
@@ -1399,11 +1415,11 @@ class Component extends DCLogic {
         opacity:lit?1:0.16,onClick:()=>this.setState({sel:n.slug})},
         React.createElement('circle',{cx:n.x,cy:n.y,r:Math.max(r+16,24),fill:'transparent',stroke:'transparent',pointerEvents:'all'}),
         React.createElement('circle',{cx:n.x,cy:n.y,r:r,fill:CAT[cat].color,
-          stroke:on?'#1d2d3d':'rgba(29,45,61,.25)',strokeWidth:on?3:1}),
-        React.createElement('text',{x:n.x,y:n.y+4,textAnchor:'middle',fill:'#fff',pointerEvents:'none',
-          style:{fontFamily:"'Barlow Condensed',sans-serif",fontWeight:700,fontSize:'12px'}},String(n.count)),
-        React.createElement('text',{x:n.x,y:n.y-r-8,textAnchor:'middle',fill:on?'#1d2d3d':'#5d5d60',pointerEvents:'none',
-          style:{fontFamily:"'Barlow Condensed','Noto Sans TC',sans-serif",fontWeight:600,fontSize:'13px'}},
+          stroke:on?'var(--color-text)':'color-mix(in srgb, var(--color-text) 25%, transparent)',strokeWidth:on?3:1}),
+        React.createElement('text',{x:n.x,y:n.y+4,textAnchor:'middle',fill:'var(--color-surface)',pointerEvents:'none',
+          style:{fontFamily:'var(--font-heading)',fontWeight:700,fontSize:'0.75rem'}},String(n.count)),
+        React.createElement('text',{x:n.x,y:n.y-r-8,textAnchor:'middle',fill:on?'var(--color-text)':'var(--color-neutral-700)',pointerEvents:'none',
+          style:{fontFamily:'var(--font-heading)',fontWeight:600,fontSize:'0.8125rem'}},
           zh?TAGS[n.slug][0]:TAGS[n.slug][1])
       );
     });
@@ -1443,7 +1459,7 @@ class Component extends DCLogic {
       mapSrc:MAP_SRC, campusLink:TRANSIT_LINK,
       transitTabs:TRANSIT.map(t=>({label:zh?t.zh:t.en,
         bg:s.transit===t.id?'var(--color-accent)':'transparent',
-        fg:s.transit===t.id?'#fff':'var(--color-neutral-700)',
+        fg:s.transit===t.id?'var(--color-surface)':'var(--color-neutral-700)',
         onClick:()=>this.setState({transit:t.id})})),
       transitItems:tmode.items.map((it,i)=>({n:String(i+1).padStart(2,'0'),zh:it.zh,en:it.en})),
       hasTransitLink:!!tmode.link,
@@ -1476,12 +1492,12 @@ class Component extends DCLogic {
       countLabel:(zh?'共 ':'')+list.length+(zh?(s.type==='journal'||s.type==='conference'?' 篇 · 第 ':' 項 · 第 '):' of '+RESEARCH_ITEMS.length+' · page ')+pg+' / '+total+(zh?' 頁':''),
       chips:chipSlugs.map(k=>({label:(TAGS[k]||[k,k])[zh?0:1],
         bg:s.tag===k?'var(--color-accent)':'transparent',
-        fg:s.tag===k?'#fff':'var(--color-neutral-700)',
+        fg:s.tag===k?'var(--color-surface)':'var(--color-neutral-700)',
         onClick:()=>this.setState({tag:s.tag===k?null:k,pg:1})})),
       pagePapers:list.slice(start,start+s.perPage).map(fmtResearch),
       pageBtns:Array.from({length:total},(_,i)=>({n:i+1,
         bg:pg===i+1?'var(--color-accent)':'transparent',
-        fg:pg===i+1?'#fff':'var(--color-neutral-700)',
+        fg:pg===i+1?'var(--color-surface)':'var(--color-neutral-700)',
         onClick:()=>this.setState({pg:i+1})})),
       prevPage:this.prevPage, nextPage:this.nextPage,
       zoomIn:this.zoomIn, zoomOut:this.zoomOut, resetView:this.resetView,
