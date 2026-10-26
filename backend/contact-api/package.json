@@ -1,0 +1,14 @@
+{
+  "name": "labsite-contact-api",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": "24.21.x"
+  },
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "nodemailer": "10.2.1"
+  }
+}

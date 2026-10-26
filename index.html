@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noimageindex">
 <title>先進製程與設備智能輔助實驗室</title>
 <meta name="description" content="國立臺灣科技大學先進製程與設備智能輔助實驗室官方網站。">
 <meta property="og:type" content="website">
@@ -565,6 +566,34 @@
 
       </div>
     </div>
+
+    <section class="blueprint soft-card content-card contact-form-card" aria-labelledby="contactFormTitle">
+      <h2 id="contactFormTitle" class="contact-form__title"><span class="l-zh">線上聯絡</span><span class="l-en">Send a message</span></h2>
+      <p id="contactPrivacy" class="contact-form__privacy">
+        <span class="l-zh">訊息會寄送至 <a href="mailto:zaira4edu@gmail.com">zaira4edu@gmail.com</a> 供實驗室回覆。網站不保存表單內容；收件信箱由管理者於 180 天內刪除。請勿填寫敏感個人資料。</span>
+        <span class="l-en">Your message will be emailed to <a href="mailto:zaira4edu@gmail.com">zaira4edu@gmail.com</a> so the lab can reply. Labsite does not store submissions; the mailbox owner deletes them within 180 days. Do not include sensitive personal information.</span>
+      </p>
+      <form class="contact-form" data-api-url="%VITE_CONTACT_API_URL%" method="post" onSubmit="{{ submitContact }}" aria-describedby="contactPrivacy">
+        <div class="contact-form__grid">
+          <div class="field">
+            <label for="contactName"><span class="l-zh">稱呼</span><span class="l-en">Name</span></label>
+            <input class="input" id="contactName" name="name" type="text" autocomplete="name" maxlength="100" required>
+          </div>
+          <div class="field">
+            <label for="contactEmail"><span class="l-zh">電子信箱</span><span class="l-en">Email address</span></label>
+            <input class="input" id="contactEmail" name="email" type="email" autocomplete="email" maxlength="254" required>
+          </div>
+          <div class="field contact-form__message-field">
+            <label for="contactMessage"><span class="l-zh">訊息</span><span class="l-en">Message</span></label>
+            <textarea class="input" id="contactMessage" name="message" rows="6" maxlength="1500" required></textarea>
+          </div>
+        </div>
+        <div class="contact-form__actions">
+          <p class="contact-form__status" data-contact-status role="status" aria-live="polite" aria-atomic="true"></p>
+          <button class="btn btn-primary" type="submit" data-contact-submit><span class="l-zh">送出訊息</span><span class="l-en">Send message</span></button>
+        </div>
+      </form>
+    </section>
   </div>
 
   <div class="container section-location">
@@ -866,6 +895,50 @@ function fmtResearch(p){
 class Component extends DCLogic {
   state={page:'home',lang:'zh',view:'list',type:'all',tag:null,perPage:10,pg:1,asc:false,
     nodes:[],sel:null,hover:null,zoom:1,px:0,py:0,tick:0,transit:'mrt',mYear:'all',photo:0,mobileMenuOpen:false};
+
+  submitContact=async e=>{
+    e.preventDefault();
+    const form=e.currentTarget;
+    const submitButton=form.querySelector('[data-contact-submit]');
+    const status=form.querySelector('[data-contact-status]');
+    const lang=document.documentElement.dataset.lang==='en'?'en':'zh';
+    const formData=new FormData(form);
+    const copy={
+      zh:{missing:'線上表單目前尚未開放，請直接寄信至上方信箱。',invalid:'請檢查稱呼、信箱與訊息欄位。',limited:'送出次數較多，請稍後再試。',unavailable:'目前無法確認訊息是否送達，請稍後再試或直接寄信至上方信箱。',success:'訊息已送出，謝謝聯絡我們。'},
+      en:{missing:'The online form is not available yet. Please email us at the address above.',invalid:'Please check your name, email address, and message.',limited:'There have been too many submissions. Please try again later.',unavailable:'We could not confirm delivery. Please try again later or email us at the address above.',success:'Your message has been sent. Thank you for contacting us.'}
+    }[lang];
+    const setStatus=(message,state)=>{status.textContent=message;status.dataset.state=state;};
+    const endpoint=(form.dataset.apiUrl||'').trim();
+    let parsedEndpoint;
+    try{parsedEndpoint=new URL(endpoint,window.location.href);}catch{setStatus(copy.missing,'error');return;}
+    const localHttp=parsedEndpoint.protocol==='http:'&&['localhost','127.0.0.1','[::1]'].includes(parsedEndpoint.hostname);
+    if(!endpoint||(endpoint.startsWith('%')&&endpoint.endsWith('%'))||parsedEndpoint.username||parsedEndpoint.password||parsedEndpoint.hash||!(parsedEndpoint.protocol==='https:'||localHttp)){
+      setStatus(copy.missing,'error');
+      return;
+    }
+    const payload={
+      name:String(formData.get('name')||'').trim(),
+      email:String(formData.get('email')||'').trim(),
+      message:String(formData.get('message')||'').trim()
+    };
+    submitButton.disabled=true;
+    form.setAttribute('aria-busy','true');
+    const controller=new AbortController();
+    const timeout=setTimeout(()=>controller.abort(),12000);
+    try{
+      const response=await fetch(parsedEndpoint.href,{method:'POST',mode:'cors',credentials:'omit',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload),signal:controller.signal});
+      if(response.ok){form.reset();setStatus(copy.success,'success');}
+      else if(response.status===429)setStatus(copy.limited,'error');
+      else if([400,413].includes(response.status))setStatus(copy.invalid,'error');
+      else setStatus(copy.unavailable,'error');
+    }catch{
+      setStatus(copy.unavailable,'error');
+    }finally{
+      clearTimeout(timeout);
+      submitButton.disabled=false;
+      form.removeAttribute('aria-busy');
+    }
+  };
 
   setYear=e=>{ this.setState({mYear:e.target.value}); };
   goPhoto=i=>()=>{ this.setState({photo:i}); };
@@ -1466,6 +1539,7 @@ class Component extends DCLogic {
       transitLinkUrl:tmode.link?tmode.link.url:'',
       transitLinkZh:tmode.link?tmode.link.zh:'',
       transitLinkEn:tmode.link?tmode.link.en:'',
+      submitContact:this.submitContact,
       navItems:NAV.map(([k,z,e])=>({zh:z,en:e,on:s.page===k?'1':'0',go:this.go(k)})),
       mobileMenuClass:s.mobileMenuOpen?'is-open':'',
       mobileMenuHidden:s.mobileMenuOpen?'false':'true',
