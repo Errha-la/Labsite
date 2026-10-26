@@ -173,14 +173,15 @@ async function checkPublications(page) {
 }
 
 async function checkContact(page) {
-  const email = page.locator('#contactDetails a[href^="mailto:"]');
-  await expect(email).toBeVisible();
-  await expect(email).toHaveAttribute('href', /^mailto:/);
-  const mapLink = page.locator('#g-contact figure a[href^="https://www.google.com/maps"]');
+  const addressCard = page.locator('#contactDetails .contact-address-card');
+  await expect(addressCard).toBeVisible();
+  await expect(addressCard.locator('.contact-address-card__title')).toBeVisible();
+  await expect(page.locator('#contactDetails a[href^="mailto:"]')).toHaveCount(0);
+  const mapLink = addressCard.locator('.location-map--address a[href^="https://www.google.com/maps"]');
   await expect(mapLink).toBeVisible();
   await expect(mapLink).toHaveAttribute('href', /^https?:/);
-  await expect(page.locator('#g-contact iframe')).toBeVisible();
-  await page.locator('#g-contact button').nth(1).click();
+  await expect(addressCard.locator('.location-map--address iframe')).toBeVisible();
+  await page.locator('#g-contact .transit-tabs .transit-tab').nth(1).click();
   await expect(page.locator('#g-contact li').first()).toBeVisible();
 }
 
