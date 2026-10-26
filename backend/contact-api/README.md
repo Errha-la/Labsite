@@ -41,13 +41,19 @@ the form stays unavailable and directs visitors to the existing public email.
 | CONTACT_MAX_PER_MINUTE | Per-process global submission ceiling, default 10. |
 | CONTACT_MAX_IN_FLIGHT | Maximum accepted requests being processed at once, default 2. |
 
-The service accepts only the configured origin, JSON POST /contact, and the
-matching OPTIONS preflight. CORS is not authentication; the reverse proxy must
-also enforce per-source and global ingress limits, body and connection timeouts,
-and HTTPS. Keep the Node port private. Configure the mailbox owner to delete
-Contact messages within 180 days and restrict mailbox access. The API code does
-not log request bodies, visitor email addresses, or SMTP errors. Reverse-proxy
-and SMTP-provider logging depends on the host configuration.
+The service accepts only the configured origin, GET /contact to issue a
+challenge, JSON POST /contact to submit, and matching OPTIONS preflights. The
+addition challenge expires after five minutes and can be used once. CORS is not
+authentication; the arithmetic check adds basic spam friction, while the
+reverse proxy must enforce per-source limits, global ingress limits, body and
+connection timeouts, and HTTPS. The request contains name, email, reason,
+message, consent, challengeId, and captchaAnswer; reason must be professor,
+industry, or other, and consent must be true. Challenges are kept in process
+memory, so multiple API instances require shared atomic challenge storage.
+Keep the Node port private. Configure the mailbox owner to delete Contact
+messages within 180 days and restrict mailbox access. The API code does not log
+request bodies, visitor email addresses, or SMTP errors. Reverse-proxy and
+SMTP-provider logging depends on the host configuration.
 
 Before public exposure, confirm the lab host supports Node 24.21.0, TLS and
 reverse-proxy controls are active, the sender is authorized by the mail domain,

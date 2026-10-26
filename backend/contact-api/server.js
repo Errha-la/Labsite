@@ -1,10 +1,19 @@
 import { createServer } from 'node:http';
+import { randomBytes, randomInt } from 'node:crypto';
 import nodemailer from 'nodemailer';
 
 const MAX_BODY_BYTES = 8192;
 const MAX_NAME_LENGTH = 100;
 const MAX_EMAIL_LENGTH = 254;
 const MAX_MESSAGE_LENGTH = 1500;
+const CHALLENGE_TTL_MS = 5 * 60_000;
+const CHALLENGE_ISSUE_LIMIT = 60;
+const MAX_ACTIVE_CHALLENGES = 300;
+const INQUIRY_TYPES = {
+  professor: '找教授 / Contact a professor',
+  industry: '產學合作 / Industry collaboration',
+  other: '其他 / Other'
+};
 const RATE_WINDOW_MS = 60_000;
 const RATE_WINDOW_LIMIT = readInteger('CONTACT_MAX_PER_MINUTE', 10, 1, 120);
 const MAX_IN_FLIGHT = readInteger('CONTACT_MAX_IN_FLIGHT', 2, 1, 8);
@@ -100,6 +109,9 @@ let rateWindowStarted = Date.now();
 let submissionsInWindow = 0;
 let activeRequests = 0;
 let previewMessage = null;
+let challengeWindowStarted = Date.now();
+let challengesIssuedInWindow = 0;
+const activeChallenges = new Map();
 
 function sendJson(response, status, body, corsOrigin = '') {
   if (response.destroyed || response.writableEnded) return;
@@ -108,7 +120,7 @@ function sendJson(response, status, body, corsOrigin = '') {
     'X-Content-Type-Options': 'nosniff',
     ...(corsOrigin ? {
       'Access-Control-Allow-Origin': corsOrigin,
-      'Access-Control-Allow-Methods': 'POST, OPTIONS',
+      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
       'Access-Control-Allow-Headers': 'Content-Type',
       'Access-Control-Max-Age': '600',
       'Vary': 'Origin'
@@ -135,6 +147,40 @@ function consumeRateBudget() {
   if (submissionsInWindow >= RATE_WINDOW_LIMIT) return false;
   submissionsInWindow += 1;
   return true;
+}
+
+function issueChallenge() {
+  const now = Date.now();
+  if (now - challengeWindowStarted >= RATE_WINDOW_MS) {
+    challengeWindowStarted = now;
+    challengesIssuedInWindow = 0;
+  }
+  for (const [id, challenge] of activeChallenges) {
+    if (challenge.expiresAt <= now) activeChallenges.delete(id);
+  }
+  if (challengesIssuedInWindow >= CHALLENGE_ISSUE_LIMIT || activeChallenges.size >= MAX_ACTIVE_CHALLENGES) {
+    throw new HttpError(429, 'challenge_unavailable');
+  }
+
+  challengesIssuedInWindow += 1;
+  const left = randomInt(1, 10);
+  const right = randomInt(1, 10);
+  const challengeId = randomBytes(24).toString('base64url');
+  const expiresAt = now + CHALLENGE_TTL_MS;
+  activeChallenges.set(challengeId, { answer: String(left + right), expiresAt });
+  return { challengeId, question: left + ' + ' + right + ' = ?', expiresAt };
+}
+
+function consumeChallenge(challengeId, answer) {
+  if (!/^[A-Za-z0-9_-]{32}$/u.test(challengeId) || !/^(?:[2-9]|1[0-8])$/u.test(answer)) {
+    throw new HttpError(400, 'invalid_captcha');
+  }
+  const challenge = activeChallenges.get(challengeId);
+  if (!challenge) throw new HttpError(400, 'invalid_captcha');
+  activeChallenges.delete(challengeId);
+  if (challenge.expiresAt <= Date.now() || challenge.answer !== answer) {
+    throw new HttpError(400, 'invalid_captcha');
+  }
 }
 
 function readJson(request) {
@@ -180,21 +226,28 @@ function readJson(request) {
 function validatePayload(value) {
   if (!value || typeof value !== 'object' || Array.isArray(value)) throw new HttpError(400, 'invalid_submission');
   const keys = Object.keys(value).sort();
-  if (keys.length !== 3 || keys[0] !== 'email' || keys[1] !== 'message' || keys[2] !== 'name') {
+  const expectedKeys = ['captchaAnswer', 'challengeId', 'consent', 'email', 'message', 'name', 'reason'];
+  if (keys.length !== expectedKeys.length || keys.some((key, index) => key !== expectedKeys[index])) {
     throw new HttpError(400, 'invalid_submission');
   }
 
   const name = typeof value.name === 'string' ? value.name.trim() : '';
   const email = typeof value.email === 'string' ? value.email.trim() : '';
+  const reason = typeof value.reason === 'string' ? value.reason : '';
+  const challengeId = typeof value.challengeId === 'string' ? value.challengeId : '';
+  const captchaAnswer = typeof value.captchaAnswer === 'string' ? value.captchaAnswer : '';
   const message = typeof value.message === 'string' ? value.message.replace(/\r\n?/g, '\n').trim() : '';
   if (!name || name.length > MAX_NAME_LENGTH || /[\u0000-\u001f\u007f]/u.test(name)) {
     throw new HttpError(400, 'invalid_submission');
   }
   if (!isMailbox(email)) throw new HttpError(400, 'invalid_submission');
+  if (!Object.hasOwn(INQUIRY_TYPES, reason)) throw new HttpError(400, 'invalid_submission');
+  if (value.consent !== true) throw new HttpError(400, 'invalid_submission');
+  if (challengeId.length > 64 || captchaAnswer.length > 2) throw new HttpError(400, 'invalid_submission');
   if (!message || message.length > MAX_MESSAGE_LENGTH || /[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/u.test(message)) {
     throw new HttpError(400, 'invalid_submission');
   }
-  return { name, email, message };
+  return { name, email, reason, message, challengeId, captchaAnswer };
 }
 
 function contentTypeIsJson(value) {
@@ -214,18 +267,27 @@ async function handleRequest(request, response) {
     return sendJson(response, 403, { error: 'origin_not_allowed' });
   }
   if (url.pathname !== '/contact') return sendJson(response, 404, { error: 'not_found' }, origin);
+  if (request.method === 'GET') {
+    if (url.search) return sendJson(response, 400, { error: 'invalid_challenge_request' }, origin);
+    try {
+      return sendJson(response, 200, issueChallenge(), origin);
+    } catch (error) {
+      if (error instanceof HttpError) return sendJson(response, error.status, { error: error.code }, origin);
+      return sendJson(response, 503, { error: 'temporarily_unavailable' }, origin);
+    }
+  }
 
   if (request.method === 'OPTIONS') {
     const requestedMethod = request.headers['access-control-request-method'];
     const requestedHeaders = String(request.headers['access-control-request-headers'] || '')
       .split(',').map(value => value.trim().toLowerCase()).filter(Boolean);
-    if (requestedMethod !== 'POST' || requestedHeaders.some(value => value !== 'content-type')) {
+    if (!['GET', 'POST'].includes(requestedMethod) || requestedHeaders.some(value => value !== 'content-type')) {
       return sendJson(response, 403, { error: 'preflight_not_allowed' }, origin);
     }
     return sendJson(response, 204, {}, origin);
   }
   if (request.method !== 'POST') {
-    response.setHeader('Allow', 'POST, OPTIONS');
+    response.setHeader('Allow', 'GET, POST, OPTIONS');
     return sendJson(response, 405, { error: 'method_not_allowed' }, origin);
   }
   if (!contentTypeIsJson(request.headers['content-type'])) {
@@ -242,12 +304,13 @@ async function handleRequest(request, response) {
   activeRequests += 1;
   try {
     const payload = validatePayload(await readJson(request));
+    consumeChallenge(payload.challengeId, payload.captchaAnswer);
     const mail = {
       from: { name: 'Labsite Contact', address: MAIL_FROM },
       to: { address: CONTACT_TO },
       replyTo: { address: payload.email },
       subject: 'Labsite Contact Form',
-      text: 'Name: ' + payload.name + '\nEmail: ' + payload.email + '\n\n' + payload.message,
+      text: 'Inquiry type: ' + INQUIRY_TYPES[payload.reason] + '\nPrivacy consent: yes\nName: ' + payload.name + '\nEmail: ' + payload.email + '\n\n' + payload.message,
       disableFileAccess: true,
       disableUrlAccess: true,
       envelope: { from: MAIL_FROM, to: [CONTACT_TO] }

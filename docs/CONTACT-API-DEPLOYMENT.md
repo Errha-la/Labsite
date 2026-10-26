@@ -125,7 +125,7 @@
    }
    ~~~
 
-   範例值應依實驗室預期流量調整。在 Nginx 或實驗室 WAF 啟用依來源 IP 的限制，並確認 request body 不會寫入記錄。程式內每分鐘 10 封上限是整個 API process 共用，不是每位訪客各 10 封。確認外部無法連線到 8080，再執行 nginx -t 和 sudo systemctl reload nginx。
+   範例值應依實驗室預期流量調整。在 Nginx 或實驗室 WAF 啟用依來源 IP 的限制，並確認 request body 不會寫入記錄。程式內每分鐘 10 封上限是整個 API process 共用，不是每位訪客各 10 封。數字算式題提供基本垃圾訊息阻力，不是可靠的機器人辨識；Origin 可由非瀏覽器客戶端偽造，仍須保留反向代理的 IP 限制與整體寄信上限。挑戰題狀態存在單一 Node process 記憶體；若要跑多個 API process，需先改用可原子消耗的共享儲存。確認外部無法連線到 8080，再執行 nginx -t 和 sudo systemctl reload nginx。
 
 6. 在 GitHub 的 Errha-la/Labsite repository 開啟 **Settings → Secrets and variables → Actions → Variables**，新增 VITE_CONTACT_API_URL，值為實際 HTTPS API URL，例如 https://contact-api.example.edu/contact。這是公開端點網址，不是密碼；SMTP 密碼不可放進這個變數。
 
@@ -148,26 +148,36 @@
      -H "Access-Control-Request-Headers: content-type"
    ~~~
 
-   預期 HTTP 204，並包含 Access-Control-Allow-Origin: https://errha-la.github.io。
+   預期 HTTP 204，並包含 Access-Control-Allow-Origin: https://errha-la.github.io。API 也會允許 GET /contact 載入數字題。
 3. **正常表單**
+
+   先取得限時、一次性的算式題：
+
+   ~~~sh
+   curl -i https://contact-api.example.edu/contact \
+     -H "Origin: https://errha-la.github.io"
+   ~~~
+
+   預期 HTTP 200、Cache-Control: no-store，以及 challengeId、question、expiresAt。答案不會出現在回應中。解題後將題目答案和 challengeId 填入表單請求：
 
    ~~~sh
    curl -i https://contact-api.example.edu/contact \
      -H "Origin: https://errha-la.github.io" \
      -H "Content-Type: application/json" \
-     --data-binary '{"name":"驗收測試","email":"qa@example.org","message":"Labsite 聯絡表單驗收"}'
+     --data-binary '{"name":"驗收測試","email":"qa@example.org","reason":"professor","message":"Labsite 聯絡表單驗收","consent":true,"challengeId":"替換為題目回傳值","captchaAnswer":"替換為算式答案"}'
    ~~~
 
-   提交前將 qa@example.org 換成實驗室可收信的測試信箱。預期 HTTP 202。確認測試信只送到固定的 CONTACT_TO，寄件人是核准的 MAIL_FROM，訪客信箱只出現在 Reply-To，回覆可正常寄到測試信箱。
+   `reason` 僅接受 `professor`、`industry` 或 `other`，且 `consent` 必須為 `true`。提交前將 qa@example.org 換成實驗室可收信的測試信箱。預期 HTTP 202。確認郵件包含來由和同意紀錄，且測試信只送到固定的 CONTACT_TO；寄件人是核准的 MAIL_FROM，訪客信箱只出現在 Reply-To，回覆可正常寄到測試信箱。
 4. **拒絕條件**
    - 改用 Origin: https://untrusted.example，預期 403。
-   - 使用允許的 Origin 呼叫 GET /contact，預期 405；使用非 JSON body，預期 415。
+   - 重複使用已送出的 challengeId、提交錯誤答案，或使用過期題目，預期 400；`GET /contact?anything=1` 預期 400。
+   - 提交未勾選同意或不在允許清單的來由，預期 400；使用其他未配置路徑預期 404，非 JSON body 預期 415。
    - 送出超過 8 KiB 的 request body，預期 413；在 staging 送超過設定上限的有效請求，預期 429。速率限制測試使用 mail sink，避免大量寄信。
    - 在 staging 停止 SMTP relay 後提交一次，預期回覆一般錯誤，不包含 SMTP 主機錯誤或訪客資料。
 5. **網站端到端**
    - GitHub Pages Actions 完成 build/deploy；確認輸出的 index.html 已包含實際 VITE_CONTACT_API_URL，沒有 %VITE_CONTACT_API_URL% 或 SMTP 密碼。
-   - 以 HTTPS 開啟網站，確認中英文表單欄位、必填驗證、送出中、成功和失敗狀態皆可讀。
-   - 以測試信箱送出一封，確認瀏覽器只向 HTTPS API 發送資料、API 回覆成功、固定收件信箱收到郵件，且郵件回覆會寄回測試信箱。
+   - 以 HTTPS 開啟網站，確認中英文表單欄位、來由標籤、同意勾選框、數字題、必填驗證、送出中、成功和失敗狀態皆可讀。
+   - 勾選同意並答對數字題後，以測試信箱送出一封；確認瀏覽器只向 HTTPS API 發送資料、API 回覆成功、固定收件信箱收到含來由和同意紀錄的郵件，且郵件回覆會寄回測試信箱。
 6. **隱私與運作**
    - 檢查 API、Nginx 和 SMTP relay 記錄沒有表單內容或訪客 email。確認伺服器不保存表單 body，收件信箱存取受限。
    - 由信箱管理者確認聯絡信件會在 180 天內刪除，並指定定期檢查責任人。

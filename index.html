@@ -554,24 +554,59 @@
     <p class="l-en page-intro">Whether it is research collaboration, industry partnership, or joining the lab, feel free to reach out.</p>
 
     <div id="contactDetails" class="grid-contact-details">
-      <div class="blueprint soft-card content-card">
-        <div class="contact-label">EMAIL</div>
-        <a href="mailto:zaira4edu@gmail.com" class="contact-email">zaira4edu@gmail.com</a>
-
+      <div class="blueprint soft-card content-card contact-address-card">
+        <div class="contact-address-card__details">
+          <h2 class="contact-section__title contact-address-card__title">ADDRESS</h2>
+          <p class="l-zh contact-address--zh">235307 新北市中和區工專路111號　臺灣科技大學 華夏校區教學大樓 2 樓 C219</p>
+          <p class="l-en contact-address--en">General Education Building 2F C219, No. 111, Gongzhuan Rd., Zhonghe Dist., New Taipei City 235307, Taiwan</p>
+        </div>
+        <figure class="location-map location-map--address">
+          <div class="location-map__header">
+            <span class="location-map__coordinates">MAP · 24.9816 N, 121.5077 E</span>
+            <a href="https://www.google.com/maps/search/?api=1&amp;query=24.981617,121.507716" target="_blank" rel="noopener noreferrer" class="location-map__link"><span class="l-zh">在 Google 地圖開啟</span><span class="l-en">Open in Google Maps</span> →</a>
+          </div>
+          <div class="location-map__viewport">
+            <iframe src="about:blank" data-map-src="{{ mapSrc }}" title="實驗室位置 Lab location" loading="lazy" referrerpolicy="no-referrer-when-downgrade" class="location-map__frame"></iframe>
+          </div>
+        </figure>
       </div>
-      <div class="blueprint soft-card content-card">
-        <div class="contact-label">ADDRESS</div>
-        <p class="l-zh contact-address--zh">235307 新北市中和區工專路111號　臺灣科技大學 華夏校區教學大樓 2 樓 C219</p>
-        <p class="l-en contact-address--en">General Education Building 2F C219, No. 111, Gongzhuan Rd., Zhonghe Dist., New Taipei City 235307, Taiwan</p>
-
+      <div id="g-contact" class="grid-contact">
+        <div class="blueprint soft-card transit-card">
+          <div class="transit-card__header">
+            <h2 class="contact-section__title transit-card__title"><span class="l-zh">交通方式</span><span class="l-en">Getting Here</span></h2>
+            <p class="transit-card__prompt">SELECT A MODE · 點選標籤切換</p>
+            <div class="transit-tabs">
+              <sc-for list="{{ transitTabs }}" as="t" hint-placeholder-count="5">
+                <button type="button" class="transit-tab" onClick="{{ t.onClick }}" style="background: {{ t.bg }};color: {{ t.fg }}">{{ t.label }}</button>
+              </sc-for>
+            </div>
+          </div>
+          <div class="transit-card__body">
+            <ul class="transit-list">
+              <sc-for list="{{ transitItems }}" as="i" hint-placeholder-count="4">
+                <li class="transit-list__item">
+                  <span class="transit-list__number">{{ i.n }}</span>
+                  <span><span class="l-zh">{{ i.zh }}</span><span class="l-en">{{ i.en }}</span></span>
+                </li>
+              </sc-for>
+            </ul>
+            <sc-if value="{{ hasTransitLink }}" hint-placeholder-val="{{ false }}">
+              <a href="{{ transitLinkUrl }}" target="_blank" rel="noopener noreferrer" class="btn btn-secondary transit-link"><span class="l-zh">{{ transitLinkZh }}</span><span class="l-en">{{ transitLinkEn }}</span> →</a>
+            </sc-if>
+            <div class="campus-link-wrapper">
+              <a href="{{ campusLink }}" target="_blank" rel="noopener noreferrer" class="campus-link"><span class="l-zh">華夏校區交通路線指引（校方頁面）</span><span class="l-en">Hwa Hsia Campus travel guide (official)</span> →</a>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
     <section class="blueprint soft-card content-card contact-form-card" aria-labelledby="contactFormTitle">
-      <h2 id="contactFormTitle" class="contact-form__title"><span class="l-zh">線上聯絡</span><span class="l-en">Send a message</span></h2>
+      <h2 id="contactFormTitle" class="contact-section__title contact-form__title"><span class="l-zh">線上聯絡</span><span class="l-en">Send a message</span></h2>
+      <p class="contact-form__response-time"><span class="l-zh">我們通常於 3 個工作日內回覆。</span><span class="l-en">We typically reply within 3 business days.</span></p>
       <p id="contactPrivacy" class="contact-form__privacy">
-        <span class="l-zh">訊息會寄送至 <a href="mailto:zaira4edu@gmail.com">zaira4edu@gmail.com</a> 供實驗室回覆。網站不保存表單內容；收件信箱由管理者於 180 天內刪除。請勿填寫敏感個人資料。</span>
-        <span class="l-en">Your message will be emailed to <a href="mailto:zaira4edu@gmail.com">zaira4edu@gmail.com</a> so the lab can reply. Labsite does not store submissions; the mailbox owner deletes them within 180 days. Do not include sensitive personal information.</span>
+        <span class="l-zh">您送出的聯絡資料會寄至實驗室信箱供回覆。本網站不保存表單內容；來信由信箱管理者於收件後 180 天內刪除。請勿透過此表單傳送敏感個人資料。</span>
+        <span class="l-en">Your message will be sent to the lab's contact mailbox for a reply. This website does not store form submissions; messages are deleted from the mailbox by its administrator within 180 days of receipt. Please do not include sensitive personal information.</span>
       </p>
       <form class="contact-form" data-api-url="%VITE_CONTACT_API_URL%" method="post" onSubmit="{{ submitContact }}" aria-describedby="contactPrivacy">
         <div class="contact-form__grid">
@@ -583,10 +618,35 @@
             <label for="contactEmail"><span class="l-zh">電子信箱</span><span class="l-en">Email address</span></label>
             <input class="input" id="contactEmail" name="email" type="email" autocomplete="email" maxlength="254" required>
           </div>
+          <fieldset class="field contact-form__reason-field">
+            <legend><span class="l-zh">來由</span><span class="l-en">Inquiry type</span></legend>
+            <div class="transit-tabs contact-form__tags">
+              <input class="contact-form__tag-input" id="contactReasonProfessor" type="radio" name="reason" value="professor" required>
+              <label class="transit-tab contact-form__tag" for="contactReasonProfessor"><span class="l-zh">找教授</span><span class="l-en">Contact a professor</span></label>
+              <input class="contact-form__tag-input" id="contactReasonIndustry" type="radio" name="reason" value="industry" required>
+              <label class="transit-tab contact-form__tag" for="contactReasonIndustry"><span class="l-zh">產學合作</span><span class="l-en">Industry collaboration</span></label>
+              <input class="contact-form__tag-input" id="contactReasonOther" type="radio" name="reason" value="other" required>
+              <label class="transit-tab contact-form__tag" for="contactReasonOther"><span class="l-zh">其他</span><span class="l-en">Other</span></label>
+            </div>
+          </fieldset>
           <div class="field contact-form__message-field">
             <label for="contactMessage"><span class="l-zh">訊息</span><span class="l-en">Message</span></label>
             <textarea class="input" id="contactMessage" name="message" rows="6" maxlength="1500" required></textarea>
           </div>
+          <div class="field contact-form__captcha-field">
+            <label for="contactCaptchaAnswer"><span class="l-zh">數字驗證碼</span><span class="l-en">Number check</span></label>
+            <div class="contact-form__captcha-row">
+              <output class="contact-form__captcha-question" data-contact-challenge-question aria-live="polite"><span class="l-zh">載入驗證題…</span><span class="l-en">Loading challenge…</span></output>
+              <button class="btn btn-secondary contact-form__captcha-refresh" type="button" data-contact-refresh><span class="l-zh">換一題</span><span class="l-en">New question</span></button>
+              <input class="input" id="contactCaptchaAnswer" name="captchaAnswer" type="text" inputmode="numeric" pattern="[0-9]{1,2}" maxlength="2" autocomplete="off" required>
+            </div>
+            <input type="hidden" name="challengeId" data-contact-challenge-id>
+            <p class="contact-form__captcha-hint"><span class="l-zh">請輸入算式的答案。</span><span class="l-en">Enter the answer to the question.</span></p>
+          </div>
+          <label class="contact-form__consent">
+            <input type="checkbox" name="consent" value="agree" required>
+            <span><span class="l-zh">我已閱讀上方隱私說明，並同意所提供的個人資料僅用於處理及回覆本次聯絡。</span><span class="l-en">I have read the privacy notice above and agree that my personal information will be used only to handle and respond to this inquiry.</span></span>
+          </label>
         </div>
         <div class="contact-form__actions">
           <p class="contact-form__status" data-contact-status role="status" aria-live="polite" aria-atomic="true"></p>
@@ -596,50 +656,6 @@
     </section>
   </div>
 
-  <div class="container section-location">
-    <div id="g-contact" class="grid-contact">
-      <figure class="blueprint soft-card location-map">
-        <div class="location-map__header">
-          <span class="location-map__coordinates">MAP · 24.9816 N, 121.5077 E</span>
-          <a href="https://www.google.com/maps/search/?api=1&amp;query=24.981617,121.507716" target="_blank" rel="noopener noreferrer" class="location-map__link"><span class="l-zh">在 Google 地圖開啟</span><span class="l-en">Open in Google Maps</span> →</a>
-        </div>
-        <div class="location-map__viewport">
-          <iframe src="about:blank" data-map-src="{{ mapSrc }}" title="實驗室位置 Lab location" loading="lazy" referrerpolicy="no-referrer-when-downgrade" class="location-map__frame"></iframe>
-          <div aria-hidden="true" class="map-interaction-shield"></div>
-        </div>
-
-      </figure>
-
-      <div class="blueprint soft-card transit-card">
-        <div class="transit-card__header">
-          <h2 class="transit-card__title"><span class="l-zh">交通方式</span><span class="l-en">Getting Here</span></h2>
-          <p class="transit-card__prompt">SELECT A MODE · 點選標籤切換</p>
-          <div class="transit-tabs">
-            <sc-for list="{{ transitTabs }}" as="t" hint-placeholder-count="5">
-              <button type="button" class="transit-tab" onClick="{{ t.onClick }}" style="background: {{ t.bg }};color: {{ t.fg }}">{{ t.label }}</button>
-            </sc-for>
-          </div>
-        </div>
-        <div class="transit-card__body">
-          <ul class="transit-list">
-            <sc-for list="{{ transitItems }}" as="i" hint-placeholder-count="4">
-              <li class="transit-list__item">
-                <span class="transit-list__number">{{ i.n }}</span>
-                <span><span class="l-zh">{{ i.zh }}</span><span class="l-en">{{ i.en }}</span></span>
-              </li>
-            </sc-for>
-          </ul>
-          <sc-if value="{{ hasTransitLink }}" hint-placeholder-val="{{ false }}">
-            <a href="{{ transitLinkUrl }}" target="_blank" rel="noopener noreferrer" class="btn btn-secondary transit-link"><span class="l-zh">{{ transitLinkZh }}</span><span class="l-en">{{ transitLinkEn }}</span> →</a>
-          </sc-if>
-          <div class="campus-link-wrapper">
-            <a href="{{ campusLink }}" target="_blank" rel="noopener noreferrer" class="campus-link"><span class="l-zh">華夏校區交通路線指引（校方頁面）</span><span class="l-en">Hwa Hsia Campus travel guide (official)</span> →</a>
-          </div>
-        </div>
-
-      </div>
-    </div>
-  </div>
 </section>
 </sc-if>
 
@@ -904,8 +920,8 @@ class Component extends DCLogic {
     const lang=document.documentElement.dataset.lang==='en'?'en':'zh';
     const formData=new FormData(form);
     const copy={
-      zh:{missing:'線上表單目前尚未開放，請直接寄信至上方信箱。',invalid:'請檢查稱呼、信箱與訊息欄位。',limited:'送出次數較多，請稍後再試。',unavailable:'目前無法確認訊息是否送達，請稍後再試或直接寄信至上方信箱。',success:'訊息已送出，謝謝聯絡我們。'},
-      en:{missing:'The online form is not available yet. Please email us at the address above.',invalid:'Please check your name, email address, and message.',limited:'There have been too many submissions. Please try again later.',unavailable:'We could not confirm delivery. Please try again later or email us at the address above.',success:'Your message has been sent. Thank you for contacting us.'}
+      zh:{missing:'線上表單目前尚未開放，請使用網站頁尾的聯絡信箱。',invalid:'請檢查所有欄位並同意隱私說明。',captcha:'驗證碼不正確，請回答新題目。',limited:'送出次數較多，請稍後再試。',unavailable:'目前無法確認訊息是否送達，請稍後再試或使用網站頁尾的聯絡信箱。',success:'訊息已送出，謝謝聯絡我們。'},
+      en:{missing:'The online form is not available yet. Please use the contact email in the site footer.',invalid:'Please check all fields and accept the privacy notice.',captcha:'The answer was incorrect. Please solve the new question.',limited:'There have been too many submissions. Please try again later.',unavailable:'We could not confirm delivery. Please try again later or use the contact email in the site footer.',success:'Your message has been sent. Thank you for contacting us.'}
     }[lang];
     const setStatus=(message,state)=>{status.textContent=message;status.dataset.state=state;};
     const endpoint=(form.dataset.apiUrl||'').trim();
@@ -919,7 +935,11 @@ class Component extends DCLogic {
     const payload={
       name:String(formData.get('name')||'').trim(),
       email:String(formData.get('email')||'').trim(),
-      message:String(formData.get('message')||'').trim()
+      reason:String(formData.get('reason')||''),
+      message:String(formData.get('message')||'').trim(),
+      captchaAnswer:String(formData.get('captchaAnswer')||'').trim(),
+      challengeId:String(formData.get('challengeId')||''),
+      consent:formData.get('consent')==='agree'
     };
     submitButton.disabled=true;
     form.setAttribute('aria-busy','true');
@@ -929,7 +949,12 @@ class Component extends DCLogic {
       const response=await fetch(parsedEndpoint.href,{method:'POST',mode:'cors',credentials:'omit',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload),signal:controller.signal});
       if(response.ok){form.reset();setStatus(copy.success,'success');}
       else if(response.status===429)setStatus(copy.limited,'error');
-      else if([400,413].includes(response.status))setStatus(copy.invalid,'error');
+      else if(response.status===400){
+        const result=await response.json().catch(()=>({}));
+        setStatus(result.error==='invalid_captcha'?copy.captcha:copy.invalid,'error');
+        form.querySelector('#contactCaptchaAnswer').value='';
+      }
+      else if(response.status===413)setStatus(copy.invalid,'error');
       else setStatus(copy.unavailable,'error');
     }catch{
       setStatus(copy.unavailable,'error');
@@ -937,6 +962,7 @@ class Component extends DCLogic {
       clearTimeout(timeout);
       submitButton.disabled=false;
       form.removeAttribute('aria-busy');
+      form.dispatchEvent(new Event('contact:refresh-challenge'));
     }
   };
 
@@ -1593,6 +1619,50 @@ class Component extends DCLogic {
 (function(){
   var MAP_SRC='https://www.google.com/maps?q=24.981617,121.507716&hl=zh-TW&z=17&output=embed';
   function patch(){
+    document.querySelectorAll('form.contact-form:not([data-contact-challenge-bound])').forEach(function(form){
+      form.setAttribute('data-contact-challenge-bound','true');
+      var question=form.querySelector('[data-contact-challenge-question]');
+      var challengeId=form.querySelector('[data-contact-challenge-id]');
+      var refresh=form.querySelector('[data-contact-refresh]');
+      if(!question||!challengeId||!refresh)return;
+      function loadChallenge(){
+        var endpoint=(form.getAttribute('data-api-url')||'').trim();
+        var lang=document.documentElement.dataset.lang==='en'?'en':'zh';
+        var copy=lang==='en'?{
+          missing:'Set the contact API URL to load the challenge.',
+          failed:'Could not load the challenge. Try again.'
+        }:{
+          missing:'尚未設定聯絡 API，無法載入驗證題。',
+          failed:'驗證題載入失敗，請重試。'
+        };
+        challengeId.value='';
+        if(!endpoint||(endpoint.startsWith('%')&&endpoint.endsWith('%'))){
+          question.textContent=copy.missing;
+          return Promise.resolve();
+        }
+        var apiUrl;
+        try{apiUrl=new URL(endpoint,window.location.href);}catch{question.textContent=copy.failed;return Promise.resolve();}
+        var localHttp=apiUrl.protocol==='http:'&&['localhost','127.0.0.1','[::1]'].includes(apiUrl.hostname);
+        if(apiUrl.username||apiUrl.password||apiUrl.hash||!(apiUrl.protocol==='https:'||localHttp)){
+          question.textContent=copy.failed;
+          return Promise.resolve();
+        }
+        refresh.disabled=true;
+        question.textContent=lang==='en'?'Loading challenge…':'載入驗證題…';
+        return fetch(apiUrl.href,{method:'GET',mode:'cors',credentials:'omit',cache:'no-store'})
+          .then(function(response){if(!response.ok)throw new Error('challenge_unavailable');return response.json();})
+          .then(function(data){
+            if(typeof data.challengeId!=='string'||typeof data.question!=='string')throw new Error('invalid_challenge');
+            challengeId.value=data.challengeId;
+            question.textContent=data.question;
+          })
+          .catch(function(){question.textContent=copy.failed;})
+          .finally(function(){refresh.disabled=false;});
+      }
+      refresh.addEventListener('click',loadChallenge);
+      form.addEventListener('contact:refresh-challenge',loadChallenge);
+      loadChallenge();
+    });
     document.querySelectorAll('img[data-member-photo]').forEach(function(img){
       var src=img.getAttribute('data-member-photo');
       if(src&&src.indexOf('{{')<0&&img.getAttribute('src')!==src)img.setAttribute('src',src);
