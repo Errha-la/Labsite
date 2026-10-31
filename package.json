@@ -14,6 +14,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "test": "playwright test",
+    "test:contact-worker": "playwright test --config=playwright.worker.config.js",
     "test:worker": "node tests/worker-routing.test.mjs"
   },
   "devDependencies": {

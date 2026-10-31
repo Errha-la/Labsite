@@ -3,6 +3,7 @@
   "name": "lab-website",
   "main": "./worker/index.js",
   "compatibility_date": "2026-10-30",
+  "send_metrics": false,
   "workers_dev": true,
   "assets": {
     "directory": "./dist",

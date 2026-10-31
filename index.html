@@ -43,6 +43,8 @@
 <script vite-ignore defer src="assets/data/story-data.js"></script>
 <script vite-ignore defer src="assets/data/research-data.js"></script>
 <script vite-ignore defer src="./assets/js/runtime.js"></script>
+<script>window.__contactTurnstileScript={loaded:false,failed:false}</script>
+<script id="contact-turnstile-script" defer src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" onload="window.__contactTurnstileScript.loaded=true;window.dispatchEvent(new Event('contact:turnstile-script'))" onerror="window.__contactTurnstileScript.failed=true;window.dispatchEvent(new Event('contact:turnstile-script'))"></script>
 </head>
 <body>
 <div id="boot" aria-hidden="true">
@@ -608,7 +610,7 @@
         <span class="l-zh">您送出的聯絡資料會寄至實驗室信箱供回覆。本網站不保存表單內容；來信由信箱管理者於收件後 180 天內刪除。請勿透過此表單傳送敏感個人資料。</span>
         <span class="l-en">Your message will be sent to the lab's contact mailbox for a reply. This website does not store form submissions; messages are deleted from the mailbox by its administrator within 180 days of receipt. Please do not include sensitive personal information.</span>
       </p>
-      <form class="contact-form" data-api-url="%VITE_CONTACT_API_URL%" method="post" onSubmit="{{ submitContact }}" aria-describedby="contactPrivacy">
+      <form class="contact-form" method="post" onSubmit="{{ submitContact }}" aria-describedby="contactPrivacy">
         <div class="contact-form__grid">
           <div class="field">
             <label for="contactName"><span class="l-zh">稱呼</span><span class="l-en">Name</span></label>
@@ -634,14 +636,9 @@
             <textarea class="input" id="contactMessage" name="message" rows="6" maxlength="1500" required></textarea>
           </div>
           <div class="field contact-form__captcha-field">
-            <label for="contactCaptchaAnswer"><span class="l-zh">數字驗證碼</span><span class="l-en">Number check</span></label>
-            <div class="contact-form__captcha-row">
-              <output class="contact-form__captcha-question" data-contact-challenge-question aria-live="polite"><span class="l-zh">載入驗證題…</span><span class="l-en">Loading challenge…</span></output>
-              <button class="btn btn-secondary contact-form__captcha-refresh" type="button" data-contact-refresh><span class="l-zh">換一題</span><span class="l-en">New question</span></button>
-              <input class="input" id="contactCaptchaAnswer" name="captchaAnswer" type="text" inputmode="numeric" pattern="[0-9]{1,2}" maxlength="2" autocomplete="off" required>
-            </div>
-            <input type="hidden" name="challengeId" data-contact-challenge-id>
-            <p class="contact-form__captcha-hint"><span class="l-zh">請輸入算式的答案。</span><span class="l-en">Enter the answer to the question.</span></p>
+            <div data-contact-turnstile data-site-key="%VITE_TURNSTILE_SITE_KEY%" aria-label="Cloudflare Turnstile"></div>
+            <input type="hidden" name="turnstileToken" data-contact-turnstile-token>
+            <p class="contact-form__captcha-hint"><span class="l-zh">請先完成安全驗證。</span><span class="l-en">Complete the security check before sending.</span></p>
           </div>
           <label class="contact-form__consent">
             <input type="checkbox" name="consent" value="agree" required>
@@ -650,7 +647,7 @@
         </div>
         <div class="contact-form__actions">
           <p class="contact-form__status" data-contact-status role="status" aria-live="polite" aria-atomic="true"></p>
-          <button class="btn btn-primary" type="submit" data-contact-submit><span class="l-zh">送出訊息</span><span class="l-en">Send message</span></button>
+          <button class="btn btn-primary" type="submit" data-contact-submit disabled><span class="l-zh">送出訊息</span><span class="l-en">Send message</span></button>
         </div>
       </form>
     </section>
@@ -918,51 +915,41 @@ class Component extends DCLogic {
     const submitButton=form.querySelector('[data-contact-submit]');
     const status=form.querySelector('[data-contact-status]');
     const lang=document.documentElement.dataset.lang==='en'?'en':'zh';
-    const formData=new FormData(form);
     const copy={
-      zh:{missing:'線上表單目前尚未開放，請使用網站頁尾的聯絡信箱。',invalid:'請檢查所有欄位並同意隱私說明。',captcha:'驗證碼不正確，請回答新題目。',limited:'送出次數較多，請稍後再試。',unavailable:'目前無法確認訊息是否送達，請稍後再試或使用網站頁尾的聯絡信箱。',success:'訊息已送出，謝謝聯絡我們。'},
-      en:{missing:'The online form is not available yet. Please use the contact email in the site footer.',invalid:'Please check all fields and accept the privacy notice.',captcha:'The answer was incorrect. Please solve the new question.',limited:'There have been too many submissions. Please try again later.',unavailable:'We could not confirm delivery. Please try again later or use the contact email in the site footer.',success:'Your message has been sent. Thank you for contacting us.'}
+      zh:{invalid:'請檢查所有欄位並同意隱私說明。',verification:'安全驗證失敗，請完成新的驗證後再試。',unavailable:'目前無法確認訊息是否送達，請稍後再試或使用網站頁尾的聯絡信箱。'},
+      en:{invalid:'Please check all fields and accept the privacy notice.',verification:'The security check failed. Complete a new check and try again.',unavailable:'We could not confirm delivery. Please try again later or use the contact email in the site footer.'}
     }[lang];
     const setStatus=(message,state)=>{status.textContent=message;status.dataset.state=state;};
-    const endpoint=(form.dataset.apiUrl||'').trim();
-    let parsedEndpoint;
-    try{parsedEndpoint=new URL(endpoint,window.location.href);}catch{setStatus(copy.missing,'error');return;}
-    const localHttp=parsedEndpoint.protocol==='http:'&&['localhost','127.0.0.1','[::1]'].includes(parsedEndpoint.hostname);
-    if(!endpoint||(endpoint.startsWith('%')&&endpoint.endsWith('%'))||parsedEndpoint.username||parsedEndpoint.password||parsedEndpoint.hash||!(parsedEndpoint.protocol==='https:'||localHttp)){
-      setStatus(copy.missing,'error');
-      return;
-    }
+    if(form.dataset.contactPending==='true')return;
+    if(!form.checkValidity()){form.reportValidity();setStatus(copy.invalid,'error');return;}
+    const formData=new FormData(form);
+    const turnstileToken=String(formData.get('turnstileToken')||'').trim();
+    if(!turnstileToken){setStatus(copy.verification,'error');return;}
     const payload={
-      name:String(formData.get('name')||'').trim(),
-      email:String(formData.get('email')||'').trim(),
+      name:String(formData.get('name')||''),
+      email:String(formData.get('email')||''),
       reason:String(formData.get('reason')||''),
-      message:String(formData.get('message')||'').trim(),
-      captchaAnswer:String(formData.get('captchaAnswer')||'').trim(),
-      challengeId:String(formData.get('challengeId')||''),
+      message:String(formData.get('message')||''),
+      turnstileToken,
       consent:formData.get('consent')==='agree'
     };
+    form.dataset.contactPending='true';
     submitButton.disabled=true;
     form.setAttribute('aria-busy','true');
     const controller=new AbortController();
     const timeout=setTimeout(()=>controller.abort(),12000);
     try{
-      const response=await fetch(parsedEndpoint.href,{method:'POST',mode:'cors',credentials:'omit',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload),signal:controller.signal});
-      if(response.ok){form.reset();setStatus(copy.success,'success');}
-      else if(response.status===429)setStatus(copy.limited,'error');
-      else if(response.status===400){
-        const result=await response.json().catch(()=>({}));
-        setStatus(result.error==='invalid_captcha'?copy.captcha:copy.invalid,'error');
-        form.querySelector('#contactCaptchaAnswer').value='';
-      }
+      const response=await fetch('/api/contact',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload),signal:controller.signal});
+      if(response.status===400||response.status===403)setStatus(copy.verification,'error');
       else if(response.status===413)setStatus(copy.invalid,'error');
       else setStatus(copy.unavailable,'error');
     }catch{
       setStatus(copy.unavailable,'error');
     }finally{
       clearTimeout(timeout);
-      submitButton.disabled=false;
+      delete form.dataset.contactPending;
       form.removeAttribute('aria-busy');
-      form.dispatchEvent(new Event('contact:refresh-challenge'));
+      form.dispatchEvent(new Event('contact:refresh-turnstile'));
     }
   };
 
@@ -1618,51 +1605,100 @@ class Component extends DCLogic {
    bindings do not resolve reliably in the generated runtime. */
 (function(){
   var MAP_SRC='https://www.google.com/maps?q=24.981617,121.507716&hl=zh-TW&z=17&output=embed';
-  function patch(){
-    document.querySelectorAll('form.contact-form:not([data-contact-challenge-bound])').forEach(function(form){
-      form.setAttribute('data-contact-challenge-bound','true');
-      var question=form.querySelector('[data-contact-challenge-question]');
-      var challengeId=form.querySelector('[data-contact-challenge-id]');
-      var refresh=form.querySelector('[data-contact-refresh]');
-      if(!question||!challengeId||!refresh)return;
-      function loadChallenge(){
-        var endpoint=(form.getAttribute('data-api-url')||'').trim();
-        var lang=document.documentElement.dataset.lang==='en'?'en':'zh';
-        var copy=lang==='en'?{
-          missing:'Set the contact API URL to load the challenge.',
-          failed:'Could not load the challenge. Try again.'
-        }:{
-          missing:'尚未設定聯絡 API，無法載入驗證題。',
-          failed:'驗證題載入失敗，請重試。'
-        };
-        challengeId.value='';
-        if(!endpoint||(endpoint.startsWith('%')&&endpoint.endsWith('%'))){
-          question.textContent=copy.missing;
-          return Promise.resolve();
+  var turnstileForms=new Map();
+  function turnstileMessage(form,kind){
+    var status=form.querySelector('[data-contact-status]');
+    if(!status)return;
+    var en=document.documentElement.dataset.lang==='en';
+    var messages={
+      loading:en?'Loading security check…':'正在載入安全驗證…',
+      unavailable:en?'The security check is unavailable. Please try again later.':'安全驗證目前無法使用，請稍後再試。',
+      retry:en?'Complete a new security check before sending.':'請完成新的安全驗證後再送出。'
+    };
+    status.textContent=messages[kind];
+    status.dataset.state=kind==='loading'?'pending':'error';
+  }
+  function disposeTurnstile(form,state){
+    state.generation+=1;
+    state.token.value='';
+    state.submit.disabled=true;
+    if(state.widgetId!==null&&window.turnstile&&typeof window.turnstile.remove==='function'){
+      try{window.turnstile.remove(state.widgetId);}catch{}
+    }
+    state.widgetId=null;
+    turnstileForms.delete(form);
+  }
+  function renderTurnstile(form,state){
+    state.generation+=1;
+    var generation=state.generation;
+    state.token.value='';
+    state.submit.disabled=true;
+    if(state.widgetId!==null&&window.turnstile&&typeof window.turnstile.remove==='function'){
+      try{window.turnstile.remove(state.widgetId);}catch{}
+    }
+    state.widgetId=null;
+    var siteKey=(state.container.getAttribute('data-site-key')||'').trim();
+    if(!siteKey||(siteKey.startsWith('%')&&siteKey.endsWith('%'))){turnstileMessage(form,'unavailable');return;}
+    if(window.__contactTurnstileScript.failed){turnstileMessage(form,'unavailable');return;}
+    if(!window.__contactTurnstileScript.loaded){
+      turnstileMessage(form,'loading');
+      return;
+    }
+    if(!window.turnstile||typeof window.turnstile.render!=='function'){
+      turnstileMessage(form,'unavailable');
+      return;
+    }
+    try{
+      state.widgetId=window.turnstile.render(state.container,{
+        sitekey:siteKey,
+        action:'contact',
+        callback:function(token){
+          if(!form.isConnected||state.generation!==generation||typeof token!=='string'||!token.trim())return;
+          state.token.value=token.trim();
+          state.submit.disabled=false;
+          var status=form.querySelector('[data-contact-status]');
+          if(status&&status.dataset.state==='pending'){status.textContent='';delete status.dataset.state;}
+        },
+        'error-callback':function(){
+          if(state.generation!==generation)return;
+          state.token.value='';state.submit.disabled=true;turnstileMessage(form,'unavailable');
+        },
+        'expired-callback':function(){
+          if(state.generation!==generation)return;
+          state.token.value='';state.submit.disabled=true;turnstileMessage(form,'retry');
+        },
+        'timeout-callback':function(){
+          if(state.generation!==generation)return;
+          state.token.value='';state.submit.disabled=true;turnstileMessage(form,'retry');
         }
-        var apiUrl;
-        try{apiUrl=new URL(endpoint,window.location.href);}catch{question.textContent=copy.failed;return Promise.resolve();}
-        var localHttp=apiUrl.protocol==='http:'&&['localhost','127.0.0.1','[::1]'].includes(apiUrl.hostname);
-        if(apiUrl.username||apiUrl.password||apiUrl.hash||!(apiUrl.protocol==='https:'||localHttp)){
-          question.textContent=copy.failed;
-          return Promise.resolve();
-        }
-        refresh.disabled=true;
-        question.textContent=lang==='en'?'Loading challenge…':'載入驗證題…';
-        return fetch(apiUrl.href,{method:'GET',mode:'cors',credentials:'omit',cache:'no-store'})
-          .then(function(response){if(!response.ok)throw new Error('challenge_unavailable');return response.json();})
-          .then(function(data){
-            if(typeof data.challengeId!=='string'||typeof data.question!=='string')throw new Error('invalid_challenge');
-            challengeId.value=data.challengeId;
-            question.textContent=data.question;
-          })
-          .catch(function(){question.textContent=copy.failed;})
-          .finally(function(){refresh.disabled=false;});
-      }
-      refresh.addEventListener('click',loadChallenge);
-      form.addEventListener('contact:refresh-challenge',loadChallenge);
-      loadChallenge();
+      });
+    }catch{turnstileMessage(form,'unavailable');}
+  }
+  function bindTurnstile(form){
+    if(turnstileForms.has(form))return;
+    var name=form.querySelector('[name="name"]');
+    var email=form.querySelector('[name="email"]');
+    var message=form.querySelector('[name="message"]');
+    var consent=form.querySelector('[name="consent"]');
+    if(name){name.required=true;name.maxLength=100;}
+    if(email){email.required=true;email.maxLength=254;}
+    if(message){message.required=true;message.maxLength=1500;}
+    if(consent)consent.required=true;
+    form.querySelectorAll('[name="reason"]').forEach(function(reason){reason.required=true;});
+    var container=form.querySelector('[data-contact-turnstile]');
+    var token=form.querySelector('[data-contact-turnstile-token]');
+    var submit=form.querySelector('[data-contact-submit]');
+    if(!container||!token||!submit)return;
+    var state={container:container,token:token,submit:submit,widgetId:null,generation:0};
+    turnstileForms.set(form,state);
+    form.addEventListener('contact:refresh-turnstile',function(){
+      if(form.isConnected)renderTurnstile(form,state);
     });
+    renderTurnstile(form,state);
+  }
+  function patch(){
+    turnstileForms.forEach(function(state,form){if(!form.isConnected)disposeTurnstile(form,state);});
+    document.querySelectorAll('form.contact-form').forEach(bindTurnstile);
     document.querySelectorAll('img[data-member-photo]').forEach(function(img){
       var src=img.getAttribute('data-member-photo');
       if(src&&src.indexOf('{{')<0&&img.getAttribute('src')!==src)img.setAttribute('src',src);
@@ -1678,6 +1714,10 @@ class Component extends DCLogic {
       if(group.getAttribute('transform')!==transform)group.setAttribute('transform',transform);
     });
   }
+  window.addEventListener('contact:turnstile-script',function(){
+    turnstileForms.forEach(function(state,form){if(form.isConnected)renderTurnstile(form,state);});
+    patch();
+  });
   patch();
   new MutationObserver(patch).observe(document.documentElement,{subtree:true,childList:true,attributes:true,
     attributeFilter:['src','transform','data-member-photo','data-map-src','data-graph-transform']});
