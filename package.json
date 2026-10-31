@@ -10,12 +10,15 @@
   "packageManager": "npm@11.19.0",
   "scripts": {
     "dev": "vite",
+    "dev:worker": "wrangler dev --local",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "playwright test"
+    "test": "playwright test",
+    "test:worker": "node tests/worker-routing.test.mjs"
   },
   "devDependencies": {
     "@playwright/test": "1.63.0",
-    "vite": "8.3.1"
+    "vite": "8.3.1",
+    "wrangler": "4.156.0"
   }
 }
