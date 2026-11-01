@@ -10,5 +10,44 @@
     "binding": "ASSETS",
     "not_found_handling": "single-page-application",
     "run_worker_first": ["/api", "/api/*"]
+  },
+  "vars": {
+    "CONTACT_ENVIRONMENT": "production"
+  },
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "CONTACT_CASE_COUNTER",
+        "class_name": "ContactCaseCounter"
+      }
+    ]
+  },
+  "migrations": [
+    {
+      "tag": "v1-contact-case-counter",
+      "new_sqlite_classes": ["ContactCaseCounter"]
+    }
+  ],
+  "env": {
+    "preview": {
+      "name": "lab-website-preview",
+      "vars": {
+        "CONTACT_ENVIRONMENT": "preview"
+      },
+      "durable_objects": {
+        "bindings": [
+          {
+            "name": "CONTACT_CASE_COUNTER",
+            "class_name": "ContactCaseCounter"
+          }
+        ]
+      },
+      "migrations": [
+        {
+          "tag": "v1-contact-case-counter",
+          "new_sqlite_classes": ["ContactCaseCounter"]
+        }
+      ]
+    }
   }
 }

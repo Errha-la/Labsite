@@ -84,6 +84,20 @@ test("valid schema, normalized values, and verified token return only the 501 st
   assert.equal("MAIL" in env, false);
 });
 
+test("verified contact requests do not invoke the case allocator or idempotency ledger", async () => {
+  let durableObjectCalls = 0;
+  const { env } = createEnv({
+    CONTACT_CASE_COUNTER: {
+      idFromName() { durableObjectCalls += 1; throw new Error("must not allocate"); },
+      get() { durableObjectCalls += 1; throw new Error("must not open ledger"); },
+    },
+  });
+  await withFetchMock(async () => verifiedResponse(), async () => {
+    await expectJson(await worker.fetch(contactRequest(), env), 501, "not_implemented");
+  });
+  assert.equal(durableObjectCalls, 0);
+});
+
 test("exact contact key set, consent, string types, and reason enum are enforced", async () => {
   const { env } = createEnv();
   const invalid = [

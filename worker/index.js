@@ -13,6 +13,8 @@ const SERVICE_ERROR_CODES = new Set([
   "internal-error",
 ]);
 
+export { ContactCaseCounter } from "./contact-case-counter.js";
+
 function jsonResponse(body, status, headers = {}) {
   return Response.json(body, {
     status,
