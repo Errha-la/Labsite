@@ -78,6 +78,45 @@ async function solve(page, token = "browser-token") {
   await page.evaluate((value) => window.__turnstileTest.solve(value), token);
 }
 
+test("Worker deep routes load root assets and mount the app", async ({ page }) => {
+  await guardNetwork(page);
+  const localOrigin = new URL("http://127.0.0.1:8787").origin;
+  const requests = [];
+  const scriptResponses = [];
+  page.on("request", (request) => {
+    const url = new URL(request.url());
+    if (url.origin === localOrigin) requests.push(url.pathname);
+  });
+  page.on("response", (response) => {
+    const url = new URL(response.url());
+    if (url.origin === localOrigin && url.pathname.endsWith(".js")) {
+      scriptResponses.push({ path: url.pathname, status: response.status(), contentType: response.headers()["content-type"] || "" });
+    }
+  });
+
+  for (const path of ["/", "/research/project"]) {
+    requests.length = 0;
+    scriptResponses.length = 0;
+    const response = await page.goto(path, { waitUntil: "domcontentloaded" });
+    expect(response?.status()).toBe(200);
+    await page.waitForFunction(() => window.React && window.ReactDOM && window.STORY_DATA && window.RESEARCH_DATA);
+    await expect(page.locator("#dc-root")).toBeVisible();
+    expect(await page.evaluate(() => ({
+      react: Boolean(window.React),
+      reactDOM: Boolean(window.ReactDOM),
+      storyData: Boolean(window.STORY_DATA),
+      researchData: Boolean(window.RESEARCH_DATA),
+    }))).toEqual({ react: true, reactDOM: true, storyData: true, researchData: true });
+
+    expect(requests.some((requestPath) => requestPath.startsWith("/research/assets/"))).toBe(false);
+    expect(scriptResponses.length).toBeGreaterThan(0);
+    for (const script of scriptResponses) {
+      expect(script.status, script.path).toBe(200);
+      expect(script.contentType, script.path).toMatch(/javascript/i);
+    }
+  }
+});
+
 test("explicit widget renders with the public key and action, then error and expiry fail closed", async ({ page }) => {
   const external = await guardNetwork(page);
   const form = await openContact(page);

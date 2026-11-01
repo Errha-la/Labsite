@@ -31,6 +31,8 @@
   "env": {
     "preview": {
       "name": "lab-website-preview",
+      "workers_dev": true,
+      "preview_urls": false,
       "vars": {
         "CONTACT_ENVIRONMENT": "preview"
       },

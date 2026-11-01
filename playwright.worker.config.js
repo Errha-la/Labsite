@@ -33,7 +33,7 @@ export default defineConfig({
     trace: "retain-on-failure",
   },
   webServer: {
-    command: `env -i ${cleanEnvironment} /bin/sh -c ${shellQuote(`npm run build && ${serveCommand}`)}`,
+    command: `env -i ${cleanEnvironment} /bin/sh -c ${shellQuote(`npm run build:cloudflare && ${serveCommand}`)}`,
     url: "http://127.0.0.1:8787/",
     timeout: 30_000,
     reuseExistingServer: false,

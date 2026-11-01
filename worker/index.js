@@ -263,14 +263,7 @@ async function handleContact(request, env) {
     return jsonResponse({ error: "delivery_unknown" }, 503);
   }
   let outcome = await sendGmail(token.accessToken, raw);
-  if (outcome.outcome === "unauthorized") {
-    const refreshed = await refreshAccessToken(gmailConfig);
-    if (!refreshed.ok) outcome = { outcome: "definite_failure" };
-    else {
-      outcome = await sendGmail(refreshed.accessToken, raw);
-      if (outcome.outcome === "unauthorized") outcome = { outcome: "definite_failure" };
-    }
-  }
+  if (outcome.outcome === "unauthorized") outcome = { outcome: "definite_failure" };
   const finalState = outcome.outcome === "accepted"
     ? "accepted"
     : outcome.outcome === "definite_failure" ? "definite_failure" : "unknown";

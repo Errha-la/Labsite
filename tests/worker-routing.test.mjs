@@ -252,52 +252,26 @@ test("accepted-state write failure reports unknown and the sending record prohib
   assert.equal(gmailCalls, 1);
 });
 
-test("first Gmail 401 refreshes exactly once; refresh failure is definite and never reopens claim", async () => {
-  const refreshOutcomes = [
-    () => new Response("invalid_grant", { status: 400 }),
-    () => new Response("quota", { status: 429 }),
-    () => new Response("down", { status: 503 }),
-    () => new Response("redirect", { status: 302 }),
-    () => Response.json({ token_type: "Bearer" }),
-    () => { throw new Error("timeout"); },
-  ];
-  for (const refreshOutcome of refreshOutcomes) {
-    const { env, counter } = createEnv();
-    let tokenCalls = 0;
-    let gmailCalls = 0;
-    const response = await withFetchMock(async (url) => {
-      if (url === VERIFY_URL) return verifiedResponse();
-      if (url === TOKEN_URL) { tokenCalls += 1; return tokenCalls === 1 ? tokenResponse("first") : refreshOutcome(); }
-      if (url === GMAIL_URL) { gmailCalls += 1; return new Response("rejected", { status: 401 }); }
-      throw new Error("unexpected endpoint");
-    }, () => worker.fetch(contactRequest(), env));
-    assert.deepEqual(await responseBody(response), { status: 502, body: { error: "delivery_failed" } });
-    assert.equal(tokenCalls, 2);
-    assert.equal(gmailCalls, 1);
-    assert.equal(counter.records.get("operation-key-00000001").state, "definite_failure");
-  }
-});
+test("first Gmail 401 is definite failure without OAuth refresh or Gmail retry", async () => {
+  const { env, counter } = createEnv();
+  let tokenCalls = 0;
+  let gmailCalls = 0;
+  const provider = async (url) => {
+    if (url === VERIFY_URL) return verifiedResponse();
+    if (url === TOKEN_URL) { tokenCalls += 1; return tokenResponse("first"); }
+    if (url === GMAIL_URL) { gmailCalls += 1; return new Response("rejected", { status: 401 }); }
+    throw new Error("unexpected endpoint");
+  };
+  const first = await withFetchMock(provider, () => worker.fetch(contactRequest(), env));
+  assert.deepEqual(await responseBody(first), { status: 502, body: { error: "delivery_failed" } });
+  assert.equal(tokenCalls, 1);
+  assert.equal(gmailCalls, 1);
+  assert.equal(counter.records.get("operation-key-00000001").state, "definite_failure");
 
-test("one successful refresh permits one Gmail retry, while a second 401 is definite", async () => {
-  for (const secondStatus of [200, 401]) {
-    const { env, counter } = createEnv();
-    let tokenCalls = 0;
-    let gmailCalls = 0;
-    const response = await withFetchMock(async (url) => {
-      if (url === VERIFY_URL) return verifiedResponse();
-      if (url === TOKEN_URL) return tokenResponse(`token-${++tokenCalls}`);
-      if (url === GMAIL_URL) {
-        gmailCalls += 1;
-        return gmailCalls === 1 ? new Response("rejected", { status: 401 })
-          : secondStatus === 200 ? Response.json({ id: "retried-message" }) : new Response("rejected", { status: 401 });
-      }
-      throw new Error("unexpected endpoint");
-    }, () => worker.fetch(contactRequest(), env));
-    assert.equal(response.status, secondStatus === 200 ? 202 : 502);
-    assert.equal(tokenCalls, 2);
-    assert.equal(gmailCalls, 2);
-    assert.equal(counter.records.get("operation-key-00000001").state, secondStatus === 200 ? "accepted" : "definite_failure");
-  }
+  const duplicate = await withFetchMock(provider, () => worker.fetch(contactRequest(), env));
+  assert.deepEqual(await responseBody(duplicate), { status: 502, body: { error: "delivery_failed" } });
+  assert.equal(tokenCalls, 1);
+  assert.equal(gmailCalls, 1);
 });
 
 test("initial Gmail outcomes are classified without automatic resend", async () => {

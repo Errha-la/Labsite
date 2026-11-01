@@ -12,6 +12,7 @@
     "dev": "vite",
     "dev:worker": "wrangler dev --local",
     "build": "vite build",
+    "build:cloudflare": "vite build --base=/",
     "preview": "vite preview",
     "test": "playwright test \"^(?!.*contact-case-counter\\\\.spec\\\\.js$).*\"",
     "test:contact-worker": "playwright test --config=playwright.worker.config.js",
