@@ -7,6 +7,7 @@ import {
   IDEMPOTENCY_TTL_MS,
   SENDING_STALE_MS,
 } from "../worker/contact-idempotency.js";
+import { RATE_LIMIT_MAX_ROWS, RATE_LIMIT_WINDOW_MS } from "../worker/contact-case-counter.js";
 
 const PAYLOAD = {
   consent: true,
@@ -49,6 +50,24 @@ function transition(target, key, to, overrides = {}) {
     now: 1_000_001,
     ...overrides,
   });
+}
+
+function claim(target, key, overrides = {}) {
+  return post(target, {
+    action: "claim_send",
+    idempotencyKey: key,
+    payload: PAYLOAD,
+    now: 1_000_001,
+    ...overrides,
+  });
+}
+
+function rateCheck(target, rateKey, now = 1_000_000) {
+  return post(target, { action: "rate_check", rateKey, now });
+}
+
+function budgetStatus(target, now = 1_000_000) {
+  return post(target, { action: "budget_status", now });
 }
 
 describe("persistent sequential contact case counter", () => {
@@ -191,7 +210,7 @@ describe("privacy-preserving idempotency ledger", () => {
       status: 409,
       body: { error: "IDEMPOTENCY_TRANSITION_REJECTED" },
     });
-    expect((await transition(target, key, "sending")).body.state).toBe("sending");
+    expect((await claim(target, key)).body).toMatchObject({ state: "sending", claimed: true });
     expect((await transition(target, key, "accepted", { now: 1_000_002 })).body.state).toBe("accepted");
     expect(await transition(target, key, "unknown", { now: 1_000_003 })).toEqual({
       status: 409,
@@ -210,7 +229,7 @@ describe("privacy-preserving idempotency ledger", () => {
 
     const first = await reserve(target, key);
     if (first.body.created) {
-      await transition(target, key, "sending");
+      await claim(target, key);
       await expect(send()).rejects.toThrow("delivery outcome unavailable");
       await transition(target, key, "unknown", { now: 1_000_002 });
     }
@@ -221,7 +240,7 @@ describe("privacy-preserving idempotency ledger", () => {
 
     const staleKey = "stale-timeout-key";
     await reserve(target, staleKey);
-    await transition(target, staleKey, "sending");
+    await claim(target, staleKey);
     const stale = await reserve(target, staleKey, { now: 1_000_001 + SENDING_STALE_MS });
     expect(stale).toMatchObject({ status: 200, body: { created: false, state: "unknown" } });
     expect(await transition(target, staleKey, "accepted", { now: 1_000_002 + SENDING_STALE_MS })).toEqual({
@@ -229,4 +248,124 @@ describe("privacy-preserving idempotency ledger", () => {
       body: { error: "IDEMPOTENCY_TRANSITION_REJECTED" },
     });
   });
+
+  test("generic transition cannot bypass the atomic budgeted send claim", async () => {
+    const target = stub("no-generic-sending");
+    const key = "no-generic-sending-key";
+    await reserve(target, key);
+    expect(await transition(target, key, "sending")).toEqual({
+      status: 400,
+      body: { error: "invalid_request" },
+    });
+    expect((await claim(target, key)).body).toMatchObject({ state: "sending", claimed: true });
+    expect((await claim(target, key, { now: 1_000_002 })).body).toMatchObject({ state: "sending", claimed: false });
+  });
+
+  test("concurrent production and preview send claims enforce exact daily budgets", async () => {
+    const production = stub("budget-production");
+    expect(await budgetStatus(production)).toEqual({ status: 200, body: { available: true, remaining: 50 } });
+    const productionKeys = Array.from({ length: 51 }, (_, index) => `production-budget-key-${index}`);
+    await Promise.all(productionKeys.map((key) => reserve(production, key)));
+    const productionClaims = await Promise.all(productionKeys.map((key) => claim(production, key)));
+    expect(productionClaims.filter(({ status, body }) => status === 200 && body.claimed === true)).toHaveLength(50);
+    expect(productionClaims.filter(({ status, body }) => status === 503 && body.error === "SEND_BUDGET_EXHAUSTED")).toHaveLength(1);
+    expect((await claim(production, productionKeys[0], { now: 1_000_002 })).body.claimed).toBe(false);
+    expect(await runInDurableObject(production, (_instance, state) => state.storage.sql.exec(
+      "SELECT used FROM contact_send_budget WHERE environment = 'production'",
+    ).one())).toEqual({ used: 50 });
+    expect(await budgetStatus(production)).toEqual({ status: 200, body: { available: false, remaining: 0 } });
+
+    const preview = stub("budget-preview");
+    await runInDurableObject(preview, (instance) => { instance.env.CONTACT_ENVIRONMENT = "preview"; });
+    expect(await budgetStatus(preview)).toEqual({ status: 200, body: { available: true, remaining: 5 } });
+    const previewKeys = Array.from({ length: 6 }, (_, index) => `preview-budget-key-${index}`);
+    await Promise.all(previewKeys.map((key) => reserve(preview, key)));
+    const previewClaims = await Promise.all(previewKeys.map((key) => claim(preview, key)));
+    expect(previewClaims.filter(({ status, body }) => status === 200 && body.claimed === true)).toHaveLength(5);
+    expect(previewClaims.filter(({ status }) => status === 503)).toHaveLength(1);
+  });
+
+  test("previous HMAC key lookup survives rotation and conflicting dual records fail closed", async () => {
+    const target = stub("key-rotation");
+    const oldSecret = "old-test-hmac-key-at-least-32-bytes-long";
+    const newSecret = "new-test-hmac-key-at-least-32-bytes-long";
+    await runInDurableObject(target, (instance) => { instance.env.CONTACT_IDEMPOTENCY_HMAC_KEY = oldSecret; });
+    const original = await reserve(target, "rotation-idempotency-key");
+    await runInDurableObject(target, (instance) => {
+      instance.env.CONTACT_IDEMPOTENCY_HMAC_KEY = newSecret;
+      instance.env.CONTACT_IDEMPOTENCY_HMAC_PREVIOUS_KEY = oldSecret;
+    });
+    expect(await reserve(target, "rotation-idempotency-key")).toEqual({
+      status: 200,
+      body: { ...original.body, created: false },
+    });
+
+    const conflictKey = "rotation-conflict-key";
+    const oldDigest = await createIdempotencyDigests(oldSecret, conflictKey, PAYLOAD);
+    const newDigest = await createIdempotencyDigests(newSecret, conflictKey, PAYLOAD);
+    await runInDurableObject(target, (_instance, state) => {
+      for (const [digest, caseNumber] of [[oldDigest, "9001"], [newDigest, "9002"]]) {
+        state.storage.sql.exec(
+          `INSERT INTO contact_idempotency
+            (key_hash, payload_hash, case_number, state, created_at, updated_at, expires_at)
+            VALUES (?, ?, ?, 'reserved', 0, 0, ?)`,
+          digest.keyHash, digest.payloadHash, caseNumber, IDEMPOTENCY_TTL_MS + 10,
+        );
+      }
+    });
+    expect(await reserve(target, conflictKey)).toEqual({
+      status: 409,
+      body: { error: "IDEMPOTENCY_DUAL_RECORD_CONFLICT" },
+    });
+  });
+});
+
+describe("strict privacy-preserving rolling rate limit", () => {
+  test("exact 60-second boundary denies until the earliest timestamp ages out and denial does not write", async () => {
+    const target = stub("rate-boundary");
+    const hash = "a".repeat(64);
+    const results = await Promise.all(Array.from({ length: 5 }, () => rateCheck(target, hash, 59_999)));
+    expect(results.filter(({ status, body }) => status === 200 && body.allowed)).toHaveLength(5);
+    const before = await runInDurableObject(target, (_instance, state) => state.storage.sql.exec(
+      `SELECT request_1, request_2, request_3, request_4, request_5, expires_at
+        FROM contact_rate_windows WHERE key_hash = ?`, hash,
+    ).one());
+    expect(await rateCheck(target, hash, 119_998)).toEqual({ status: 429, body: { allowed: false } });
+    expect(await rateCheck(target, hash, 119_999)).toEqual({ status: 429, body: { allowed: false } });
+    const after = await runInDurableObject(target, (_instance, state) => state.storage.sql.exec(
+      `SELECT request_1, request_2, request_3, request_4, request_5, expires_at
+        FROM contact_rate_windows WHERE key_hash = ?`, hash,
+    ).one());
+    expect(after).toEqual(before);
+    expect(await rateCheck(target, hash, 120_000))
+      .toMatchObject({ status: 200, body: { allowed: true, remaining: 4 } });
+  });
+
+  test("six concurrent requests admit exactly five", async () => {
+    const target = stub("rate-concurrent");
+    const hash = "b".repeat(64);
+    const results = await Promise.all(Array.from({ length: 6 }, () => rateCheck(target, hash)));
+    expect(results.filter(({ status, body }) => status === 200 && body.allowed)).toHaveLength(5);
+    expect(results.filter(({ status, body }) => status === 429 && body.allowed === false)).toHaveLength(1);
+  });
+
+  test("bounded rate storage fails closed at capacity", async () => {
+    const target = stub("rate-capacity");
+    await runInDurableObject(target, (_instance, state) => {
+      state.storage.transactionSync(() => {
+        for (let index = 0; index < RATE_LIMIT_MAX_ROWS; index += 1) {
+          state.storage.sql.exec(
+            `INSERT INTO contact_rate_windows
+              (key_hash, request_1, request_2, request_3, request_4, request_5, expires_at)
+              VALUES (?, 0, NULL, NULL, NULL, NULL, ?)`,
+            index.toString(16).padStart(64, "0"), RATE_LIMIT_WINDOW_MS * 100,
+          );
+        }
+      });
+    });
+    expect(await rateCheck(target, "f".repeat(64))).toEqual({
+      status: 503,
+      body: { error: "RATE_LIMIT_CAPACITY" },
+    });
+  }, 60_000);
 });

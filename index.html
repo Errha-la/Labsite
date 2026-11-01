@@ -916,8 +916,8 @@ class Component extends DCLogic {
     const status=form.querySelector('[data-contact-status]');
     const lang=document.documentElement.dataset.lang==='en'?'en':'zh';
     const copy={
-      zh:{invalid:'請檢查所有欄位並同意隱私說明。',verification:'安全驗證失敗，請完成新的驗證後再試。',unavailable:'目前無法確認訊息是否送達，請稍後再試或使用網站頁尾的聯絡信箱。'},
-      en:{invalid:'Please check all fields and accept the privacy notice.',verification:'The security check failed. Complete a new check and try again.',unavailable:'We could not confirm delivery. Please try again later or use the contact email in the site footer.'}
+      zh:{invalid:'請檢查所有欄位並同意隱私說明。',verification:'安全驗證失敗，請完成新的驗證後再試。',failed:'訊息確定未送出，請完成新的驗證後再試。',unknown:'目前無法確認訊息是否送達；為避免重複寄送，請勿變更內容並稍後重試。',expired:'先前送出狀態已逾 24 小時，為避免重複寄送，本表單不會再次送出；請改用網站頁尾的聯絡信箱。',storage:'瀏覽器無法安全保存重試識別碼，本表單不會送出；請改用網站頁尾的聯絡信箱。',unavailable:'目前無法送出訊息，請稍後再試或使用網站頁尾的聯絡信箱。',success:'訊息已送出，案件編號：'},
+      en:{invalid:'Please check all fields and accept the privacy notice.',verification:'The security check failed. Complete a new check and try again.',failed:'The message was not sent. Complete a new check and try again.',unknown:'Delivery could not be confirmed. To avoid a duplicate, keep the content unchanged and retry later.',expired:'The previous delivery state is over 24 hours old. To prevent a duplicate, this form will not send again; use the contact email in the site footer.',storage:'The browser cannot safely retain a retry identifier, so this form will not send; use the contact email in the site footer.',unavailable:'The message cannot be sent right now. Please try again later or use the contact email in the site footer.',success:'Message sent. Case number: '}
     }[lang];
     const setStatus=(message,state)=>{status.textContent=message;status.dataset.state=state;};
     if(form.dataset.contactPending==='true')return;
@@ -933,18 +933,66 @@ class Component extends DCLogic {
       turnstileToken,
       consent:formData.get('consent')==='agree'
     };
+    const storageKey='labsite-contact-operation-v1';
+    const operationTtl=24*60*60*1000;
+    const uuidPattern=/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+    const writeOperation=value=>{
+      const serialized=JSON.stringify(value);
+      localStorage.setItem(storageKey,serialized);
+      if(localStorage.getItem(storageKey)!==serialized)throw new Error('operation storage mismatch');
+    };
+    const clearOperation=()=>{
+      try{localStorage.removeItem(storageKey);return localStorage.getItem(storageKey)===null;}catch{return false;}
+    };
+    let operation;
+    try{
+      const now=Date.now();
+      const raw=localStorage.getItem(storageKey);
+      if(raw===null){
+        operation={key:crypto.randomUUID(),createdAt:now,expiresAt:now+operationTtl,state:'pending'};
+      }else{
+        let saved=null;
+        try{saved=JSON.parse(raw);}catch{}
+        const keys=saved&&typeof saved==='object'&&!Array.isArray(saved)?Object.keys(saved).sort():[];
+        const valid=keys.join(',')==='createdAt,expiresAt,key,state'
+          &&typeof saved.key==='string'&&uuidPattern.test(saved.key)
+          &&Number.isSafeInteger(saved.createdAt)&&saved.createdAt>=0&&saved.createdAt<=now
+          &&Number.isSafeInteger(saved.expiresAt)&&saved.expiresAt===saved.createdAt+operationTtl
+          &&(saved.state==='pending'||saved.state==='unknown');
+        if(!valid){
+          const safeKey=saved&&typeof saved.key==='string'&&uuidPattern.test(saved.key)?saved.key:crypto.randomUUID();
+          writeOperation({key:safeKey,createdAt:now-operationTtl,expiresAt:now,state:'unknown'});
+          setStatus(copy.expired,'error');return;
+        }
+        if(now>=saved.expiresAt){setStatus(copy.expired,'error');return;}
+        operation={...saved,state:'pending'};
+      }
+      writeOperation(operation);
+    }catch{setStatus(copy.storage,'error');return;}
+    const idempotencyKey=operation.key;
+    const setOperationState=state=>{
+      try{operation={...operation,state};writeOperation(operation);return true;}catch{return false;}
+    };
     form.dataset.contactPending='true';
     submitButton.disabled=true;
     form.setAttribute('aria-busy','true');
     const controller=new AbortController();
     const timeout=setTimeout(()=>controller.abort(),12000);
     try{
-      const response=await fetch('/api/contact',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload),signal:controller.signal});
-      if(response.status===400||response.status===403)setStatus(copy.verification,'error');
+      const response=await fetch('/api/contact',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json','X-Contact-Idempotency-Key':idempotencyKey},body:JSON.stringify(payload),signal:controller.signal});
+      let result=null;
+      try{result=await response.json();}catch{}
+      if(response.status===202&&result&&result.ok===true&&typeof result.caseNumber==='string'&&/^\d{4,}$/.test(result.caseNumber)){
+        setStatus(copy.success+result.caseNumber,'success');
+        form.reset();
+        clearOperation();
+      }else if(response.status===400||response.status===403)setStatus(copy.verification,'error');
       else if(response.status===413)setStatus(copy.invalid,'error');
+      else if(result&&result.error==='delivery_failed'){clearOperation();setStatus(copy.failed,'error');}
+      else if(result&&result.error==='delivery_unknown')setStatus(setOperationState('unknown')?copy.unknown:copy.storage,'error');
       else setStatus(copy.unavailable,'error');
     }catch{
-      setStatus(copy.unavailable,'error');
+      setStatus(setOperationState('unknown')?copy.unknown:copy.storage,'error');
     }finally{
       clearTimeout(timeout);
       delete form.dataset.contactPending;

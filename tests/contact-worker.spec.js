@@ -161,7 +161,7 @@ test("native validation blocks requests and a failed request preserves every vis
   await expect(form.locator('[name="turnstileToken"]')).toHaveValue("");
 });
 
-test("200, 202, 204, malformed, timeout, 501, and 503 never show success or reset fields", async ({ page }) => {
+test("opaque operation storage survives reload, expires closed, and rotates only after terminal outcomes", async ({ page }) => {
   await guardNetwork(page);
   const outcomes = [
     { status: 200, body: "not-json" },
@@ -171,17 +171,23 @@ test("200, 202, 204, malformed, timeout, 501, and 503 never show success or rese
     { abort: true },
     { status: 501, body: '{"error":"not_implemented"}' },
     { status: 503, body: '{"error":"service_unavailable"}' },
+    { status: 503, body: '{"error":"delivery_unknown"}' },
+    { status: 202, body: '{"ok":true,"caseNumber":"0042"}', success: true },
+    { status: 502, body: '{"error":"delivery_failed"}', definiteFailure: true },
+    { status: 202, body: '{"ok":true,"caseNumber":"0043"}', success: true },
   ];
   let call = 0;
+  const keys = [];
   await page.route("**/api/contact", async (route) => {
     const outcome = outcomes[call++];
+    keys.push(route.request().headers()["x-contact-idempotency-key"]);
     if (outcome.abort) await route.abort("timedout");
     else await route.fulfill({ status: outcome.status, contentType: "application/json", body: outcome.body });
   });
-  const form = await openContact(page);
+  let form = await openContact(page);
   await fillContact(form);
 
-  for (let index = 0; index < outcomes.length; index += 1) {
+  for (let index = 0; index < 8; index += 1) {
     await solve(page, `token-${index}`);
     await form.locator("[data-contact-submit]").click();
     await expect.poll(() => call).toBe(index + 1);
@@ -196,6 +202,71 @@ test("200, 202, 204, malformed, timeout, 501, and 503 never show success or rese
     await expect(form.locator('[name="turnstileToken"]')).toHaveValue("");
     await expect(form.locator("[data-contact-submit]")).toBeDisabled();
   }
+  const storedText = await page.evaluate(() => localStorage.getItem("labsite-contact-operation-v1"));
+  const stored = JSON.parse(storedText);
+  expect(Object.keys(stored).sort()).toEqual(["createdAt", "expiresAt", "key", "state"]);
+  expect(stored.state).toBe("unknown");
+  expect(stored.expiresAt - stored.createdAt).toBe(24 * 60 * 60 * 1000);
+  expect(storedText).not.toMatch(/fingerprint|digest|hash|payload|consent|visitor@example|Please contact|Visitor|other/i);
+
+  await page.reload({ waitUntil: "domcontentloaded" });
+  form = await openContact(page);
+  await form.locator('[name="name"]').fill("  Visitor  ");
+  await form.locator('[name="email"]').fill("visitor@example.test");
+  await form.locator('label[for="contactReasonOther"]').click();
+  await form.locator('[name="message"]').fill("  Please contact me.  ");
+  await form.locator('[name="consent"]').check();
+  await solve(page, "reload-token");
+  await form.locator("[data-contact-submit]").click();
+  await expect.poll(() => call).toBe(9);
+  await expect(form.locator("[data-contact-status]")).toHaveAttribute("data-state", "success");
+  await expect(form.locator("[data-contact-status]")).toContainText("0042");
+  expect(keys[8]).toBe(keys[0]);
+  expect(await page.evaluate(() => localStorage.getItem("labsite-contact-operation-v1"))).toBeNull();
+
+  await fillContact(form);
+  await solve(page, "definite-token");
+  await form.locator("[data-contact-submit]").click();
+  await expect.poll(() => call).toBe(10);
+  await expect(form.locator("[data-contact-status]")).toHaveAttribute("data-state", "error");
+  expect(await page.evaluate(() => localStorage.getItem("labsite-contact-operation-v1"))).toBeNull();
+  expect(keys[9]).not.toBe(keys[0]);
+
+  await solve(page, "after-definite-token");
+  await form.locator("[data-contact-submit]").click();
+  await expect.poll(() => call).toBe(11);
+  await expect(form.locator("[data-contact-status]")).toHaveAttribute("data-state", "success");
+  await expect(form.locator("[data-contact-status]")).toContainText("0043");
+  expect(keys[10]).not.toBe(keys[9]);
+  expect(await page.evaluate(() => localStorage.getItem("labsite-contact-operation-v1"))).toBeNull();
+
+  await fillContact(form);
+  await solve(page, "expired-token");
+  await page.evaluate(() => {
+    const expiresAt = Date.now() - 1;
+    localStorage.setItem("labsite-contact-operation-v1", JSON.stringify({
+      key: crypto.randomUUID(),
+      createdAt: expiresAt - (24 * 60 * 60 * 1000),
+      expiresAt,
+      state: "unknown",
+    }));
+  });
+  await form.locator("[data-contact-submit]").click();
+  await expect(form.locator("[data-contact-status]")).toHaveAttribute("data-state", "error");
+  await expect(form.locator("[data-contact-status]")).toContainText(/24|footer|頁尾/i);
+  expect(call).toBe(11);
+
+  await page.evaluate(() => {
+    localStorage.removeItem("labsite-contact-operation-v1");
+    Object.defineProperty(Storage.prototype, "getItem", {
+      configurable: true,
+      value() { throw new Error("controlled storage failure"); },
+    });
+  });
+  await form.locator("[data-contact-submit]").click();
+  await expect(form.locator("[data-contact-status]")).toContainText(/browser|瀏覽器/i);
+  expect(call).toBe(11);
+  expect(keys[0]).toMatch(/^[0-9a-f-]{36}$/i);
 });
 
 test("pending guard permits one request and every attempt requires a newly rendered widget", async ({ page }) => {

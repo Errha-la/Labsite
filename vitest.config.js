@@ -12,6 +12,7 @@ export default defineConfig({
     miniflare: {
       bindings: {
         CONTACT_IDEMPOTENCY_HMAC_KEY: "test-only-hmac-key-at-least-32-bytes-long",
+        CONTACT_ENVIRONMENT: "production",
         CONTACT_TEST_CLOCK: "enabled",
       },
       isolatedResourcePersistencePath: workerState,

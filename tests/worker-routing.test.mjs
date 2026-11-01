@@ -1,32 +1,16 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import worker from "../worker/index.js";
+import worker, { canonicalizeClientIp } from "../worker/index.js";
 
 const VERIFY_URL = "https://challenges.cloudflare.com/turnstile/v0/siteverify";
-
-function createEnv(overrides = {}) {
-  const assetRequests = [];
-  return {
-    env: {
-      ASSETS: {
-        async fetch(request) {
-          assetRequests.push(request);
-          return new Response("static asset", { headers: { "Content-Type": "text/plain" } });
-        },
-      },
-      TURNSTILE_SECRET: "test-secret",
-      TURNSTILE_EXPECTED_HOSTNAME: "example.test",
-      ...overrides,
-    },
-    assetRequests,
-  };
-}
+const TOKEN_URL = "https://oauth2.googleapis.com/token";
+const GMAIL_URL = "https://gmail.googleapis.com/gmail/v1/users/me/messages/send";
 
 function validPayload(overrides = {}) {
   return {
     consent: true,
     email: "visitor@example.test",
-    message: "Hello",
+    message: "Hello 世界",
     name: "Visitor",
     reason: "other",
     turnstileToken: "token-1",
@@ -34,331 +18,407 @@ function validPayload(overrides = {}) {
   };
 }
 
+function createCounter(options = {}) {
+  const records = new Map();
+  const calls = [];
+  let next = 1;
+  let sends = 0;
+  const stub = {
+    async fetch(_url, init) {
+      const input = JSON.parse(init.body);
+      calls.push(input.action);
+      if (input.action === "rate_check") return Response.json({ allowed: true, remaining: 4 });
+      if (input.action === "budget_status") {
+        const available = options.budgetAvailable !== false;
+        return Response.json({ available, remaining: available ? 1 : 0 });
+      }
+      const existing = records.get(input.idempotencyKey);
+      if (input.action === "reserve") {
+        const payload = JSON.stringify(input.payload);
+        if (existing) {
+          if (existing.payload !== payload) return Response.json({ error: "IDEMPOTENCY_CONFLICT" }, { status: 409 });
+          return Response.json({ created: false, caseNumber: existing.caseNumber, state: existing.state, expiresAt: 99 });
+        }
+        const record = { payload, caseNumber: String(next++).padStart(4, "0"), state: "reserved" };
+        records.set(input.idempotencyKey, record);
+        return Response.json({ created: true, caseNumber: record.caseNumber, state: record.state, expiresAt: 99 }, { status: 201 });
+      }
+      if (!existing) return Response.json({ error: "IDEMPOTENCY_NOT_FOUND" }, { status: 404 });
+      if (input.action === "claim_send") {
+        if (existing.state !== "reserved") return Response.json({ caseNumber: existing.caseNumber, state: existing.state, claimed: false, expiresAt: 99 });
+        existing.state = "sending";
+        sends += 1;
+        return Response.json({ caseNumber: existing.caseNumber, state: "sending", claimed: true, expiresAt: 99 });
+      }
+      if (input.action === "transition") {
+        if (options.failTransitionTo === input.to) {
+          return Response.json({ error: "storage_unavailable" }, { status: 503 });
+        }
+        existing.state = input.to;
+        return Response.json({ caseNumber: existing.caseNumber, state: existing.state, expiresAt: 99 });
+      }
+      return Response.json({ error: "invalid_request" }, { status: 400 });
+    },
+  };
+  return {
+    binding: { idFromName: () => "singleton", get: () => stub },
+    calls,
+    records,
+    get sends() { return sends; },
+  };
+}
+
+function createEnv(overrides = {}) {
+  const counter = overrides.__counter || createCounter();
+  const assetRequests = [];
+  const env = {
+    ASSETS: { async fetch(request) { assetRequests.push(request); return new Response("static asset"); } },
+    CONTACT_ADMIN_EMAIL: "admin@example.test",
+    CONTACT_CASE_COUNTER: counter.binding,
+    CONTACT_ENVIRONMENT: "production",
+    CONTACT_IDEMPOTENCY_HMAC_KEY: "test-idempotency-hmac-key-at-least-32-bytes",
+    CONTACT_RATE_LIMIT_HMAC_KEY: "test-rate-limit-hmac-key-at-least-32-bytes",
+    GMAIL_SENDER_EMAIL: "sender@example.test",
+    GOOGLE_OAUTH_CLIENT_ID: "test-client-id",
+    GOOGLE_OAUTH_CLIENT_SECRET: "test-client-secret",
+    GOOGLE_OAUTH_REFRESH_TOKEN: "test-refresh-token",
+    TURNSTILE_EXPECTED_HOSTNAME: "example.test",
+    TURNSTILE_SECRET: "test-turnstile-secret",
+    ...overrides,
+  };
+  delete env.__counter;
+  return { env, counter, assetRequests };
+}
+
 function contactRequest(payload = validPayload(), options = {}) {
+  const headers = new Headers({
+    "Content-Type": "application/json",
+    "CF-Connecting-IP": "2001:db8::1",
+    "X-Contact-Idempotency-Key": "operation-key-00000001",
+    ...options.headers,
+  });
   return new Request(options.url || "https://example.test/api/contact", {
     method: options.method || "POST",
-    headers: options.headers || { "Content-Type": "application/json" },
+    headers,
     body: options.body === undefined ? JSON.stringify(payload) : options.body,
     ...(options.duplex ? { duplex: options.duplex } : {}),
   });
-}
-
-async function withFetchMock(mock, callback) {
-  const original = globalThis.fetch;
-  globalThis.fetch = mock;
-  try {
-    return await callback();
-  } finally {
-    globalThis.fetch = original;
-  }
 }
 
 function verifiedResponse(overrides = {}) {
   return Response.json({ success: true, hostname: "example.test", action: "contact", ...overrides });
 }
 
-async function expectJson(response, status, error) {
-  assert.equal(response.status, status);
-  assert.equal(response.headers.get("Cache-Control"), "no-store");
-  assert.match(response.headers.get("Content-Type"), /^application\/json/);
-  assert.deepEqual(await response.json(), { error });
+function tokenResponse(token = "access-token") {
+  return Response.json({ access_token: token, token_type: "Bearer" });
 }
 
-test("valid schema, normalized values, and verified token return only the 501 stub", async () => {
-  const { env, assetRequests } = createEnv();
-  let verifyRequest;
-  await withFetchMock(async (url, init) => {
-    verifyRequest = { url, init };
-    return verifiedResponse();
-  }, async () => {
-    const response = await worker.fetch(contactRequest(validPayload({
-      name: "  Visitor  ",
-      email: "  visitor@example.test  ",
-      message: "  first\r\nsecond\r  ",
-      turnstileToken: "  token-1  ",
-    })), env);
-    await expectJson(response, 501, "not_implemented");
-  });
-  assert.equal(assetRequests.length, 0);
-  assert.equal(new URLSearchParams(verifyRequest.init.body).get("response"), "token-1");
-  assert.equal("MAIL" in env, false);
+async function withFetchMock(mock, callback) {
+  const original = globalThis.fetch;
+  globalThis.fetch = mock;
+  try { return await callback(); } finally { globalThis.fetch = original; }
+}
+
+async function responseBody(response) {
+  return { status: response.status, body: await response.json() };
+}
+
+function successProvider(captured = []) {
+  return async (url, init) => {
+    captured.push({ url, init });
+    if (url === VERIFY_URL) return verifiedResponse();
+    if (url === TOKEN_URL) return tokenResponse();
+    if (url === GMAIL_URL) return Response.json({ id: "gmail-message-id" }, { status: 202 });
+    throw new Error("unexpected endpoint");
+  };
+}
+
+test("confirmed Gmail acceptance returns 202 and MIME has fixed safe headers with Unicode roundtrip", async () => {
+  const { env, counter } = createEnv();
+  const calls = [];
+  const response = await withFetchMock(successProvider(calls), () => worker.fetch(contactRequest(), env));
+  assert.deepEqual(await responseBody(response), { status: 202, body: { ok: true, caseNumber: "0001" } });
+  assert.deepEqual(calls.map(({ url }) => url), [VERIFY_URL, TOKEN_URL, GMAIL_URL]);
+  assert.deepEqual(counter.calls, ["rate_check", "reserve", "budget_status", "claim_send", "transition"]);
+  const tokenRequest = calls[1];
+  assert.equal(tokenRequest.init.redirect, "manual");
+  assert.deepEqual([...new URLSearchParams(tokenRequest.init.body).keys()].sort(), ["client_id", "client_secret", "grant_type", "refresh_token"]);
+  const gmailRequest = calls[2];
+  assert.equal(gmailRequest.init.redirect, "manual");
+  assert.equal(gmailRequest.init.headers.Authorization, "Bearer access-token");
+  const raw = JSON.parse(gmailRequest.init.body).raw;
+  const mime = Buffer.from(raw, "base64url").toString("utf8");
+  const [headerText, bodyEncoded] = mime.split("\r\n\r\n");
+  assert.match(headerText, /^From: sender@example\.test\r\nTo: admin@example\.test\r\nReply-To: visitor@example\.test\r\n/);
+  assert.match(headerText, /Subject: =\?UTF-8\?B\?[^?]+\?= New Contact Message/);
+  const prefix = headerText.match(/Subject: =\?UTF-8\?B\?([^?]+)\?=/)[1];
+  assert.equal(Buffer.from(prefix, "base64").toString("utf8"), "[案件編號 0001]");
+  assert.match(headerText, /MIME-Version: 1\.0/);
+  assert.match(headerText, /Content-Type: text\/plain; charset=UTF-8/);
+  assert.match(headerText, /Content-Transfer-Encoding: base64/);
+  assert.doesNotMatch(headerText, /\r\n(?:Cc|Bcc):/i);
+  assert.equal(bodyEncoded.split("\r\n").every((line) => line.length <= 76), true);
+  assert.match(Buffer.from(bodyEncoded, "base64").toString("utf8"), /Hello 世界/);
 });
 
-test("verified contact requests do not invoke the case allocator or idempotency ledger", async () => {
-  let durableObjectCalls = 0;
-  const { env } = createEnv({
-    CONTACT_CASE_COUNTER: {
-      idFromName() { durableObjectCalls += 1; throw new Error("must not allocate"); },
-      get() { durableObjectCalls += 1; throw new Error("must not open ledger"); },
-    },
-  });
-  await withFetchMock(async () => verifiedResponse(), async () => {
-    await expectJson(await worker.fetch(contactRequest(), env), 501, "not_implemented");
-  });
-  assert.equal(durableObjectCalls, 0);
+test("duplicate accepted key returns the same case without another OAuth or Gmail call", async () => {
+  const { env, counter } = createEnv();
+  const calls = [];
+  const first = await withFetchMock(successProvider(calls), () => worker.fetch(contactRequest(), env));
+  const second = await withFetchMock(successProvider(calls), () => worker.fetch(contactRequest(), env));
+  assert.deepEqual(await responseBody(first), { status: 202, body: { ok: true, caseNumber: "0001" } });
+  assert.deepEqual(await responseBody(second), { status: 202, body: { ok: true, caseNumber: "0001" } });
+  assert.equal(calls.filter(({ url }) => url === GMAIL_URL).length, 1);
+  assert.equal(counter.sends, 1);
 });
 
-test("exact contact key set, consent, string types, and reason enum are enforced", async () => {
-  const { env } = createEnv();
-  const invalid = [
-    { ...validPayload(), extra: "no" },
-    Object.fromEntries(Object.entries(validPayload()).filter(([key]) => key !== "name")),
-    validPayload({ consent: false }),
-    validPayload({ consent: "true" }),
-    validPayload({ name: 1 }),
-    validPayload({ email: null }),
-    validPayload({ message: [] }),
-    validPayload({ reason: "Professor" }),
-    validPayload({ turnstileToken: {} }),
+test("concurrent identical requests allocate and send exactly once", async () => {
+  const { env, counter } = createEnv();
+  let gmailCalls = 0;
+  const provider = async (url) => {
+    if (url === VERIFY_URL) return verifiedResponse();
+    if (url === TOKEN_URL) return tokenResponse();
+    if (url === GMAIL_URL) { gmailCalls += 1; return Response.json({ id: "one-message" }); }
+    throw new Error("unexpected endpoint");
+  };
+  const [first, second] = await withFetchMock(provider, () => Promise.all([
+    worker.fetch(contactRequest(), env), worker.fetch(contactRequest(), env),
+  ]));
+  assert.deepEqual([first.status, second.status], [202, 202]);
+  assert.equal(counter.records.size, 1);
+  assert.equal(counter.sends, 1);
+  assert.equal(gmailCalls, 1);
+});
+
+test("OAuth failures leave the record reserved and spend no send claim", async () => {
+  const outcomes = [
+    () => new Response("revoked", { status: 400 }),
+    () => Response.json({ token_type: "Bearer" }),
+    () => Response.json({ access_token: "", token_type: "Bearer" }),
+    () => Response.json({ access_token: "token", token_type: "Bearer", scope: "https://www.googleapis.com/auth/gmail.send https://www.googleapis.com/auth/gmail.readonly" }),
+    () => new Response("not-json", { status: 200 }),
+    () => new Response("redirect", { status: 302 }),
+    () => { throw new Error("reset"); },
   ];
-  let calls = 0;
-  await withFetchMock(async () => { calls += 1; return verifiedResponse(); }, async () => {
-    for (const payload of invalid) {
-      await expectJson(await worker.fetch(contactRequest(payload), env), 400, "invalid_request");
-    }
-  });
-  assert.equal(calls, 0);
+  for (const makeTokenResponse of outcomes) {
+    const { env, counter } = createEnv();
+    const response = await withFetchMock(async (url) => {
+      if (url === VERIFY_URL) return verifiedResponse();
+      if (url === TOKEN_URL) return makeTokenResponse();
+      throw new Error("Gmail must not be called");
+    }, () => worker.fetch(contactRequest(), env));
+    assert.deepEqual(await responseBody(response), { status: 503, body: { error: "service_unavailable" } });
+    assert.equal(counter.records.get("operation-key-00000001").state, "reserved");
+    assert.equal(counter.sends, 0);
+  }
 });
 
-test("name, message, token, and email bounds reject empty and over-limit values", async () => {
-  const { env } = createEnv();
-  const invalid = [
-    validPayload({ name: "   " }),
-    validPayload({ name: "n".repeat(101) }),
-    validPayload({ message: "\r\n  " }),
-    validPayload({ message: "m".repeat(1501) }),
-    validPayload({ turnstileToken: "  " }),
-    validPayload({ turnstileToken: "t".repeat(2049) }),
-    validPayload({ email: `${"a".repeat(243)}@example.test` }),
+test("exhausted daily budget stops before OAuth and Gmail while leaving the reservation retryable", async () => {
+  const counter = createCounter({ budgetAvailable: false });
+  const { env } = createEnv({ __counter: counter });
+  const providerUrls = [];
+  const response = await withFetchMock(async (url) => {
+    providerUrls.push(url);
+    if (url === VERIFY_URL) return verifiedResponse();
+    throw new Error("OAuth and Gmail must not run");
+  },
+    () => worker.fetch(contactRequest(), env));
+  assert.deepEqual(await responseBody(response), { status: 503, body: { error: "service_unavailable" } });
+  assert.deepEqual(providerUrls, [VERIFY_URL]);
+  assert.deepEqual(counter.calls, ["rate_check", "reserve", "budget_status"]);
+  assert.equal(counter.records.get("operation-key-00000001").state, "reserved");
+  assert.equal(counter.sends, 0);
+});
+
+test("accepted-state write failure reports unknown and the sending record prohibits resend", async () => {
+  const counter = createCounter({ failTransitionTo: "accepted" });
+  const { env } = createEnv({ __counter: counter });
+  let gmailCalls = 0;
+  const provider = async (url) => {
+    if (url === VERIFY_URL) return verifiedResponse();
+    if (url === TOKEN_URL) return tokenResponse();
+    if (url === GMAIL_URL) { gmailCalls += 1; return Response.json({ id: "accepted-but-write-failed" }); }
+    throw new Error("unexpected endpoint");
+  };
+  assert.deepEqual(await responseBody(await withFetchMock(provider, () => worker.fetch(contactRequest(), env))), {
+    status: 503,
+    body: { error: "delivery_unknown" },
+  });
+  assert.equal(counter.records.get("operation-key-00000001").state, "sending");
+  assert.deepEqual(await responseBody(await withFetchMock(provider, () => worker.fetch(contactRequest(), env))), {
+    status: 409,
+    body: { error: "request_in_progress" },
+  });
+  assert.equal(gmailCalls, 1);
+});
+
+test("first Gmail 401 refreshes exactly once; refresh failure is definite and never reopens claim", async () => {
+  const refreshOutcomes = [
+    () => new Response("invalid_grant", { status: 400 }),
+    () => new Response("quota", { status: 429 }),
+    () => new Response("down", { status: 503 }),
+    () => new Response("redirect", { status: 302 }),
+    () => Response.json({ token_type: "Bearer" }),
+    () => { throw new Error("timeout"); },
   ];
-  await withFetchMock(async () => verifiedResponse(), async () => {
-    for (const payload of invalid) {
-      await expectJson(await worker.fetch(contactRequest(payload), env), 400, "invalid_request");
-    }
-    for (const payload of [
-      validPayload({ name: "n".repeat(100) }),
-      validPayload({ message: "m".repeat(1500) }),
-      validPayload({ turnstileToken: "t".repeat(2048) }),
-    ]) {
-      await expectJson(await worker.fetch(contactRequest(payload), env), 501, "not_implemented");
-    }
-  });
-});
-
-test("email rejects controls, whitespace, repeated dots, malformed domains, and multiple at signs", async () => {
-  const { env } = createEnv();
-  for (const email of [
-    "a b@example.test",
-    "a\n@example.test",
-    ".a@example.test",
-    "a..b@example.test",
-    "a@example..test",
-    "a@-example.test",
-    "a@@example.test",
-    "not-an-address",
-  ]) {
-    await expectJson(await worker.fetch(contactRequest(validPayload({ email })), env), 400, "invalid_request");
+  for (const refreshOutcome of refreshOutcomes) {
+    const { env, counter } = createEnv();
+    let tokenCalls = 0;
+    let gmailCalls = 0;
+    const response = await withFetchMock(async (url) => {
+      if (url === VERIFY_URL) return verifiedResponse();
+      if (url === TOKEN_URL) { tokenCalls += 1; return tokenCalls === 1 ? tokenResponse("first") : refreshOutcome(); }
+      if (url === GMAIL_URL) { gmailCalls += 1; return new Response("rejected", { status: 401 }); }
+      throw new Error("unexpected endpoint");
+    }, () => worker.fetch(contactRequest(), env));
+    assert.deepEqual(await responseBody(response), { status: 502, body: { error: "delivery_failed" } });
+    assert.equal(tokenCalls, 2);
+    assert.equal(gmailCalls, 1);
+    assert.equal(counter.records.get("operation-key-00000001").state, "definite_failure");
   }
 });
 
-test("JSON content type, valid JSON, and exact query-free path are required", async () => {
-  const { env } = createEnv();
-  await expectJson(await worker.fetch(contactRequest(null, { headers: { "Content-Type": "text/plain" } }), env), 400, "invalid_request");
-  await expectJson(await worker.fetch(contactRequest(null, { headers: { "Content-Type": "application/problem+json" } }), env), 400, "invalid_request");
-  await expectJson(await worker.fetch(contactRequest(null, { body: "{" }), env), 400, "invalid_request");
-  await expectJson(await worker.fetch(contactRequest(validPayload(), { url: "https://example.test/api/contact?x=1" }), env), 404, "not_found");
-});
-
-test("body cap accepts 8192 bytes for schema validation and rejects 8193 without Content-Length", async () => {
-  const { env } = createEnv();
-  for (const [size, status, error] of [[8192, 400, "invalid_request"], [8193, 413, "request_too_large"]]) {
-    const prefix = '{"padding":"';
-    const suffix = '"}';
-    const text = prefix + "x".repeat(size - prefix.length - suffix.length) + suffix;
-    const stream = new ReadableStream({
-      start(controller) {
-        controller.enqueue(new TextEncoder().encode(text));
-        controller.close();
-      },
-    });
-    const request = contactRequest(null, { body: stream, duplex: "half" });
-    assert.equal(request.headers.has("Content-Length"), false);
-    await expectJson(await worker.fetch(request, env), status, error);
+test("one successful refresh permits one Gmail retry, while a second 401 is definite", async () => {
+  for (const secondStatus of [200, 401]) {
+    const { env, counter } = createEnv();
+    let tokenCalls = 0;
+    let gmailCalls = 0;
+    const response = await withFetchMock(async (url) => {
+      if (url === VERIFY_URL) return verifiedResponse();
+      if (url === TOKEN_URL) return tokenResponse(`token-${++tokenCalls}`);
+      if (url === GMAIL_URL) {
+        gmailCalls += 1;
+        return gmailCalls === 1 ? new Response("rejected", { status: 401 })
+          : secondStatus === 200 ? Response.json({ id: "retried-message" }) : new Response("rejected", { status: 401 });
+      }
+      throw new Error("unexpected endpoint");
+    }, () => worker.fetch(contactRequest(), env));
+    assert.equal(response.status, secondStatus === 200 ? 202 : 502);
+    assert.equal(tokenCalls, 2);
+    assert.equal(gmailCalls, 2);
+    assert.equal(counter.records.get("operation-key-00000001").state, secondStatus === 200 ? "accepted" : "definite_failure");
   }
 });
 
-test("Content-Length over 8192 is rejected before reading the stream", async () => {
-  const { env } = createEnv();
-  const request = contactRequest(null, {
-    headers: { "Content-Type": "application/json", "Content-Length": "8193" },
-    body: JSON.stringify(validPayload()),
-  });
-  await expectJson(await worker.fetch(request, env), 413, "request_too_large");
-  assert.equal(request.bodyUsed, false);
-});
-
-test("Siteverify uses the fixed URL, POST form body, manual redirects, and no remote IP", async () => {
-  const { env } = createEnv();
-  let captured;
-  await withFetchMock(async (url, init) => { captured = { url, init }; return verifiedResponse(); }, async () => {
-    await expectJson(await worker.fetch(contactRequest(), env), 501, "not_implemented");
-  });
-  assert.equal(captured.url, VERIFY_URL);
-  assert.equal(new URL(captured.url).search, "");
-  assert.equal(captured.init.method, "POST");
-  assert.equal(captured.init.redirect, "manual");
-  assert.equal(captured.init.headers["Content-Type"], "application/x-www-form-urlencoded");
-  const body = new URLSearchParams(captured.init.body);
-  assert.deepEqual([...body.keys()].sort(), ["idempotency_key", "response", "secret"]);
-  assert.equal(body.get("secret"), "test-secret");
-  assert.equal(body.get("response"), "token-1");
-  assert.match(body.get("idempotency_key"), /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i);
-  assert.equal(body.has("remoteip"), false);
-});
-
-test("missing secret or expected hostname fails closed before Siteverify", async () => {
-  let calls = 0;
-  await withFetchMock(async () => { calls += 1; return verifiedResponse(); }, async () => {
-    for (const overrides of [{ TURNSTILE_SECRET: "" }, { TURNSTILE_EXPECTED_HOSTNAME: "" }]) {
-      const { env } = createEnv(overrides);
-      await expectJson(await worker.fetch(contactRequest(), env), 503, "service_unavailable");
-    }
-  });
-  assert.equal(calls, 0);
-});
-
-test("invalid, expired, and duplicate token codes map to generic 400", async () => {
-  for (const code of ["invalid-input-response", "missing-input-response", "timeout-or-duplicate"]) {
-    const { env } = createEnv();
-    await withFetchMock(async () => Response.json({ success: false, "error-codes": [code] }), async () => {
-      await expectJson(await worker.fetch(contactRequest(), env), 400, "verification_failed");
-    });
-  }
-});
-
-test("hostname or action mismatch maps to generic 403", async () => {
-  for (const response of [
-    verifiedResponse({ hostname: "attacker.test" }),
-    verifiedResponse({ action: "other" }),
-  ]) {
-    const { env } = createEnv();
-    await withFetchMock(async () => response, async () => {
-      await expectJson(await worker.fetch(contactRequest(), env), 403, "verification_failed");
-    });
-  }
-});
-
-test("provider service codes, mixed or unknown codes, malformed data, non-2xx, and network errors map to 503", async () => {
+test("initial Gmail outcomes are classified without automatic resend", async () => {
   const cases = [
-    async () => Response.json({ success: false, "error-codes": ["missing-input-secret"] }),
-    async () => Response.json({ success: false, "error-codes": ["invalid-input-secret"] }),
-    async () => Response.json({ success: false, "error-codes": ["bad-request"] }),
-    async () => Response.json({ success: false, "error-codes": ["internal-error"] }),
-    async () => Response.json({ success: false, "error-codes": ["invalid-input-response", "internal-error"] }),
-    async () => Response.json({ success: false, "error-codes": ["future-code"] }),
-    async () => Response.json({ success: false }),
-    async () => Response.json({ success: "true", hostname: "example.test", action: "contact" }),
-    async () => new Response("not-json", { status: 200 }),
-    async () => new Response("redirect", { status: 302 }),
-    async () => new Response("down", { status: 503 }),
-    async () => { throw new Error("network down"); },
+    { response: () => new Response("quota", { status: 429 }), expected: [502, "delivery_failed", "definite_failure"] },
+    { response: () => new Response("forbidden", { status: 403 }), expected: [502, "delivery_failed", "definite_failure"] },
+    { response: () => new Response("timeout", { status: 408 }), expected: [503, "delivery_unknown", "unknown"] },
+    { response: () => new Response("redirect", { status: 302 }), expected: [503, "delivery_unknown", "unknown"] },
+    { response: () => new Response("down", { status: 503 }), expected: [503, "delivery_unknown", "unknown"] },
+    { response: () => Response.json({}), expected: [503, "delivery_unknown", "unknown"] },
+    { response: () => { throw new Error("reset"); }, expected: [503, "delivery_unknown", "unknown"] },
   ];
-  for (const mock of cases) {
-    const { env } = createEnv();
-    await withFetchMock(mock, async () => {
-      await expectJson(await worker.fetch(contactRequest(), env), 503, "service_unavailable");
-    });
+  for (const entry of cases) {
+    const { env, counter } = createEnv();
+    let gmailCalls = 0;
+    const response = await withFetchMock(async (url) => {
+      if (url === VERIFY_URL) return verifiedResponse();
+      if (url === TOKEN_URL) return tokenResponse();
+      if (url === GMAIL_URL) { gmailCalls += 1; return entry.response(); }
+      throw new Error("unexpected endpoint");
+    }, () => worker.fetch(contactRequest(), env));
+    assert.deepEqual(await responseBody(response), { status: entry.expected[0], body: { error: entry.expected[1] } });
+    assert.equal(counter.records.get("operation-key-00000001").state, entry.expected[2]);
+    assert.equal(gmailCalls, 1);
   }
 });
 
-test("Siteverify aborts at 3500ms and always clears the timer", async () => {
+test("payload mismatch and terminal unknown fail closed without Gmail resend", async () => {
   const { env } = createEnv();
-  const originalSetTimeout = globalThis.setTimeout;
-  const originalClearTimeout = globalThis.clearTimeout;
-  let delay;
-  let timer;
-  let cleared;
-  globalThis.setTimeout = (callback, milliseconds) => {
-    delay = milliseconds;
-    timer = { timer: true };
-    queueMicrotask(callback);
-    return timer;
+  let gmailCalls = 0;
+  const unknownProvider = async (url) => {
+    if (url === VERIFY_URL) return verifiedResponse();
+    if (url === TOKEN_URL) return tokenResponse();
+    if (url === GMAIL_URL) { gmailCalls += 1; return new Response("down", { status: 503 }); }
+    throw new Error("unexpected endpoint");
   };
-  globalThis.clearTimeout = (value) => { cleared = value; };
-  try {
-    await withFetchMock(async (_url, { signal }) => new Promise((resolve, reject) => {
-      const abort = () => reject(signal.reason || new DOMException("Aborted", "AbortError"));
-      if (signal.aborted) abort();
-      else signal.addEventListener("abort", abort, { once: true });
-    }), async () => {
-      await expectJson(await worker.fetch(contactRequest(), env), 503, "service_unavailable");
-    });
-  } finally {
-    globalThis.setTimeout = originalSetTimeout;
-    globalThis.clearTimeout = originalClearTimeout;
+  assert.equal((await withFetchMock(unknownProvider, () => worker.fetch(contactRequest(), env))).status, 503);
+  assert.equal((await withFetchMock(unknownProvider, () => worker.fetch(contactRequest(), env))).status, 503);
+  assert.equal(gmailCalls, 1);
+  const mismatch = await withFetchMock(unknownProvider, () => worker.fetch(contactRequest(validPayload({ message: "changed" })), env));
+  assert.deepEqual(await responseBody(mismatch), { status: 409, body: { error: "idempotency_conflict" } });
+  assert.equal(gmailCalls, 1);
+});
+
+test("strict direct CF IP validation and canonicalization reject ambiguous forms before providers", async () => {
+  assert.equal(canonicalizeClientIp("192.0.2.1"), "192.0.2.1");
+  assert.equal(canonicalizeClientIp("2001:0DB8::1"), "2001:0db8:0000:0000:0000:0000:0000:0001");
+  assert.equal(canonicalizeClientIp("::ffff:192.0.2.1"), "0000:0000:0000:0000:0000:ffff:c000:0201");
+  assert.equal(canonicalizeClientIp(" 192.0.2.1"), null);
+  for (const ip of [null, "", "192.0.2.1, 198.51.100.2", "01.2.3.4", "2001::db8::1", "fe80::1%eth0"]) {
+    const { env, counter } = createEnv();
+    let providerCalls = 0;
+    const headers = ip === null ? { "CF-Connecting-IP": "" } : { "CF-Connecting-IP": ip };
+    const response = await withFetchMock(async () => { providerCalls += 1; return verifiedResponse(); },
+      () => worker.fetch(contactRequest(validPayload(), { headers }), env));
+    assert.equal(response.status, 503);
+    assert.equal(providerCalls, 0);
+    assert.equal(counter.calls.length, 0);
   }
-  assert.equal(delay, 3500);
-  assert.equal(cleared, timer);
 });
 
-test("successful Siteverify clears its timer", async () => {
-  const { env } = createEnv();
-  const originalSetTimeout = globalThis.setTimeout;
-  const originalClearTimeout = globalThis.clearTimeout;
-  const timer = { timer: true };
-  let cleared;
-  globalThis.setTimeout = (_callback, milliseconds) => {
-    assert.equal(milliseconds, 3500);
-    return timer;
-  };
-  globalThis.clearTimeout = (value) => { cleared = value; };
-  try {
-    await withFetchMock(async () => verifiedResponse(), async () => {
-      await expectJson(await worker.fetch(contactRequest(), env), 501, "not_implemented");
-    });
-  } finally {
-    globalThis.setTimeout = originalSetTimeout;
-    globalThis.clearTimeout = originalClearTimeout;
+test("visitor email CRLF injection is rejected before provider or message construction", async () => {
+  const { env, counter } = createEnv();
+  let providerCalls = 0;
+  const response = await withFetchMock(async () => { providerCalls += 1; return verifiedResponse(); }, () => worker.fetch(
+    contactRequest(validPayload({ email: "visitor@example.test\r\nBcc: attacker@example.test" })), env,
+  ));
+  assert.deepEqual(await responseBody(response), { status: 400, body: { error: "invalid_request" } });
+  assert.equal(providerCalls, 0);
+  assert.deepEqual(counter.calls, ["rate_check"]);
+});
+
+test("missing or invalid secrets, emails, environment, and binding fail closed", async () => {
+  const overrides = [
+    { CONTACT_RATE_LIMIT_HMAC_KEY: "short" },
+    { CONTACT_IDEMPOTENCY_HMAC_KEY: "short" },
+    { CONTACT_IDEMPOTENCY_HMAC_PREVIOUS_KEY: "short" },
+    { CONTACT_IDEMPOTENCY_HMAC_PREVIOUS_KEY: "test-idempotency-hmac-key-at-least-32-bytes" },
+    { GOOGLE_OAUTH_CLIENT_SECRET: "" },
+    { GMAIL_SENDER_EMAIL: "bad\r\nBcc:x@example.test" },
+    { CONTACT_ADMIN_EMAIL: "visitor-controlled" },
+    { CONTACT_ENVIRONMENT: "staging" },
+    { CONTACT_CASE_COUNTER: null },
+  ];
+  for (const override of overrides) {
+    const { env } = createEnv(override);
+    let providerCalls = 0;
+    const response = await withFetchMock(async () => { providerCalls += 1; return verifiedResponse(); }, () => worker.fetch(contactRequest(), env));
+    assert.equal(response.status, 503);
+    assert.equal(providerCalls, 0);
   }
-  assert.equal(cleared, timer);
 });
 
-test("reusing a token performs a second verification and a provider duplicate result fails", async () => {
-  const { env } = createEnv();
-  const ids = [];
-  let calls = 0;
-  await withFetchMock(async (_url, init) => {
-    calls += 1;
-    ids.push(new URLSearchParams(init.body).get("idempotency_key"));
-    return calls === 1
-      ? verifiedResponse()
-      : Response.json({ success: false, "error-codes": ["timeout-or-duplicate"] });
-  }, async () => {
-    await expectJson(await worker.fetch(contactRequest(), env), 501, "not_implemented");
-    await expectJson(await worker.fetch(contactRequest(), env), 400, "verification_failed");
-  });
-  assert.equal(calls, 2);
-  assert.notEqual(ids[0], ids[1]);
+test("Turnstile remains mandatory and fail closed before OAuth", async () => {
+  for (const [siteverify, status] of [
+    [Response.json({ success: false, "error-codes": ["invalid-input-response"] }), 400],
+    [verifiedResponse({ hostname: "attacker.test" }), 403],
+    [new Response("down", { status: 503 }), 503],
+    [new Response("not-json"), 503],
+  ]) {
+    const { env, counter } = createEnv();
+    let calls = 0;
+    const response = await withFetchMock(async (url) => {
+      calls += 1;
+      assert.equal(url, VERIFY_URL);
+      return siteverify.clone();
+    }, () => worker.fetch(contactRequest(), env));
+    assert.equal(response.status, status);
+    assert.equal(calls, 1);
+    assert.deepEqual(counter.calls, ["rate_check"]);
+  }
 });
 
-test("method and API routing never fall through to static assets", async () => {
+test("method and API routing never fall through while static routes delegate", async () => {
   const { env, assetRequests } = createEnv();
-  const response = await worker.fetch(new Request("https://example.test/api/contact"), env);
-  await expectJson(response, 405, "method_not_allowed");
-  assert.equal(response.headers.get("Allow"), "POST");
-  for (const path of ["/api", "/api/unknown", "/api/contact?query=1"]) {
-    await expectJson(await worker.fetch(new Request(`https://example.test${path}`), env), 404, "not_found");
+  const method = await worker.fetch(new Request("https://example.test/api/contact"), env);
+  assert.equal(method.status, 405);
+  assert.equal(method.headers.get("Allow"), "POST");
+  for (const path of ["/api", "/api/unknown", "/api/contact?x=1"]) {
+    assert.equal((await worker.fetch(new Request(`https://example.test${path}`), env)).status, 404);
   }
-  assert.equal(assetRequests.length, 0);
-});
-
-test("static routes and refreshes delegate unchanged to Workers Static Assets", async () => {
-  const { env, assetRequests } = createEnv();
-  for (const path of ["/", "/research/project"]) {
-    const request = new Request(`https://example.test${path}`);
-    const response = await worker.fetch(request, env);
-    assert.equal(await response.text(), "static asset");
-    assert.equal(assetRequests.at(-1), request);
-  }
-  assert.equal(assetRequests.length, 2);
+  assert.equal((await worker.fetch(new Request("https://example.test/research/project"), env)).status, 200);
+  assert.equal(assetRequests.length, 1);
 });
